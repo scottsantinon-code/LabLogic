@@ -1886,6 +1886,1176 @@
       );
     }
 
+    // ========== IRON STUDIES MODULE ==========
+
+    function IronModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const [hasInflammation, setHasInflammation] = useState(null);
+      const [clinicalContext, setClinicalContext] = useState(null);
+      const [ferritin, setFerritin] = useState('');
+      const [ferritinResult, setFerritinResult] = useState(null);
+      const [serumIron, setSerumIron] = useState('');
+      const [transferrin, setTransferrin] = useState('');
+      const [tsat, setTsat] = useState('');
+      const [tsatResult, setTsatResult] = useState(null);
+      const [showMgmt, setShowMgmt] = useState(false);
+
+      const steps = [
+        { label: 'Context', color: 'var(--red)' },
+        { label: 'Ferritin', color: 'var(--red)' },
+        { label: 'TSAT', color: 'var(--red)' },
+        { label: 'Result', color: 'var(--red)' }
+      ];
+
+      const scrollToTop = () => {
+        if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const goToStep = (s) => { setStep(s); scrollToTop(); };
+
+      const handleBack = () => {
+        if (showMgmt) setShowMgmt(false);
+        else if (step === 0) onBack();
+        else goToStep(step - 1);
+      };
+
+      // Calculate TSAT from iron and transferrin
+      const calcTsat = () => {
+        const iron = parseFloat(serumIron);
+        const tf = parseFloat(transferrin);
+        if (!isNaN(iron) && !isNaN(tf) && tf > 0) {
+          return ((iron / (tf * 25)) * 100).toFixed(1);
+        }
+        return null;
+      };
+
+      const effectiveTsat = tsat || calcTsat();
+
+      const getInflammationDisplay = () => ({
+        value: hasInflammation ? 'Present' : 'Absent',
+        interpretation: hasInflammation ? 'Adjusted thresholds apply' : 'Standard thresholds',
+        color: hasInflammation ? 'var(--orange)' : 'var(--green)'
+      });
+
+      const getFerritinDisplay = () => {
+        const labels = { veryLow: '< 15', lowNormal: '15–100', normal: '30–300', high: '> 300', veryHigh: '> 1000' };
+        const colors = { veryLow: 'var(--red)', lowNormal: 'var(--orange)', normal: 'var(--green)', high: 'var(--orange)', veryHigh: 'var(--red)' };
+        return { value: ferritin ? `${ferritin} µg/L` : labels[ferritinResult] || '', interpretation: ferritinResult === 'veryLow' ? 'Absolute iron deficiency' : ferritinResult === 'veryHigh' ? 'Urgent evaluation needed' : ferritinResult === 'high' ? 'Elevated' : ferritinResult === 'normal' ? 'Normal range' : 'Low-normal', color: colors[ferritinResult] || 'var(--blue)' };
+      };
+
+      const getTsatDisplay = () => {
+        if (tsatResult === 'low') return { value: effectiveTsat ? `${effectiveTsat}%` : '< 16%', interpretation: 'Low — iron deficient erythropoiesis', color: 'var(--red)' };
+        if (tsatResult === 'high') return { value: effectiveTsat ? `${effectiveTsat}%` : '> 45%', interpretation: 'High — iron overload', color: 'var(--orange)' };
+        return { value: effectiveTsat ? `${effectiveTsat}%` : '16–45%', interpretation: 'Normal', color: 'var(--green)' };
+      };
+
+      // Management screen
+      if (showMgmt) {
+        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e('div', { className: 'screen-content' },
+            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Iron Deficiency')
+            ),
+            e(MgmtStep, { number: 1, title: 'Oral Iron', color: 'var(--red)' },
+              e('span', null, e('strong', null, 'Ferrous sulfate 325mg daily'), ' (65mg elemental iron) on empty stomach. ', e('strong', null, 'Alternate day dosing'), ' may improve absorption — hepcidin rises after a dose, reducing next-day absorption.', e('br'), 'Expect Hb rise of ~10 g/L per week if responding. Continue 3–6 months after Hb normalises to replenish stores.', e('br'), 'Side effects: nausea, constipation, black stools — major adherence barrier.')
+            ),
+            e(MgmtStep, { number: 2, title: 'IV Iron', color: 'var(--red)' },
+              e('span', null, e('strong', null, 'Preferred if:'), ' oral intolerance, malabsorption, ongoing losses exceeding oral replacement, CKD, heart failure, pre-operative urgency, active IBD.', e('br'), e('strong', null, 'Ferric carboxymaltose (Ferinject):'), ' 15–20 mg/kg (max 1000 mg per infusion), can repeat at 1 week.', e('br'), e('strong', null, 'Iron polymaltose (Ferrum H):'), ' slower infusion, lower risk of hypophosphataemia.')
+            ),
+            e(WarningBanner, null, e('strong', null, 'Ferric carboxymaltose can cause hypophosphataemia'), ' — check phosphate at 2 weeks, especially if repeat dosing.'),
+            e(MgmtStep, { number: 3, title: 'Transfusion', color: 'var(--red)' }, 'Reserve for haemodynamic instability or active severe bleeding. Iron deficiency alone is almost never an indication for transfusion.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local laboratory\'s reference ranges.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          )
+        );
+      }
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'Iron Studies', onBack: handleBack }),
+        e('div', { className: 'screen-content' },
+          e(StepTrail, { steps, current: step }),
+
+          // STEP 0: Clinical Context
+          step === 0 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Clinical Context'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Inflammation fundamentally changes iron study interpretation')
+            ),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Is there active inflammation?'),
+            e(ChoiceButton, { label: 'Yes — CRP elevated, active infection/inflammation', sublabel: 'Ferritin thresholds adjusted upward', selected: hasInflammation === true, onClick: () => setHasInflammation(true), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'No — stable outpatient', sublabel: 'Standard ferritin thresholds apply', selected: hasInflammation === false, onClick: () => setHasInflammation(false), color: 'var(--green)' }),
+            hasInflammation === true && e(WarningBanner, null, e('strong', null, 'Ferritin is an acute phase reactant.'), ' It rises with inflammation independently of iron stores. A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated. Higher thresholds apply.'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '20px', marginBottom: '12px' } }, 'Specific clinical context?'),
+            e(ChoiceButton, { label: 'CKD or haemodialysis', sublabel: 'Ferritin <200 with TSAT <20% suggests iron deficiency', selected: clinicalContext === 'ckd', onClick: () => setClinicalContext('ckd'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Heart failure', sublabel: 'Ferritin <100, or 100–300 with TSAT <20%', selected: clinicalContext === 'heartFailure', onClick: () => setClinicalContext('heartFailure'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'None of the above', sublabel: 'Standard thresholds', selected: clinicalContext === 'none', onClick: () => setClinicalContext('none'), color: 'var(--blue)' }),
+            e(InfoPanel, { title: 'Why Ferritin Is Unreliable in Inflammation', color: 'var(--red)' },
+              e('p', { style: { marginBottom: '10px' } }, 'Ferritin synthesis is upregulated by inflammatory cytokines (IL-1, IL-6, TNF-α) independently of iron status. This is part of the innate immune response — the body sequesters iron to deprive bacteria of this essential nutrient (\'nutritional immunity\').'),
+              e('p', { style: { marginBottom: '10px' } }, 'Hepcidin — the master iron regulatory hormone — is also upregulated by inflammation, blocking intestinal iron absorption and trapping iron in macrophages.'),
+              e('p', null, 'Result: serum iron ↓, ferritin ↑, transferrin ↓ — even if total body iron stores are depleted.')
+            ),
+            e(PrimaryButton, { label: 'Next → Ferritin', disabled: hasInflammation === null || clinicalContext === null, color: 'var(--red)', onClick: () => goToStep(1) })
+          ),
+
+          // STEP 1: Ferritin
+          step === 1 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Ferritin'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'The starting point — but interpret with context')
+            ),
+            e(BranchCard, { label: 'Inflammation', ...getInflammationDisplay() }),
+            e(ValueInput, { label: 'Ferritin', unit: 'µg/L', value: ferritin, onChange: setFerritin, placeholder: 'Enter value' }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Select ferritin interpretation'),
+            e(ChoiceButton, { label: 'Very low  ‹ 15 (F) / ‹ 30 (M)', sublabel: 'Absolute iron deficiency — diagnostic regardless of other values', selected: ferritinResult === 'veryLow', onClick: () => setFerritinResult('veryLow'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Low-normal  15–100', sublabel: 'Iron deficiency possible, especially with inflammation', selected: ferritinResult === 'lowNormal', onClick: () => setFerritinResult('lowNormal'), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'Normal  30–300', sublabel: 'Stores probably adequate BUT may be masked by inflammation', selected: ferritinResult === 'normal', onClick: () => setFerritinResult('normal'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'High  › 300', sublabel: 'Iron overload OR acute phase response OR liver disease', selected: ferritinResult === 'high', onClick: () => setFerritinResult('high'), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'Very high  › 1000', sublabel: 'Iron overload, malignancy, liver necrosis, HLH, Still\'s disease', selected: ferritinResult === 'veryHigh', onClick: () => setFerritinResult('veryHigh'), color: 'var(--red)' }),
+            ferritinResult === 'veryLow' && e('div', { style: { marginTop: '16px' } },
+              e(ResultCard, { title: 'Absolute Iron Deficiency', severity: 'likely', tags: ['Diagnostic', 'Investigate cause'] }, 'Ferritin this low is diagnostic of iron deficiency regardless of other iron study values or inflammatory markers.'),
+              e(WarningBanner, null, 'Iron deficiency is a diagnosis that demands an explanation, not an endpoint. All males and post-menopausal females require GI investigation (upper + lower endoscopy). Check coeliac serology in all cases.'),
+              e(PrimaryButton, { label: 'View Management', color: 'var(--red)', onClick: () => { goToStep(3); setShowMgmt(true); } }),
+              e(PrimaryButton, { label: 'Check TSAT anyway', color: 'var(--label3)', onClick: () => goToStep(2) })
+            ),
+            ferritinResult === 'veryHigh' && e(WarningBanner, null, 'Ferritin >1000 µg/L requires urgent evaluation. Consider: massive iron overload (haemochromatosis, transfusional), hepatic necrosis, haemophagocytic lymphohistiocytosis (HLH), adult-onset Still\'s disease, malignancy.'),
+            ferritinResult && ferritinResult !== 'veryLow' && e(PrimaryButton, { label: 'Next → TSAT', color: 'var(--red)', onClick: () => goToStep(2) })
+          ),
+
+          // STEP 2: TSAT
+          step === 2 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Transferrin Saturation'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'TSAT is the most reliable discriminator when ferritin is unreliable')
+            ),
+            e(BranchCard, { label: 'Inflammation', ...getInflammationDisplay() }),
+            e(BranchCard, { label: 'Ferritin', ...getFerritinDisplay() }),
+            e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '16px' } },
+              e('div', { style: { fontSize: '13px', color: 'var(--label3)', marginBottom: '12px' } }, 'Enter TSAT directly, OR calculate from iron + transferrin:'),
+              e(ValueInput, { label: 'TSAT', unit: '%', value: tsat, onChange: setTsat, placeholder: '16–45', hint: 'Normal: 16–45%' }),
+              e('div', { style: { textAlign: 'center', fontSize: '12px', color: 'var(--label3)', margin: '8px 0' } }, '— OR calculate —'),
+              e(ValueInput, { label: 'Serum Iron', unit: 'µmol/L', value: serumIron, onChange: setSerumIron, placeholder: '10–30' }),
+              e(ValueInput, { label: 'Transferrin', unit: 'g/L', value: transferrin, onChange: setTransferrin, placeholder: '1.7–3.4' }),
+              calcTsat() && !tsat && e('div', { style: { fontSize: '13px', color: 'var(--green)', fontWeight: 600 } }, `Calculated: ${calcTsat()}%`)
+            ),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'TSAT interpretation'),
+            e(ChoiceButton, { label: 'Low  ‹ 16%', sublabel: 'Iron deficient erythropoiesis — insufficient iron delivery to marrow', selected: tsatResult === 'low', onClick: () => setTsatResult('low'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Normal  16–45%', sublabel: 'Adequate iron supply', selected: tsatResult === 'normal', onClick: () => setTsatResult('normal'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'High  › 45%', sublabel: 'Iron overload — excess unbound iron causing tissue damage', selected: tsatResult === 'high', onClick: () => setTsatResult('high'), color: 'var(--orange)' }),
+            e(PrimaryButton, { label: 'Interpret →', disabled: !tsatResult, color: 'var(--red)', onClick: () => goToStep(3) })
+          ),
+
+          // STEP 3: Results
+          step === 3 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Pattern recognition')
+            ),
+            e(BranchCard, { label: 'Inflammation', ...getInflammationDisplay() }),
+            e(BranchCard, { label: 'Ferritin', ...getFerritinDisplay() }),
+            e(BranchCard, { label: 'TSAT', ...getTsatDisplay() }),
+            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+
+            // Pattern: Ferritin low/low-normal + TSAT low
+            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Iron Deficiency Anaemia', severity: 'likely', tags: ['Classic pattern', 'Investigate cause'] }, 'Low ferritin + low TSAT = straightforward iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport).'),
+              e(WarningBanner, null, e('strong', null, 'Iron deficiency demands investigation.'), ' All males and post-menopausal females require upper + lower GI endoscopy to exclude malignancy. Check coeliac serology (tissue transglutaminase antibody) in all unexplained cases.')
+            ),
+
+            // Pattern: Ferritin normal + TSAT low (with inflammation)
+            ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(React.Fragment, null,
+              e(ResultCard, { title: 'Iron Deficiency Masked by Inflammation', severity: 'likely', tags: ['Ferritin falsely normal', 'TSAT is the giveaway'] }, 'This is the most common diagnostic trap in hospital medicine. Ferritin appears \'normal\' because inflammation has raised it, but low TSAT reveals inadequate iron delivery to the marrow.'),
+              e(InfoPanel, { title: 'The Hardest Call in Iron Studies', color: 'var(--red)' },
+                e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
+                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
+                e('p', null, e('strong', null, 'Pragmatic approach:'), ' If in doubt and the patient is symptomatic, a trial of IV iron is both diagnostic and therapeutic. If Hb rises, they were iron deficient.')
+              )
+            ),
+
+            // Pattern: Ferritin normal + TSAT normal (with inflammation)
+            ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(ResultCard, { title: 'Anaemia of Chronic Disease', severity: 'consider', tags: ['Inflammatory iron sequestration', 'Iron trapped in macrophages'] }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
+
+            // Pattern: Ferritin high + TSAT high
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Iron Overload', severity: 'dangerous', tags: ['Haemochromatosis', 'Transfusional', 'Check HFE genotype'] }, 'Elevated ferritin with TSAT >45% (especially >60%) strongly suggests true iron overload. Check HFE gene (C282Y homozygosity = hereditary haemochromatosis). If transfusion-dependent, consider chelation therapy.'),
+              e(ResultCard, { title: 'Liver Disease', subtitle: 'Can mimic iron overload', severity: 'consider', tags: ['Hepatocyte damage', 'Ferritin leak'] }, 'Damaged hepatocytes leak ferritin into serum. TSAT may be normal or elevated. Check LFTs. Liver disease + iron overload can coexist (e.g. haemochromatosis with cirrhosis).')
+            ),
+
+            // Pattern: Ferritin high + TSAT normal
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'normal' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Acute Phase Response', severity: 'likely', tags: ['Inflammation', 'Liver disease', 'Recheck when stable'] }, 'Elevated ferritin with normal TSAT most likely reflects an acute phase response rather than true iron overload. Recheck when inflammation has resolved.'),
+              e(ResultCard, { title: 'Liver Disease', severity: 'consider', tags: ['Ferritin leak from hepatocytes'] })
+            ),
+
+            // Pattern: Ferritin high + TSAT low
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'low' && e(ResultCard, { title: 'Anaemia of Chronic Disease (severe)', severity: 'consider', tags: ['Hepcidin-mediated', 'Iron trapped'] }, 'High ferritin (inflammation) + low TSAT (no iron reaching marrow). Iron is present in stores but trapped by hepcidin-mediated sequestration.'),
+
+            // Ferritin very high
+            ferritinResult === 'veryHigh' && e(ResultCard, { title: 'Urgent Evaluation Required', severity: 'dangerous', tags: ['HLH', 'Malignancy', 'Hepatic necrosis', 'Still\'s disease'] }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
+
+            // Investigation info for iron deficiency
+            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'When to Scope', color: 'var(--red)' },
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Mandatory GI investigation:'), ' All males, all post-menopausal females with unexplained iron deficiency.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Pre-menopausal females:'), ' Investigate if GI symptoms, family history of GI cancer, or iron deficiency not explained by menstrual losses.'),
+              e('p', null, e('strong', null, 'Coeliac serology'), ' should be checked in all cases of unexplained iron deficiency.')
+            ),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local laboratory\'s reference ranges.'),
+            e('div', { style: { marginTop: '16px' } },
+              (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(PrimaryButton, { label: 'View Management', color: 'var(--red)', onClick: () => setShowMgmt(true) }),
+              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+            )
+          )
+        )
+      );
+    }
+
+    // ========== CALCIUM & PTH MODULE ==========
+
+    function CalciumModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const [useIonised, setUseIonised] = useState(false);
+      const [totalCa, setTotalCa] = useState('');
+      const [albumin, setAlbumin] = useState('');
+      const [ionisedCa, setIonisedCa] = useState('');
+      const [calciumDirection, setCalciumDirection] = useState(null);
+      const [pth, setPth] = useState('');
+      const [pthResult, setPthResult] = useState(null);
+      const [phosphate, setPhosphate] = useState('');
+      const [vitD, setVitD] = useState('');
+      const [magnesium, setMagnesium] = useState('');
+      const [showMgmt, setShowMgmt] = useState(false);
+      const [mgmtType, setMgmtType] = useState(null);
+
+      const steps = [
+        { label: 'Calcium', color: 'var(--orange)' },
+        { label: 'Direction', color: 'var(--orange)' },
+        { label: 'PTH', color: 'var(--orange)' },
+        { label: 'Result', color: 'var(--orange)' }
+      ];
+
+      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
+      const goToStep = (s) => { setStep(s); scrollToTop(); };
+      const handleBack = () => {
+        if (showMgmt) setShowMgmt(false);
+        else if (step === 0) onBack();
+        else goToStep(step - 1);
+      };
+
+      // Corrected calcium calculation
+      const getCorrectedCa = () => {
+        const ca = parseFloat(totalCa);
+        const alb = parseFloat(albumin);
+        if (!isNaN(ca) && !isNaN(alb)) return (ca + 0.02 * (40 - alb)).toFixed(2);
+        return null;
+      };
+
+      // Get effective calcium value
+      const getEffectiveCa = () => {
+        if (useIonised) return parseFloat(ionisedCa);
+        return parseFloat(getCorrectedCa());
+      };
+
+      // Classify calcium
+      const classifyCa = () => {
+        const ca = getEffectiveCa();
+        if (isNaN(ca)) return null;
+        if (useIonised) {
+          if (ca < 1.12) return 'low';
+          if (ca > 1.30) return 'high';
+          return 'normal';
+        } else {
+          if (ca < 2.15) return 'low';
+          if (ca > 2.55) return 'high';
+          return 'normal';
+        }
+      };
+
+      const getSeverity = () => {
+        const ca = getEffectiveCa();
+        if (isNaN(ca)) return null;
+        if (useIonised) {
+          if (ca > 1.50) return { color: 'var(--red)', text: 'Severe / Crisis' };
+          if (ca > 1.40) return { color: 'var(--orange)', text: 'Moderate' };
+          if (ca > 1.30) return { color: 'var(--orange)', text: 'Mild' };
+          if (ca < 0.9) return { color: 'var(--red)', text: 'Severe' };
+          if (ca < 1.12) return { color: 'var(--orange)', text: 'Low' };
+          return { color: 'var(--green)', text: 'Normal' };
+        } else {
+          if (ca > 3.5) return { color: 'var(--red)', text: 'Severe / Crisis — dehydration, renal failure, coma' };
+          if (ca > 3.0) return { color: 'var(--orange)', text: 'Moderate — nausea, polyuria, confusion' };
+          if (ca > 2.55) return { color: 'var(--orange)', text: 'Mild — often asymptomatic' };
+          if (ca < 1.8) return { color: 'var(--red)', text: 'Severe' };
+          if (ca < 2.15) return { color: 'var(--orange)', text: 'Low' };
+          return { color: 'var(--green)', text: 'Normal' };
+        }
+      };
+
+      const getCaDisplay = () => {
+        const ca = getEffectiveCa();
+        const sev = getSeverity();
+        return { value: useIonised ? `${ionisedCa} mmol/L (ionised)` : `${getCorrectedCa()} mmol/L (corrected)`, interpretation: sev?.text || '', color: sev?.color || 'var(--blue)' };
+      };
+
+      const getPthDisplay = () => {
+        if (calciumDirection === 'high') {
+          if (pthResult === 'high') return { value: pth ? `${pth} pmol/L` : 'High/inappropriately normal', interpretation: 'PTH-mediated', color: 'var(--orange)' };
+          return { value: pth ? `${pth} pmol/L` : 'Low (suppressed)', interpretation: 'PTH-independent', color: 'var(--blue)' };
+        } else {
+          if (pthResult === 'low') return { value: pth ? `${pth} pmol/L` : 'Low/inappropriately normal', interpretation: 'Hypoparathyroidism', color: 'var(--red)' };
+          return { value: pth ? `${pth} pmol/L` : 'High (appropriate)', interpretation: 'Secondary hyperparathyroidism', color: 'var(--orange)' };
+        }
+      };
+
+      // Management screens
+      if (showMgmt) {
+        const isHyperCa = mgmtType === 'hyperCa';
+        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e('div', { className: 'screen-content' },
+            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, isHyperCa ? 'Hypercalcaemia' : 'Hypocalcaemia')
+            ),
+            isHyperCa ? e(React.Fragment, null,
+              e(MgmtStep, { number: 1, title: 'IV Normal Saline', color: 'var(--orange)' }, e('strong', null, '200–300 ml/hr initially.'), ' Most patients are profoundly dehydrated from polyuria. Aim UO 100–150 ml/hr.'),
+              e(MgmtStep, { number: 2, title: 'Zoledronic Acid', color: 'var(--orange)' }, e('span', null, e('strong', null, '4 mg IV over 15 min.'), ' Onset 2–4 days, peak 4–7 days. Most effective for malignant hypercalcaemia.')),
+              e(WarningBanner, null, 'Check renal function. Dose reduce if eGFR 30–60. Avoid if eGFR <30.'),
+              e(MgmtStep, { number: 3, title: 'Calcitonin', color: 'var(--orange)' }, e('strong', null, '4 IU/kg SC/IM q12h.'), ' Rapid onset (hours) but tachyphylaxis within 48h. Bridge until bisphosphonate works.'),
+              e(MgmtStep, { number: 4, title: 'Other Options', color: 'var(--orange)' },
+                e('span', null, e('strong', null, 'Denosumab 120 mg SC'), ' — if refractory to bisphosphonates or renal impairment.', e('br'),
+                  e('strong', null, 'Corticosteroids'), ' (hydrocortisone 200 mg IV then prednisolone 40 mg daily) — for granulomatous disease, lymphoma, vitamin D toxicity, myeloma.', e('br'),
+                  e('strong', null, 'Dialysis'), ' — for life-threatening hypercalcaemia refractory to above.')
+              ),
+              e(WarningBanner, null, e('strong', null, 'Avoid thiazide diuretics'), ' (worsen hypercalcaemia). Loop diuretics (frusemide) ONLY after adequate volume resuscitation.')
+            ) : e(React.Fragment, null,
+              e(MgmtStep, { number: 1, title: 'Acute IV Calcium', color: 'var(--orange)' }, e('strong', null, '10 ml 10% calcium gluconate IV over 10 min'), ' (2.2 mmol Ca per ampoule). Can repeat.'),
+              e(MgmtStep, { number: 2, title: 'Continuous Infusion', color: 'var(--orange)' }, e('strong', null, '100 ml 10% calcium gluconate in 1000 ml 5% dextrose or NaCl 0.9%'), ' at 50 ml/hr. Titrate to ionised calcium.'),
+              e(WarningBanner, null, e('strong', null, 'Do NOT give calcium through the same line as bicarbonate'), ' — precipitates.'),
+              e(MgmtStep, { number: 3, title: 'Correct Magnesium', color: 'var(--orange)' }, e('strong', null, '10–20 mmol MgSO₄ IV over 20 min'), ' then infusion. Calcium will not correct until Mg is replaced.'),
+              e(MgmtStep, { number: 4, title: 'Cardiac Monitoring', color: 'var(--orange)' }, 'If ionised Ca <0.8 mmol/L — risk of arrhythmia.'),
+              e(MgmtStep, { number: 5, title: 'Chronic Replacement', color: 'var(--orange)' },
+                e('span', null, e('strong', null, 'Calcium supplements:'), ' calcium carbonate 500–1000 mg elemental BD–TDS with food.', e('br'),
+                  e('strong', null, 'Vitamin D:'), ' cholecalciferol 1000–4000 IU daily. Calcitriol 0.25–0.5 mcg BD if renal impairment or hypoparathyroidism.')
+              )
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          )
+        );
+      }
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'Calcium & PTH', onBack: handleBack }),
+        e('div', { className: 'screen-content' },
+          e(StepTrail, { steps, current: step }),
+
+          // STEP 0: Calcium Input
+          step === 0 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Calcium'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Enter total calcium + albumin for correction, OR ionised calcium directly')
+            ),
+            // Tab selector
+            e('div', { style: { display: 'flex', background: 'var(--sep)', borderRadius: '10px', padding: '3px', marginBottom: '20px' } },
+              e('button', { onClick: () => setUseIonised(false), style: { flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: !useIonised ? 'var(--card)' : 'transparent', fontWeight: 600, fontSize: '14px', cursor: 'pointer', fontFamily: 'var(--font)', color: !useIonised ? 'var(--label)' : 'var(--label3)' } }, 'Total Ca + Albumin'),
+              e('button', { onClick: () => setUseIonised(true), style: { flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: useIonised ? 'var(--card)' : 'transparent', fontWeight: 600, fontSize: '14px', cursor: 'pointer', fontFamily: 'var(--font)', color: useIonised ? 'var(--label)' : 'var(--label3)' } }, 'Ionised Ca')
+            ),
+            !useIonised ? e(React.Fragment, null,
+              e(ValueInput, { label: 'Total Calcium', unit: 'mmol/L', value: totalCa, onChange: setTotalCa, placeholder: '2.15–2.55', hint: 'Normal: 2.15–2.55' }),
+              e(ValueInput, { label: 'Albumin', unit: 'g/L', value: albumin, onChange: setAlbumin, placeholder: '35–50', hint: 'Normal: 35–50' }),
+              getCorrectedCa() && e(BranchCard, { label: 'Corrected Calcium', value: `${getCorrectedCa()} mmol/L`, interpretation: getSeverity()?.text || '', color: getSeverity()?.color || 'var(--blue)' }),
+              e(InfoPanel, { title: 'Why Correct for Albumin?', color: 'var(--orange)' },
+                e('p', null, '~40% of total serum calcium is bound to albumin. In hypoalbuminaemia (common in hospital patients), total calcium is artificially low even if ionised (free) calcium is normal. The correction estimates what total calcium would be if albumin were normal. It\'s imperfect — ionised calcium is always more reliable.')
+              )
+            ) : e(React.Fragment, null,
+              e(ValueInput, { label: 'Ionised Calcium', unit: 'mmol/L', value: ionisedCa, onChange: setIonisedCa, placeholder: '1.12–1.30', hint: 'Normal: 1.12–1.30' }),
+              e('div', { style: { fontSize: '13px', color: 'var(--label3)', marginBottom: '16px' } }, 'Ionised calcium is the physiologically active fraction. Not affected by albumin.'),
+              ionisedCa && e(BranchCard, { label: 'Ionised Calcium', value: `${ionisedCa} mmol/L`, interpretation: getSeverity()?.text || '', color: getSeverity()?.color || 'var(--blue)' })
+            ),
+            e(PrimaryButton, { label: 'Next →', disabled: useIonised ? !ionisedCa : (!totalCa || !albumin), color: 'var(--orange)', onClick: () => { const dir = classifyCa(); setCalciumDirection(dir); goToStep(dir === 'normal' ? 1 : 2); } })
+          ),
+
+          // STEP 1: Direction (for normal calcium)
+          step === 1 && calciumDirection === 'normal' && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Calcium Normal')
+            ),
+            e(BranchCard, { label: 'Calcium', ...getCaDisplay() }),
+            e(ResultCard, { title: 'Normal Calcium', severity: 'likely', tags: ['No further workup needed'] }, 'Calcium is within normal range — no further algorithmic interpretation needed.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          ),
+
+          // STEP 2: PTH
+          step === 2 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, calciumDirection === 'high' ? 'Hypercalcaemia' : 'Hypocalcaemia'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, calciumDirection === 'high' ? 'PTH is THE key branch point' : 'PTH tells us whether parathyroids are responding')
+            ),
+            e(BranchCard, { label: 'Calcium', ...getCaDisplay() }),
+            calciumDirection === 'high' && getEffectiveCa() > 3.0 && e(WarningBanner, null, 'Calcium >3.0 mmol/L requires urgent treatment. Start IV saline immediately.'),
+            calciumDirection === 'low' && e(WarningBanner, null, e('strong', null, 'Always check magnesium.'), ' Hypomagnesaemia causes functional hypoparathyroidism AND end-organ resistance to PTH. Calcium will not correct until magnesium is replaced.'),
+            e(ValueInput, { label: 'PTH', unit: 'pmol/L', value: pth, onChange: setPth, placeholder: '1.6–6.9', hint: 'Normal: 1.6–6.9' }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'PTH interpretation'),
+            calciumDirection === 'high' ? e(React.Fragment, null,
+              e(ChoiceButton, { label: 'High or inappropriately normal', sublabel: 'PTH-mediated — parathyroids are driving this', selected: pthResult === 'high', onClick: () => setPthResult('high'), color: 'var(--orange)' }),
+              e(ChoiceButton, { label: 'Low (appropriately suppressed)', sublabel: 'PTH-independent — something else is causing high calcium', selected: pthResult === 'low', onClick: () => setPthResult('low'), color: 'var(--blue)' })
+            ) : e(React.Fragment, null,
+              e(ChoiceButton, { label: 'Low or inappropriately normal', sublabel: 'Hypoparathyroidism — parathyroids not responding', selected: pthResult === 'low', onClick: () => setPthResult('low'), color: 'var(--red)' }),
+              e(ChoiceButton, { label: 'High (appropriate response)', sublabel: 'Secondary hyperparathyroidism — parathyroids trying to compensate', selected: pthResult === 'high', onClick: () => setPthResult('high'), color: 'var(--orange)' })
+            ),
+            e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'Supporting labs (optional)'),
+            e(ValueInput, { label: 'Phosphate', unit: 'mmol/L', value: phosphate, onChange: setPhosphate, placeholder: '0.75–1.50', hint: 'Normal: 0.75–1.50' }),
+            e(ValueInput, { label: '25(OH) Vitamin D', unit: 'nmol/L', value: vitD, onChange: setVitD, placeholder: '>50 adequate', hint: 'Adequate: >50' }),
+            e(ValueInput, { label: 'Magnesium', unit: 'mmol/L', value: magnesium, onChange: setMagnesium, placeholder: '0.70–1.10', hint: 'Normal: 0.70–1.10' }),
+            e(PrimaryButton, { label: 'Interpret →', disabled: !pthResult, color: 'var(--orange)', onClick: () => goToStep(3) })
+          ),
+
+          // STEP 3: Results
+          step === 3 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
+            ),
+            e(BranchCard, { label: 'Calcium', ...getCaDisplay() }),
+            e(BranchCard, { label: 'PTH', ...getPthDisplay() }),
+            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+
+            // HYPERCALCAEMIA + PTH HIGH
+            calciumDirection === 'high' && pthResult === 'high' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Primary Hyperparathyroidism (PHPT)', severity: 'likely', tags: ['Single adenoma ~85%', 'Hyperplasia ~15%', 'Outpatient #1 cause'], onTap: () => { setMgmtType('hyperCa'); setShowMgmt(true); } }, 'Most common cause of hypercalcaemia in outpatients. Classic: ↑Ca, ↑PTH, ↓PO₄. Often incidental finding.'),
+              e(ResultCard, { title: 'Familial Hypocalciuric Hypercalcaemia (FHH)', severity: 'consider', tags: ['Benign', 'Does NOT need surgery', 'Check CCCR'] }, 'Ca-sensing receptor mutation → higher calcium set point. Distinguished from PHPT by low urinary calcium excretion (CCCR <0.01). Important: surgery does NOT fix FHH.'),
+              e(InfoPanel, { title: 'PHPT vs FHH — CCCR Calculator', color: 'var(--orange)' }, e('p', null, 'CCCR = (Urine Ca × Serum Cr) / (Serum Ca × Urine Cr)', e('br'), 'CCCR > 0.02 → PHPT. CCCR < 0.01 → FHH. 0.01–0.02 → indeterminate.')),
+              e(ResultCard, { title: 'Tertiary Hyperparathyroidism', subtitle: 'Post-CKD or post-transplant', severity: 'consider', tags: ['Autonomous PTH'] }),
+              e(ResultCard, { title: 'Lithium Therapy', severity: 'consider', tags: ['Shifts Ca set point'] })
+            ),
+
+            // HYPERCALCAEMIA + PTH LOW
+            calciumDirection === 'high' && pthResult === 'low' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Malignancy', severity: 'dangerous', tags: ['Hospital #1 cause', 'PTHrP', 'Osteolytic mets', 'Lymphoma'], onTap: () => { setMgmtType('hyperCa'); setShowMgmt(true); } }, 'Most common cause in hospitalised patients. Check PTHrP level. Three mechanisms: humoral (PTHrP), osteolytic metastases, calcitriol-mediated (lymphoma).'),
+              e(InfoPanel, { title: 'Malignancy-Associated Hypercalcaemia', color: 'var(--orange)' },
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Humoral (PTHrP):'), ' ~80%. Tumour secretes PTH-related peptide. NOT detected by standard PTH assay. Common: squamous cell, renal cell, breast.'),
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Osteolytic:'), ' Direct bone destruction. Breast, myeloma, lung. Expect ↑ALP.'),
+                e('p', null, e('strong', null, 'Calcitriol-mediated:'), ' Lymphoma produces 1,25(OH)₂D.')
+              ),
+              e(ResultCard, { title: 'Granulomatous Disease', severity: 'consider', tags: ['Sarcoidosis', 'TB', 'Fungal', 'Check 1,25(OH)₂D'] }, 'Macrophages produce 1,25(OH)₂D autonomously.'),
+              e(ResultCard, { title: 'Vitamin D Toxicity', severity: 'consider', tags: ['Exogenous intake', '25(OH)D >250 nmol/L'] }),
+              e(ResultCard, { title: 'Other', severity: 'rare', tags: ['Thyrotoxicosis', 'Thiazides', 'Immobilisation', 'Milk-alkali'] })
+            ),
+
+            // HYPOCALCAEMIA + PTH LOW
+            calciumDirection === 'low' && pthResult === 'low' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Hypoparathyroidism', severity: 'likely', tags: ['Post-surgical (#1)', 'Autoimmune', 'Infiltrative'], onTap: () => { setMgmtType('hypoCa'); setShowMgmt(true); } }, 'Most commonly post-thyroidectomy or parathyroidectomy. May be transient or permanent.'),
+              magnesium && parseFloat(magnesium) < 0.70 && e(React.Fragment, null,
+                e(WarningBanner, null, e('strong', null, 'Magnesium is low.'), ' Hypomagnesaemia impairs PTH secretion AND end-organ response. Replace magnesium FIRST.'),
+                e(ResultCard, { title: 'Functional Hypoparathyroidism (Mg depletion)', severity: 'dangerous', tags: ['Replace Mg first', 'PTH will not work'] })
+              )
+            ),
+
+            // HYPOCALCAEMIA + PTH HIGH
+            calciumDirection === 'low' && pthResult === 'high' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Vitamin D Deficiency', severity: 'likely', tags: ['Most common globally', 'Check 25(OH)D'], onTap: () => { setMgmtType('hypoCa'); setShowMgmt(true); } }, 'PTH appropriately elevated in response to low calcium. Phosphate typically low (PTH promoting phosphaturia).'),
+              phosphate && e(InfoPanel, { title: 'Phosphate as Discriminator', color: 'var(--orange)' },
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Low phosphate + high PTH'), ' = PTH is working on kidneys. Problem is lack of calcium input (vitamin D deficiency, malabsorption).'),
+                e('p', null, e('strong', null, 'High phosphate + high PTH'), ' = PTH is NOT working on kidneys (renal failure, PTH resistance) OR phosphate load.')
+              ),
+              e(ResultCard, { title: 'CKD', severity: 'consider', tags: ['Impaired 1α-hydroxylation', 'High phosphate', 'Check eGFR'] }, 'Kidneys can\'t convert 25(OH)D to active 1,25(OH)₂D. Need calcitriol, not cholecalciferol.'),
+              e(ResultCard, { title: 'Malabsorption', severity: 'consider', tags: ['Coeliac', 'Crohn\'s', 'Post-bariatric'] }),
+              e(ResultCard, { title: 'Hungry Bone Syndrome', subtitle: 'Post-parathyroidectomy', severity: 'consider', tags: ['Rapid Ca + PO₄ uptake'] }),
+              e(ResultCard, { title: 'Pseudohypoparathyroidism', severity: 'rare', tags: ['PTH resistance', 'Albright hereditary osteodystrophy'] }, 'High PTH but no response — end-organ resistance.')
+            ),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e('div', { style: { marginTop: '16px' } },
+              e(PrimaryButton, { label: 'View Management', color: 'var(--orange)', onClick: () => { setMgmtType(calciumDirection === 'high' ? 'hyperCa' : 'hypoCa'); setShowMgmt(true); } }),
+              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+            )
+          )
+        )
+      );
+    }
+
+    // ========== CSF ANALYSIS MODULE ==========
+
+    function CSFModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const [appearance, setAppearance] = useState(null);
+      const [openingPressure, setOpeningPressure] = useState('');
+      const [isImmunocompromised, setIsImmunocompromised] = useState(null);
+      const [csfWcc, setCsfWcc] = useState('');
+      const [csfRcc, setCsfRcc] = useState('');
+      const [csfDiff, setCsfDiff] = useState(null);
+      const [csfProtein, setCsfProtein] = useState('');
+      const [csfGlucose, setCsfGlucose] = useState('');
+      const [serumGlucose, setSerumGlucose] = useState('');
+      const [showMgmt, setShowMgmt] = useState(false);
+
+      const steps = [
+        { label: 'Appearance', color: '#1C1C1E' },
+        { label: 'Chemistry', color: '#1C1C1E' },
+        { label: 'Pattern', color: '#1C1C1E' },
+        { label: 'Result', color: '#1C1C1E' }
+      ];
+
+      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
+      const goToStep = (s) => { setStep(s); scrollToTop(); };
+      const handleBack = () => {
+        if (showMgmt) setShowMgmt(false);
+        else if (step === 0) onBack();
+        else goToStep(step - 1);
+      };
+
+      // Traumatic tap correction
+      const getCorrectedWcc = () => {
+        const wcc = parseFloat(csfWcc);
+        const rcc = parseFloat(csfRcc);
+        if (!isNaN(wcc) && !isNaN(rcc) && rcc > 0) {
+          return Math.max(0, wcc - (rcc / 700)).toFixed(0);
+        }
+        return null;
+      };
+
+      const getCorrectedProtein = () => {
+        const prot = parseFloat(csfProtein);
+        const rcc = parseFloat(csfRcc);
+        if (!isNaN(prot) && !isNaN(rcc) && rcc > 0) {
+          return Math.max(0, prot - (rcc * 0.00001)).toFixed(3);
+        }
+        return null;
+      };
+
+      // CSF:Serum glucose ratio
+      const getGlucoseRatio = () => {
+        const csf = parseFloat(csfGlucose);
+        const serum = parseFloat(serumGlucose);
+        if (!isNaN(csf) && !isNaN(serum) && serum > 0) {
+          return (csf / serum).toFixed(2);
+        }
+        return null;
+      };
+
+      const getGlucoseRatioDisplay = () => {
+        const ratio = getGlucoseRatio();
+        if (!ratio) return null;
+        const r = parseFloat(ratio);
+        if (r > 0.6) return { value: ratio, interpretation: 'Normal — effectively excludes bacterial meningitis', color: 'var(--green)' };
+        if (r >= 0.3) return { value: ratio, interpretation: 'Low — consider bacterial, TB, fungal, malignant', color: 'var(--orange)' };
+        return { value: ratio, interpretation: 'Very low — strongly suggests bacterial or TB meningitis', color: 'var(--red)' };
+      };
+
+      const getOPDisplay = () => {
+        if (!openingPressure) return null;
+        const op = parseFloat(openingPressure);
+        if (op < 6) return { value: `${openingPressure} cmH₂O`, interpretation: 'Low — CSF leak, dehydration', color: 'var(--blue)' };
+        if (op <= 20) return { value: `${openingPressure} cmH₂O`, interpretation: 'Normal', color: 'var(--green)' };
+        if (op <= 25) return { value: `${openingPressure} cmH₂O`, interpretation: 'Borderline elevated', color: 'var(--orange)' };
+        if (op <= 40) return { value: `${openingPressure} cmH₂O`, interpretation: 'Elevated', color: 'var(--red)' };
+        return { value: `${openingPressure} cmH₂O`, interpretation: 'Markedly elevated — herniation risk', color: 'var(--red)' };
+      };
+
+      // Determine likely pattern
+      const getLikelyPattern = () => {
+        const lowGlucose = getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6;
+        const highProtein = csfProtein && parseFloat(csfProtein) > 0.45;
+        const highWcc = csfWcc && parseFloat(csfWcc) > 5;
+
+        if (csfDiff === 'polys' && lowGlucose) return 'bacterial';
+        if (csfDiff === 'lymphs' && !lowGlucose) return 'viral';
+        if (csfDiff === 'lymphs' && lowGlucose) return 'tb';
+        if (csfDiff === 'lymphs' && lowGlucose && isImmunocompromised) return 'crypto';
+        return null;
+      };
+
+      // Management screen
+      if (showMgmt) {
+        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e('div', { className: 'screen-content' },
+            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Meningitis / Encephalitis')
+            ),
+            e(WarningBanner, null, e('strong', null, 'If LP cannot be done immediately:'), ' blood cultures THEN empiric antibiotics IMMEDIATELY.'),
+            e(MgmtStep, { number: 1, title: 'Empiric Antibiotics', color: 'var(--yellow)' },
+              e('span', null, e('strong', null, 'Adult (community-acquired):'), ' Ceftriaxone 2g IV BD + Dexamethasone 10 mg IV QID × 4 days.', e('br'),
+                e('strong', null, 'If Listeria risk (>50 years, immunosuppressed, pregnant):'), ' ADD Benzylpenicillin 2.4g IV 4-hourly.', e('br'),
+                e('strong', null, 'Post-neurosurgical / VP shunt:'), ' Vancomycin + Meropenem.')
+            ),
+            e(MgmtStep, { number: 2, title: 'Dexamethasone', color: 'var(--yellow)' }, 'Must be given WITH or BEFORE first antibiotic dose. No benefit if started later.'),
+            e(WarningBanner, null, e('strong', null, 'Do NOT give dexamethasone if:'), ' immunosuppressed, post-neurosurgical, or suspected viral/TB meningitis.'),
+            e(MgmtStep, { number: 3, title: 'HSV Encephalitis', color: 'var(--yellow)' },
+              e('span', null, e('strong', null, 'Aciclovir 10 mg/kg IV TDS'), ' — start empirically if ANY suspicion of encephalitis (confusion, focal neurology, seizures, temporal lobe changes). Do NOT wait for PCR.')
+            ),
+            e(MgmtStep, { number: 4, title: 'TB Meningitis', color: 'var(--yellow)' }, '4-drug anti-TB therapy × 2 months, then rifampicin + isoniazid × 10 months (total 12 months). Dexamethasone — evidence supports steroids in TB meningitis.'),
+            e(MgmtStep, { number: 5, title: 'Cryptococcal', color: 'var(--yellow)' },
+              e('span', null, 'Amphotericin B + flucytosine (induction) → fluconazole (maintenance). ', e('strong', null, 'Therapeutic LP'), ' for raised pressure — serial LPs to maintain OP <20 cmH₂O.')
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          )
+        );
+      }
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'CSF Analysis', onBack: handleBack }),
+        e('div', { className: 'screen-content' },
+          e(StepTrail, { steps, current: step }),
+
+          // STEP 0: Appearance & Pressure
+          step === 0 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'CSF Appearance & Pressure'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'First impressions before the lab results')
+            ),
+            e(WarningBanner, null, e('strong', null, 'Do NOT delay antibiotics to perform LP.'), ' If bacterial meningitis is suspected and LP cannot be done immediately, take blood cultures then give empiric antibiotics. LP can follow later.'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'CSF Appearance'),
+            e(ChoiceButton, { label: 'Crystal clear', sublabel: 'Normal or early/mild infection. Does NOT exclude meningitis.', selected: appearance === 'clear', onClick: () => setAppearance('clear'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'Turbid / cloudy', sublabel: 'High WCC or protein. Suggests bacterial until proven otherwise.', selected: appearance === 'turbid', onClick: () => setAppearance('turbid'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Xanthochromic (yellow)', sublabel: 'Haemoglobin breakdown → SAH (if >12h) or very high protein', selected: appearance === 'xanthochromic', onClick: () => setAppearance('xanthochromic'), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'Bloody', sublabel: 'Traumatic tap (common) or subarachnoid haemorrhage', selected: appearance === 'bloody', onClick: () => setAppearance('bloody'), color: 'var(--red)' }),
+            appearance === 'bloody' && e(InfoPanel, { title: 'Traumatic Tap vs SAH', color: 'var(--yellow)' },
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Traumatic tap:'), ' Blood clears in successive tubes (↓ RCC tube 1 → tube 4). No xanthochromia. Clear supernatant.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'SAH:'), ' Blood does NOT clear. Uniform RCC. Xanthochromia present (>12h from onset). Yellow supernatant.'),
+              e('p', null, e('strong', null, 'Corrections:'), ' Subtract 1 WCC per 700 RBCs. Subtract ~0.01 g/L protein per 1000 RBCs.')
+            ),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '16px', marginBottom: '12px' } }, 'Opening Pressure'),
+            e(ValueInput, { label: 'Opening Pressure', unit: 'cmH₂O', value: openingPressure, onChange: setOpeningPressure, placeholder: '6–20', hint: 'Normal: 6–20' }),
+            openingPressure && e(BranchCard, { label: 'Opening Pressure', ...getOPDisplay() }),
+            parseFloat(openingPressure) > 25 && e(InfoPanel, { title: 'Causes of Elevated Opening Pressure', color: 'var(--yellow)' },
+              e('p', null, 'Bacterial meningitis, cryptococcal meningitis (often markedly elevated), TB meningitis, idiopathic intracranial hypertension, cerebral venous sinus thrombosis.')
+            ),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '16px', marginBottom: '12px' } }, 'Is the patient immunocompromised?'),
+            e(ChoiceButton, { label: 'Yes', sublabel: 'HIV, transplant, chemotherapy, immunosuppressive drugs', selected: isImmunocompromised === true, onClick: () => setIsImmunocompromised(true), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'No', sublabel: 'Immunocompetent', selected: isImmunocompromised === false, onClick: () => setIsImmunocompromised(false), color: 'var(--green)' }),
+            e(PrimaryButton, { label: 'Next → CSF Chemistry', disabled: appearance === null || isImmunocompromised === null, color: 'var(--yellow)', onClick: () => goToStep(1) })
+          ),
+
+          // STEP 1: Cells & Chemistry
+          step === 1 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'CSF Analysis'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Enter available CSF results')
+            ),
+            appearance && e(BranchCard, { label: 'Appearance', value: appearance.charAt(0).toUpperCase() + appearance.slice(1), interpretation: appearance === 'turbid' ? 'High WCC/protein' : appearance === 'clear' ? 'May still have infection' : '', color: appearance === 'turbid' || appearance === 'bloody' ? 'var(--red)' : 'var(--green)' }),
+            openingPressure && e(BranchCard, { label: 'Opening Pressure', ...getOPDisplay() }),
+            e(ValueInput, { label: 'CSF White Cell Count', unit: 'cells/µL', value: csfWcc, onChange: setCsfWcc, placeholder: 'Normal: 0–5' }),
+            e(ValueInput, { label: 'CSF Red Cell Count', unit: 'cells/µL', value: csfRcc, onChange: setCsfRcc, placeholder: 'Normal: 0', hint: 'For traumatic tap correction' }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Predominant cell type'),
+            e(ChoiceButton, { label: 'Polymorphs (neutrophils)', sublabel: 'Suggests bacterial', selected: csfDiff === 'polys', onClick: () => setCsfDiff('polys'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Lymphocytes', sublabel: 'Viral, TB, fungal, or partially treated bacterial', selected: csfDiff === 'lymphs', onClick: () => setCsfDiff('lymphs'), color: 'var(--blue)' }),
+            e(ChoiceButton, { label: 'Mixed', sublabel: 'Early bacterial, or overlap pattern', selected: csfDiff === 'mixed', onClick: () => setCsfDiff('mixed'), color: 'var(--orange)' }),
+            e(ValueInput, { label: 'CSF Protein', unit: 'g/L', value: csfProtein, onChange: setCsfProtein, placeholder: '0.15–0.45', hint: 'Normal: 0.15–0.45' }),
+            e(ValueInput, { label: 'CSF Glucose', unit: 'mmol/L', value: csfGlucose, onChange: setCsfGlucose, placeholder: '2.8–4.4', hint: 'Normal: 2.8–4.4' }),
+            e(ValueInput, { label: 'Paired Serum Glucose', unit: 'mmol/L', value: serumGlucose, onChange: setSerumGlucose, placeholder: 'For ratio', hint: 'Essential for interpretation' }),
+            csfRcc && parseFloat(csfRcc) > 0 && getCorrectedWcc() && e(React.Fragment, null,
+              e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'Traumatic tap correction'),
+              e(BranchCard, { label: 'Corrected WCC', value: `${getCorrectedWcc()} cells/µL`, interpretation: 'After subtracting RBC contribution', color: 'var(--blue)' }),
+              getCorrectedProtein() && e(BranchCard, { label: 'Corrected Protein', value: `${getCorrectedProtein()} g/L`, interpretation: 'After subtracting RBC contribution', color: 'var(--blue)' })
+            ),
+            getGlucoseRatio() && e(BranchCard, { label: 'CSF:Serum Glucose Ratio', ...getGlucoseRatioDisplay() }),
+            e(InfoPanel, { title: 'The Glucose Rule', color: 'var(--yellow)' },
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Low CSF glucose'), ' (ratio <0.6) = organisms or cells consuming glucose. Narrows differential to: bacterial, TB, fungal, malignant meningitis, neurosarcoidosis.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Normal CSF glucose'), ' effectively excludes bacterial meningitis (high negative predictive value). Viral meningitis has NORMAL glucose.'),
+              e('p', null, e('strong', null, 'Critical:'), ' Always measure paired serum glucose. Absolute CSF glucose of 3.0 looks normal but is low if serum is 20 (ratio 0.15).')
+            ),
+            e(PrimaryButton, { label: 'Match Pattern →', disabled: !csfWcc || !csfDiff, color: 'var(--yellow)', onClick: () => goToStep(2) })
+          ),
+
+          // STEP 2: Pattern matching / Results
+          step === 2 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Pattern Recognition')
+            ),
+            appearance && e(BranchCard, { label: 'Appearance', value: appearance.charAt(0).toUpperCase() + appearance.slice(1), interpretation: '', color: appearance === 'turbid' || appearance === 'bloody' ? 'var(--red)' : 'var(--green)' }),
+            csfWcc && e(BranchCard, { label: 'CSF WCC', value: `${getCorrectedWcc() || csfWcc} cells/µL`, interpretation: csfDiff === 'polys' ? 'Polymorphs predominant' : csfDiff === 'lymphs' ? 'Lymphocytes predominant' : 'Mixed', color: csfDiff === 'polys' ? 'var(--red)' : 'var(--blue)' }),
+            getGlucoseRatio() && e(BranchCard, { label: 'CSF:Serum Glucose', ...getGlucoseRatioDisplay() }),
+            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+
+            // Bacterial
+            e(ResultCard, { title: 'Bacterial Meningitis', severity: csfDiff === 'polys' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6 ? 'dangerous' : 'consider', tags: ['Empiric antibiotics BEFORE LP', 'Gram stain', 'Blood cultures', 'Dexamethasone'], onTap: () => setShowMgmt(true) }, 'Classic: turbid CSF, polymorphs, very high WCC, high protein, low glucose. However, early bacterial meningitis can mimic viral (lymphocyte predominance in first 24h).'),
+
+            // Viral
+            e(ResultCard, { title: 'Viral Meningitis', severity: csfDiff === 'lymphs' && (!getGlucoseRatio() || parseFloat(getGlucoseRatio()) > 0.6) ? 'likely' : 'consider', tags: ['Enterovirus most common', 'HSV PCR', 'Self-limiting'] }, 'Clear CSF, lymphocyte predominance, mildly elevated protein, NORMAL glucose. Usually self-limiting. Key concern: rule out HSV encephalitis if confusion/focal neurology/seizures.'),
+
+            // TB
+            (csfDiff === 'lymphs' || csfDiff === 'mixed') && e(ResultCard, { title: 'TB Meningitis', severity: getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6 ? 'dangerous' : 'consider', tags: ['Subacute onset', 'Cranial nerve palsies', 'SIADH', 'Treat empirically if suspected'], onTap: () => setShowMgmt(true) }, 'Lymphocytes, low glucose, high protein. Notoriously difficult to diagnose (AFB smear only 10–20% sensitive). GeneXpert ~60–80% in CSF.'),
+            (csfDiff === 'lymphs' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6) && e(InfoPanel, { title: 'TB Meningitis — the Great Mimicker', color: 'var(--yellow)' },
+              e('p', { style: { marginBottom: '8px' } }, 'Clinical clues: subacute onset (days-weeks), cranial nerve palsies (especially VI), basal meningeal enhancement on MRI, hyponatraemia (SIADH), risk factors.'),
+              e('p', { style: { fontWeight: 700 } }, 'If clinical suspicion is moderate-high, start empiric treatment while awaiting results. Mortality of untreated TB meningitis approaches 100%.')
+            ),
+
+            // Cryptococcal
+            isImmunocompromised && e(ResultCard, { title: 'Cryptococcal Meningitis', severity: 'dangerous', tags: ['Immunosuppressed', 'High opening pressure', 'CrAg', 'Therapeutic LP'], onTap: () => setShowMgmt(true) }, 'Lymphocytes, low glucose, elevated protein, often markedly raised opening pressure. Check serum and CSF cryptococcal antigen (CrAg). Raised pressure is the major cause of morbidity.'),
+
+            // Partially treated
+            e(ResultCard, { title: 'Partially Treated Bacterial', severity: 'consider', tags: ['Prior antibiotics', 'Modified pattern', 'May look viral'] }, 'Prior antibiotics can modify the CSF pattern: lymphocyte shift, less dramatic glucose drop. Treat as bacterial if clinical suspicion high.'),
+
+            // Malignant
+            (csfDiff === 'lymphs' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6) && e(ResultCard, { title: 'Malignant Meningitis', severity: 'consider', tags: ['Lymphocytic', 'Low glucose', 'Known malignancy', 'Cytology'] }, 'Carcinomatous or lymphomatous meningitis. Lymphocytes, low glucose, very high protein. Send CSF cytology — may need repeat LPs.'),
+
+            // GBS
+            csfProtein && parseFloat(csfProtein) > 1.0 && csfWcc && parseFloat(csfWcc) < 10 && e(ResultCard, { title: 'Guillain-Barré Syndrome', severity: 'consider', tags: ['High protein', 'Few cells', 'Albuminocytological dissociation'] }, 'Very high protein with few or no cells — \'albuminocytological dissociation\'. Usually presents with ascending weakness, areflexia.'),
+
+            // IIH
+            openingPressure && parseFloat(openingPressure) > 25 && csfWcc && parseFloat(csfWcc) <= 5 && (!getGlucoseRatio() || parseFloat(getGlucoseRatio()) > 0.6) && e(ResultCard, { title: 'Idiopathic Intracranial Hypertension', severity: 'consider', tags: ['Elevated pressure', 'Normal composition', 'Diagnosis of exclusion'] }, 'Elevated opening pressure with completely normal CSF composition. Typical patient: young woman, obesity, headache, papilloedema.'),
+
+            // Investigations
+            e(InfoPanel, { title: 'Specific Investigations to Request', color: 'var(--yellow)' },
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Gram stain'), ' — always. Sensitivity ~60–90%. Negative does NOT exclude bacterial.'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Bacterial culture'), ' — always. Gold standard. 24–48h. Also blood cultures.'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'PCR (multiplex)'), ' — bacterial + viral (HSV, VZV, enterovirus). Higher sensitivity than culture after antibiotics.'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Cryptococcal antigen'), ' — if immunosuppressed, HIV, or lymphocytic with low glucose.'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'TB PCR (GeneXpert)'), ' — if subacute, lymphocytic, low glucose, risk factors. Large volume (>6ml).'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Cytology'), ' — if malignancy suspected. Large volume. May need repeat LPs.'),
+              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Oligoclonal bands'), ' — if MS suspected. Paired with serum.')
+            ),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e('div', { style: { marginTop: '16px' } },
+              e(PrimaryButton, { label: 'View Management', color: 'var(--yellow)', onClick: () => setShowMgmt(true) }),
+              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+            )
+          )
+        )
+      );
+    }
+
+    // ========== AKI / URINE BIOCHEM MODULE ==========
+
+    function AKIModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const [urineNa, setUrineNa] = useState('');
+      const [urineCr, setUrineCr] = useState('');
+      const [serumNa, setSerumNa] = useState('');
+      const [serumCr, setSerumCr] = useState('');
+      const [onDiuretics, setOnDiuretics] = useState(null);
+      const [urineUrea, setUrineUrea] = useState('');
+      const [serumUrea, setSerumUrea] = useState('');
+      const [urineOsm, setUrineOsm] = useState('');
+      const [fenaResult, setFenaResult] = useState(null);
+      const [showMgmt, setShowMgmt] = useState(false);
+      const [mgmtType, setMgmtType] = useState(null);
+
+      const steps = [
+        { label: 'Labs', color: 'var(--cyan)' },
+        { label: 'FENa', color: 'var(--cyan)' },
+        { label: 'Result', color: 'var(--cyan)' }
+      ];
+
+      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
+      const goToStep = (s) => { setStep(s); scrollToTop(); };
+      const handleBack = () => {
+        if (showMgmt) setShowMgmt(false);
+        else if (step === 0) onBack();
+        else goToStep(step - 1);
+      };
+
+      // FENa calculation: (UNa × SCr) / (SNa × UCr) × 100
+      // Note: SCr needs to be converted from µmol/L to mmol/L (÷1000)
+      const calcFENa = () => {
+        const una = parseFloat(urineNa);
+        const ucr = parseFloat(urineCr);
+        const sna = parseFloat(serumNa);
+        const scr = parseFloat(serumCr) / 1000; // Convert to mmol/L
+        if (!isNaN(una) && !isNaN(ucr) && !isNaN(sna) && !isNaN(scr) && ucr > 0 && sna > 0) {
+          return ((una * scr) / (sna * ucr) * 100).toFixed(2);
+        }
+        return null;
+      };
+
+      // FEUrea calculation
+      const calcFEUrea = () => {
+        const uurea = parseFloat(urineUrea);
+        const surea = parseFloat(serumUrea);
+        const ucr = parseFloat(urineCr);
+        const scr = parseFloat(serumCr) / 1000;
+        if (!isNaN(uurea) && !isNaN(surea) && !isNaN(ucr) && !isNaN(scr) && ucr > 0 && surea > 0) {
+          return ((uurea * scr) / (surea * ucr) * 100).toFixed(1);
+        }
+        return null;
+      };
+
+      const getFENaDisplay = () => {
+        const fena = calcFENa();
+        if (!fena) return null;
+        const v = parseFloat(fena);
+        if (v < 1) return { value: `${fena}%`, interpretation: 'Suggests pre-renal', color: 'var(--green)' };
+        if (v <= 2) return { value: `${fena}%`, interpretation: 'Indeterminate', color: 'var(--orange)' };
+        return { value: `${fena}%`, interpretation: 'Suggests intrinsic (ATN)', color: 'var(--red)' };
+      };
+
+      const getFEUreaDisplay = () => {
+        const feurea = calcFEUrea();
+        if (!feurea) return null;
+        const v = parseFloat(feurea);
+        if (v < 35) return { value: `${feurea}%`, interpretation: 'Suggests pre-renal', color: 'var(--green)' };
+        if (v <= 50) return { value: `${feurea}%`, interpretation: 'Indeterminate', color: 'var(--orange)' };
+        return { value: `${feurea}%`, interpretation: 'Suggests intrinsic (ATN)', color: 'var(--red)' };
+      };
+
+      const getUrineOsmDisplay = () => {
+        if (!urineOsm) return null;
+        const v = parseFloat(urineOsm);
+        if (v > 500) return { value: `${urineOsm} mOsm/kg`, interpretation: 'Concentrated — consistent with pre-renal', color: 'var(--green)' };
+        if (v >= 350) return { value: `${urineOsm} mOsm/kg`, interpretation: 'Intermediate', color: 'var(--orange)' };
+        return { value: `${urineOsm} mOsm/kg`, interpretation: 'Dilute — consistent with ATN', color: 'var(--red)' };
+      };
+
+      if (showMgmt) {
+        const isPreRenal = mgmtType === 'preRenal';
+        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e('div', { className: 'screen-content' },
+            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, isPreRenal ? 'Pre-renal AKI' : 'Intrinsic AKI (ATN)')
+            ),
+            isPreRenal ? e(React.Fragment, null,
+              e(MgmtStep, { number: 1, title: 'Volume Resuscitation', color: 'var(--cyan)' }, 'Crystalloid boluses 250–500 ml, reassess after each.'),
+              e(MgmtStep, { number: 2, title: 'Treat Underlying Cause', color: 'var(--cyan)' }, 'Sepsis, bleeding, heart failure, liver failure.'),
+              e(MgmtStep, { number: 3, title: 'Hold Nephrotoxins', color: 'var(--cyan)' }, 'NSAIDs, ACEi/ARB, aminoglycosides.'),
+              e(MgmtStep, { number: 4, title: 'Monitor', color: 'var(--cyan)' }, 'UO target >0.5 ml/kg/hr. Serial creatinine.')
+            ) : e(React.Fragment, null,
+              e(MgmtStep, { number: 1, title: 'Supportive', color: 'var(--cyan)' }, 'No specific treatment for established ATN.'),
+              e(MgmtStep, { number: 2, title: 'Avoid Further Insults', color: 'var(--cyan)' }, 'Nephrotoxins, hypotension, contrast.'),
+              e(MgmtStep, { number: 3, title: 'Manage Complications', color: 'var(--cyan)' }, 'Hyperkalaemia, acidosis, fluid overload.'),
+              e(MgmtStep, { number: 4, title: 'RRT Criteria', color: 'var(--cyan)' }, 'Refractory hyperkalaemia, severe acidosis, fluid overload unresponsive to diuretics, uraemic encephalopathy or pericarditis.')
+            ),
+            e(InfoPanel, { title: 'Post-renal AKI', color: 'var(--cyan)' },
+              e('p', null, 'Relieve obstruction — catheterise (lower tract), nephrostomy/stent (upper tract). Monitor for post-obstructive diuresis — can be massive and cause electrolyte shifts.')
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          )
+        );
+      }
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'Urine Biochem', onBack: handleBack }),
+        e('div', { className: 'screen-content' },
+          e(StepTrail, { steps, current: step }),
+
+          // STEP 0: Inputs
+          step === 0 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Urine & Serum Biochemistry'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'For FENa calculation and AKI workup')
+            ),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Is the patient on diuretics?'),
+            e(ChoiceButton, { label: 'Yes — on loop or thiazide diuretics', sublabel: 'Use FEUrea instead of FENa', selected: onDiuretics === true, onClick: () => setOnDiuretics(true), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'No diuretics', sublabel: 'FENa is reliable', selected: onDiuretics === false, onClick: () => setOnDiuretics(false), color: 'var(--green)' }),
+            onDiuretics === true && e(WarningBanner, null, e('strong', null, 'FENa is unreliable on diuretics.'), ' Diuretics force sodium excretion, making FENa falsely elevated (mimicking intrinsic AKI). Use FEUrea instead.'),
+            e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'FENa inputs'),
+            e(ValueInput, { label: 'Urine Sodium', unit: 'mmol/L', value: urineNa, onChange: setUrineNa, placeholder: 'Enter' }),
+            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter' }),
+            e(ValueInput, { label: 'Serum Sodium', unit: 'mmol/L', value: serumNa, onChange: setSerumNa, placeholder: '135–145' }),
+            e(ValueInput, { label: 'Serum Creatinine', unit: 'µmol/L', value: serumCr, onChange: setSerumCr, placeholder: 'Enter' }),
+            onDiuretics && e(React.Fragment, null,
+              e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'FEUrea inputs'),
+              e(ValueInput, { label: 'Urine Urea', unit: 'mmol/L', value: urineUrea, onChange: setUrineUrea, placeholder: 'Enter' }),
+              e(ValueInput, { label: 'Serum Urea', unit: 'mmol/L', value: serumUrea, onChange: setSerumUrea, placeholder: 'Enter' })
+            ),
+            e(ValueInput, { label: 'Urine Osmolality (optional)', unit: 'mOsm/kg', value: urineOsm, onChange: setUrineOsm, placeholder: 'Optional' }),
+            e(InfoPanel, { title: 'Why FENa Works', color: 'var(--cyan)' },
+              e('p', { style: { marginBottom: '8px' } }, 'In pre-renal AKI, kidneys are underperfused but structurally intact → maximally reabsorb sodium (low FENa, <1%) and concentrate urine (high urine osm).'),
+              e('p', null, 'In intrinsic AKI (ATN), tubules are damaged → sodium \'leaks\' into urine (high FENa, >2%) and urine osmolality approaches serum (~300).')
+            ),
+            e(PrimaryButton, { label: 'Calculate →', disabled: onDiuretics === null || !urineNa || !urineCr || !serumNa || !serumCr, color: 'var(--cyan)', onClick: () => goToStep(1) })
+          ),
+
+          // STEP 1: Calculated Results
+          step === 1 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Calculated Indices')
+            ),
+            calcFENa() && !onDiuretics && e(BranchCard, { label: 'FENa', ...getFENaDisplay() }),
+            calcFENa() && onDiuretics && e('div', { style: { opacity: 0.5, marginBottom: '16px' } },
+              e(BranchCard, { label: 'FENa', value: `${calcFENa()}%`, interpretation: '⚠️ Unreliable on diuretics', color: 'var(--label3)' })
+            ),
+            onDiuretics && calcFEUrea() && e(BranchCard, { label: 'FEUrea', ...getFEUreaDisplay() }),
+            urineOsm && e(BranchCard, { label: 'Urine Osmolality', ...getUrineOsmDisplay() }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Select interpretation'),
+            e(ChoiceButton, { label: 'Pre-renal', sublabel: onDiuretics ? 'FEUrea <35%' : 'FENa <1%', selected: fenaResult === 'preRenal', onClick: () => setFenaResult('preRenal'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'Intrinsic (ATN)', sublabel: onDiuretics ? 'FEUrea >50%' : 'FENa >2%', selected: fenaResult === 'intrinsic', onClick: () => setFenaResult('intrinsic'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Indeterminate', sublabel: 'Borderline values — may be transitioning', selected: fenaResult === 'indeterminate', onClick: () => setFenaResult('indeterminate'), color: 'var(--orange)' }),
+            e(PrimaryButton, { label: 'Interpret →', disabled: !fenaResult, color: 'var(--cyan)', onClick: () => goToStep(2) })
+          ),
+
+          // STEP 2: Results
+          step === 2 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
+            ),
+            !onDiuretics && calcFENa() && e(BranchCard, { label: 'FENa', ...getFENaDisplay() }),
+            onDiuretics && calcFEUrea() && e(BranchCard, { label: 'FEUrea', ...getFEUreaDisplay() }),
+            urineOsm && e(BranchCard, { label: 'Urine Osmolality', ...getUrineOsmDisplay() }),
+            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'INTERPRETATION'),
+
+            fenaResult === 'preRenal' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Pre-renal AKI', severity: 'likely', tags: ['Underperfusion', 'Structurally intact', 'Reversible'], onTap: () => { setMgmtType('preRenal'); setShowMgmt(true); } }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
+              e(WarningBanner, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling:'),
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
+                '• Contrast nephropathy (vasoconstriction)', e('br'),
+                '• Rhabdomyolysis (early)', e('br'),
+                '• Early sepsis (renal vasoconstriction)', e('br'),
+                '• Acute glomerulonephritis (glomerular injury, tubules intact)', e('br'),
+                '• Early interstitial nephritis', e('br'),
+                '• Acute urinary obstruction (early)'
+              )
+            ),
+
+            fenaResult === 'intrinsic' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Intrinsic AKI (ATN)', severity: 'likely', tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'], onTap: () => { setMgmtType('intrinsic'); setShowMgmt(true); } }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
+              e(WarningBanner, null, e('strong', null, 'FENa >1% does NOT always mean intrinsic:')),
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
+                '• Diuretic use (falsely elevated)', e('br'),
+                '• CKD baseline (chronic nephron loss)', e('br'),
+                '• Adrenal insufficiency (lack of aldosterone)', e('br'),
+                '• Cerebral salt wasting', e('br'),
+                '• IV saline administration', e('br'),
+                '• Glycosuria (osmotic diuresis)'
+              )
+            ),
+
+            fenaResult === 'indeterminate' && e(ResultCard, { title: 'Evolving AKI', severity: 'consider', tags: ['May be transitioning', 'Serial measurements', 'Trend'] }, 'Borderline values — may be evolving from pre-renal to intrinsic. Serial measurement over 6–12 hours is more useful than a single value.'),
+
+            e(InfoPanel, { title: 'Urine Microscopy — the Forgotten Tool', color: 'var(--cyan)' },
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Muddy brown granular casts:'), ' ATN — pathognomonic'),
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Red cell casts:'), ' Glomerulonephritis'),
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'White cell casts:'), ' Interstitial nephritis or pyelonephritis'),
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Eosinophiluria:'), ' Allergic interstitial nephritis (low sensitivity)'),
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Bland sediment:'), ' Pre-renal, obstruction, or HRS'),
+              e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Crystals:'), ' Crystal nephropathy (tumour lysis, ethylene glycol)')
+            ),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e('div', { style: { marginTop: '16px' } },
+              e(PrimaryButton, { label: 'View Management', color: 'var(--cyan)', onClick: () => { setMgmtType(fenaResult === 'preRenal' ? 'preRenal' : 'intrinsic'); setShowMgmt(true); } }),
+              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+            )
+          )
+        )
+      );
+    }
+
+    // ========== COAGULATION MODULE ==========
+
+    function CoagModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const [pt, setPt] = useState('');
+      const [inr, setInr] = useState('');
+      const [aptt, setAptt] = useState('');
+      const [fibrinogen, setFibrinogen] = useState('');
+      const [dDimer, setDDimer] = useState('');
+      const [platelets, setPlatelets] = useState('');
+      const [clinicalContext, setClinicalContext] = useState(null);
+      const [pattern, setPattern] = useState(null);
+      const [showMgmt, setShowMgmt] = useState(false);
+
+      const steps = [
+        { label: 'Labs', color: 'var(--green)' },
+        { label: 'Pattern', color: 'var(--green)' },
+        { label: 'Result', color: 'var(--green)' }
+      ];
+
+      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
+      const goToStep = (s) => { setStep(s); scrollToTop(); };
+      const handleBack = () => {
+        if (showMgmt) setShowMgmt(false);
+        else if (step === 0) onBack();
+        else goToStep(step - 1);
+      };
+
+      const isPtProlonged = pt && parseFloat(pt) > 13.5;
+      const isApttProlonged = aptt && parseFloat(aptt) > 38;
+
+      // ISTH DIC Score calculation
+      const calcDICScore = () => {
+        if (!platelets || !dDimer || !pt || !fibrinogen) return null;
+        let score = 0;
+        const plt = parseFloat(platelets);
+        const dd = parseFloat(dDimer);
+        const ptVal = parseFloat(pt);
+        const fib = parseFloat(fibrinogen);
+        if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
+        if (dd <= 0.5) score += 0; else if (dd <= 5) score += 1; else score += 2;
+        const ptProlongation = ptVal - 13;
+        if (ptProlongation < 3) score += 0; else if (ptProlongation <= 6) score += 1; else score += 2;
+        if (fib >= 1.0) score += 0; else score += 2;
+        return score;
+      };
+
+      const getLabDisplay = (name, value, unit, normal) => {
+        if (!value) return null;
+        const v = parseFloat(value);
+        let interp = 'Normal';
+        let color = 'var(--green)';
+        if (name === 'PT' && v > 13.5) { interp = 'Prolonged'; color = 'var(--orange)'; }
+        if (name === 'APTT' && v > 38) { interp = 'Prolonged'; color = 'var(--orange)'; }
+        if (name === 'Fibrinogen' && v < 2.0) { interp = 'Low'; color = 'var(--red)'; }
+        if (name === 'Platelets' && v < 150) { interp = 'Low'; color = 'var(--red)'; }
+        if (name === 'D-dimer' && v > 0.5) { interp = 'Elevated'; color = 'var(--orange)'; }
+        return { value: `${value} ${unit}`, interpretation: interp, color };
+      };
+
+      if (showMgmt) {
+        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e('div', { className: 'screen-content' },
+            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Coagulopathy')
+            ),
+            e(MgmtStep, { number: 1, title: 'Stop the Cause', color: 'var(--green)' }, 'Stop anticoagulants. Treat sepsis. Control bleeding source.'),
+            e(MgmtStep, { number: 2, title: 'Replace What\'s Missing', color: 'var(--green)' },
+              e('span', null, e('strong', null, 'FFP 15 ml/kg'), ' if PT/APTT prolonged.', e('br'),
+                e('strong', null, 'Cryoprecipitate 5–10 units'), ' if fibrinogen <1.5 g/L (rich in fibrinogen, Factor VIII, vWF, Factor XIII).', e('br'),
+                e('strong', null, 'Platelets'), ' if <50 and actively bleeding (or <100 if neurosurgical/ophthalmic).', e('br'),
+                e('strong', null, 'Vitamin K 10 mg IV slow'), ' if vitamin K deficiency or warfarin.')
+            ),
+            e(MgmtStep, { number: 3, title: 'Specific Reversal Agents', color: 'var(--green)' },
+              e('span', null, e('strong', null, 'Warfarin:'), ' Prothrombinex (3-factor PCC) + Vitamin K.', e('br'),
+                e('strong', null, 'Dabigatran:'), ' Idarucizumab (Praxbind).', e('br'),
+                e('strong', null, 'Rivaroxaban/Apixaban:'), ' Andexanet alfa (if available) or Prothrombinex (off-label).', e('br'),
+                e('strong', null, 'Heparin:'), ' Protamine sulphate.')
+            ),
+            clinicalContext === 'preOp' && e(InfoPanel, { title: 'Pre-operative Abnormal Coag', color: 'var(--green)' },
+              e('p', null, 'Isolated mildly prolonged APTT in an asymptomatic patient: consider lupus anticoagulant or Factor XII deficiency — ', e('strong', null, 'neither causes bleeding. Do NOT delay surgery.'), e('br'), 'Personal/family history of bleeding is more important than the screening coag result.')
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+          )
+        );
+      }
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'Coagulation', onBack: handleBack }),
+        e('div', { className: 'screen-content' },
+          e(StepTrail, { steps, current: step }),
+
+          // STEP 0: Inputs
+          step === 0 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Coagulation Studies'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Enter available results')
+            ),
+            e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5', hint: 'Normal: 11–13.5' }),
+            e(ValueInput, { label: 'INR', unit: '', value: inr, onChange: setInr, placeholder: '0.9–1.1', hint: 'Normal: 0.9–1.1' }),
+            e(ValueInput, { label: 'APTT', unit: 'sec', value: aptt, onChange: setAptt, placeholder: '25–38', hint: 'Normal: 25–38' }),
+            e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0', hint: 'Normal: 2.0–4.0' }),
+            e(ValueInput, { label: 'D-dimer', unit: 'mg/L', value: dDimer, onChange: setDDimer, placeholder: '<0.5', hint: 'Normal: <0.5' }),
+            e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400', hint: 'Normal: 150–400' }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '16px', marginBottom: '12px' } }, 'Clinical context'),
+            e(ChoiceButton, { label: 'Active bleeding', sublabel: 'Urgent — need to identify and correct the problem', selected: clinicalContext === 'bleeding', onClick: () => setClinicalContext('bleeding'), color: 'var(--red)' }),
+            e(ChoiceButton, { label: 'Incidental finding', sublabel: 'Abnormal coag on routine tests', selected: clinicalContext === 'incidental', onClick: () => setClinicalContext('incidental'), color: 'var(--blue)' }),
+            e(ChoiceButton, { label: 'Pre-operative screening', sublabel: 'Abnormal coag before planned surgery', selected: clinicalContext === 'preOp', onClick: () => setClinicalContext('preOp'), color: 'var(--orange)' }),
+            e(InfoPanel, { title: 'Which Test Maps to Which Pathway?', color: 'var(--green)' },
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'PT/INR'), ' = Extrinsic + Common pathway. Factor VII is unique. Warfarin affects this.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'APTT'), ' = Intrinsic + Common pathway. Factors VIII, IX, XI, XII are unique. Heparin affects this.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Common pathway'), ' = X → V → II → fibrinogen → fibrin. Abnormalities prolong BOTH.'),
+              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Fibrinogen'), ' = final substrate. Consumed in DIC, massive bleeding.'),
+              e('p', null, e('strong', null, 'D-dimer'), ' = fibrin degradation product. Elevated when clot is forming AND breaking down.')
+            ),
+            e(PrimaryButton, { label: 'Identify Pattern →', disabled: !clinicalContext || (!pt && !aptt), color: 'var(--green)', onClick: () => goToStep(1) })
+          ),
+
+          // STEP 1: Pattern
+          step === 1 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Pattern'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Which pathway is affected?')
+            ),
+            pt && e(BranchCard, { label: 'PT', ...getLabDisplay('PT', pt, 'sec', '11–13.5') }),
+            aptt && e(BranchCard, { label: 'APTT', ...getLabDisplay('APTT', aptt, 'sec', '25–38') }),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Select the pattern'),
+            e(ChoiceButton, { label: 'A — Isolated prolonged PT', sublabel: 'APTT normal. Extrinsic pathway problem.', selected: pattern === 'A', onClick: () => setPattern('A'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'B — Isolated prolonged APTT', sublabel: 'PT normal. Intrinsic pathway problem.', selected: pattern === 'B', onClick: () => setPattern('B'), color: 'var(--green)' }),
+            e(ChoiceButton, { label: 'C — Both PT and APTT prolonged', sublabel: 'Common pathway OR global coagulopathy', selected: pattern === 'C', onClick: () => setPattern('C'), color: 'var(--orange)' }),
+            e(ChoiceButton, { label: 'D — Both normal', sublabel: 'Consider platelet or vascular cause if bleeding', selected: pattern === 'D', onClick: () => setPattern('D'), color: 'var(--blue)' }),
+            e(PrimaryButton, { label: 'Interpret →', disabled: !pattern, color: 'var(--green)', onClick: () => goToStep(2) })
+          ),
+
+          // STEP 2: Results
+          step === 2 && e(FadeIn, null,
+            e('div', { style: { marginBottom: '20px' } },
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
+            ),
+            pt && e(BranchCard, { label: 'PT', ...getLabDisplay('PT', pt, 'sec', '11–13.5') }),
+            aptt && e(BranchCard, { label: 'APTT', ...getLabDisplay('APTT', aptt, 'sec', '25–38') }),
+            fibrinogen && e(BranchCard, { label: 'Fibrinogen', ...getLabDisplay('Fibrinogen', fibrinogen, 'g/L', '2.0–4.0') }),
+            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+
+            // Pattern A: Isolated prolonged PT
+            pattern === 'A' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Warfarin', severity: 'likely', tags: ['Most common', 'Check INR target'] }),
+              e(ResultCard, { title: 'Early Liver Disease', severity: 'consider', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] }),
+              e(ResultCard, { title: 'Vitamin K Deficiency', severity: 'consider', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] }),
+              e(ResultCard, { title: 'DOAC (Rivaroxaban/Apixaban)', severity: 'consider', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] }),
+              e(ResultCard, { title: 'Factor VII Deficiency', severity: 'rare', tags: ['Congenital', 'Only extrinsic factor'] })
+            ),
+
+            // Pattern B: Isolated prolonged APTT
+            pattern === 'B' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Heparin (UFH)', severity: 'likely', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] }),
+              e(ResultCard, { title: 'Haemophilia A (Factor VIII ↓)', severity: 'consider', tags: ['X-linked', 'Severity correlates with level'] }),
+              e(ResultCard, { title: 'Haemophilia B (Factor IX ↓)', severity: 'consider', tags: ['X-linked', 'Clinically identical to A'] }),
+              e(ResultCard, { title: 'von Willebrand Disease', severity: 'consider', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] }),
+              e(ResultCard, { title: 'Factor XI Deficiency', severity: 'consider', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] }),
+              e(ResultCard, { title: 'Factor XII Deficiency', severity: 'rare', tags: ['NO bleeding risk', 'Do NOT delay surgery'] }, 'Prolongs APTT but causes NO bleeding risk whatsoever. Safe for surgery.'),
+              e(WarningBanner, null, e('strong', null, 'Factor XII deficiency and lupus anticoagulant prolong APTT but do NOT cause bleeding.'), ' Do NOT delay surgery for either of these.'),
+              e(ResultCard, { title: 'Lupus Anticoagulant', severity: 'consider', tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical'] }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
+              e(ResultCard, { title: 'Dabigatran', severity: 'consider', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] }),
+              e(InfoPanel, { title: 'The Mixing Study', color: 'var(--green)' },
+                e('p', { style: { marginBottom: '8px' } }, 'When APTT is prolonged, mix 1:1 patient plasma with normal plasma:'),
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
+                e('p', null, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate: lupus anticoagulant, heparin. Time-dependent (2h): acquired Factor VIII inhibitor (serious).', e('br'), 'If patient is on heparin, the mixing study is useless.')
+              )
+            ),
+
+            // Pattern C: Both prolonged
+            pattern === 'C' && e(React.Fragment, null,
+              e(ResultCard, { title: 'DIC', severity: 'dangerous', tags: ['Consumption', '↓Fibrinogen', '↓Platelets', '↑D-dimer', 'Schistocytes'] }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
+              calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive of overt DIC — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)' }),
+              e(ResultCard, { title: 'Severe Liver Disease', severity: 'likely', tags: ['Impaired synthesis', 'Factor VIII normal/↑ (distinguishes from DIC)'] }),
+              e(InfoPanel, { title: 'Liver vs DIC', color: 'var(--green)' },
+                e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Factor VIII is the key.'), ' Normal/high in liver disease (Factor VIII made by endothelium). Low in DIC (consumed).'),
+                e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
+              ),
+              e(ResultCard, { title: 'Massive Transfusion / Dilution', severity: 'consider', tags: ['Dilution of factors + platelets'] }),
+              e(ResultCard, { title: 'Vitamin K Deficiency (severe)', severity: 'consider', tags: ['All K-dependent factors'] }),
+              e(ResultCard, { title: 'Supratherapeutic Warfarin', severity: 'consider', tags: ['Very high INR'] }),
+              e(ResultCard, { title: 'Direct Thrombin Inhibitor (high dose)', severity: 'consider', tags: ['Dabigatran', 'Argatroban'] })
+            ),
+
+            // Pattern D: Both normal
+            pattern === 'D' && e(React.Fragment, null,
+              e(ResultCard, { title: 'Platelet Disorder', severity: 'likely', tags: ['Thrombocytopenia', 'Platelet dysfunction', 'Aspirin', 'Uraemia'] }),
+              e(ResultCard, { title: 'Mild von Willebrand Disease', severity: 'consider', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] }),
+              e(ResultCard, { title: 'Factor XIII Deficiency', severity: 'rare', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] }),
+              e(ResultCard, { title: 'Vascular Cause', severity: 'rare', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] })
+            ),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e('div', { style: { marginTop: '16px' } },
+              e(PrimaryButton, { label: 'View Management', color: 'var(--green)', onClick: () => setShowMgmt(true) }),
+              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
+            )
+          )
+        )
+      );
+    }
+
     // ========== MAIN APP ==========
 
     function App() {
@@ -1903,6 +3073,26 @@
 
       if (screen === 'hypona') {
         return e(HyponatraemiaModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'iron') {
+        return e(IronModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'calcium') {
+        return e(CalciumModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'coag') {
+        return e(CoagModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'aki') {
+        return e(AKIModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'csf') {
+        return e(CSFModule, { onBack: () => setScreen('home') });
       }
 
       // Placeholder for other modules
