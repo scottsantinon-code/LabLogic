@@ -43,6 +43,12 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+      20%, 40%, 60%, 80% { transform: translateX(8px); }
+    }
+
     .app-container {
       max-width: 430px;
       margin: 0 auto;
@@ -89,10 +95,8 @@
       { id: "hypona", name: "Hyponatraemia", icon: "💧", color: "#0A84FF", gradient: "linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
       { id: "tft", name: "Thyroid Function", icon: "🦋", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
       { id: "iron", name: "Iron Studies", icon: "🩸", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Pattern recognition with ferritin traps", tag: "Fe" },
-      { id: "calcium", name: "Calcium & PTH", icon: "🦴", color: "#FF9F0A", gradient: "linear-gradient(135deg, #FF9F0A 0%, #E08600 100%)", desc: "PTH-dependent branching", tag: "Ca²⁺" },
       { id: "coag", name: "Coagulation", icon: "🔬", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT / APTT pattern analysis", tag: "Coag" },
-      { id: "aki", name: "Urine Biochem", icon: "⚗️", color: "#64D2FF", gradient: "linear-gradient(135deg, #64D2FF 0%, #32B4E0 100%)", desc: "FENa & AKI workup", tag: "AKI" },
-      { id: "csf", name: "CSF Analysis", icon: "🧠", color: "#FFD60A", gradient: "linear-gradient(135deg, #FFD60A 0%, #E0B800 100%)", desc: "Meningitis pattern matching", tag: "CSF" }
+      { id: "aki", name: "Urine Biochem", icon: "⚗️", color: "#64D2FF", gradient: "linear-gradient(135deg, #64D2FF 0%, #32B4E0 100%)", desc: "FENa & AKI workup", tag: "AKI", beta: true }
     ];
 
     // Reference ranges
@@ -666,6 +670,134 @@
       );
     }
 
+    // 16. BetaGate (password gate for beta modules)
+    function BetaGate({ moduleName, moduleColor, onSuccess, onBack }) {
+      const [pin, setPin] = useState('');
+      const [shake, setShake] = useState(false);
+      const CORRECT_PIN = '0000';
+
+      const handleDigit = (digit) => {
+        if (pin.length >= 4) return;
+        const newPin = pin + digit;
+        setPin(newPin);
+        if (newPin.length === 4) {
+          if (newPin === CORRECT_PIN) {
+            setTimeout(() => onSuccess(), 200);
+          } else {
+            setShake(true);
+            setTimeout(() => {
+              setShake(false);
+              setPin('');
+            }, 500);
+          }
+        }
+      };
+
+      const handleDelete = () => {
+        setPin(pin.slice(0, -1));
+      };
+
+      const PinDot = ({ filled }) => e('div', {
+        style: {
+          width: '16px',
+          height: '16px',
+          borderRadius: '50%',
+          border: filled ? 'none' : '2px solid var(--label3)',
+          background: filled ? moduleColor : 'transparent',
+          transition: 'all 0.15s ease'
+        }
+      });
+
+      const NumKey = ({ digit, letters }) => e('button', {
+        onClick: () => handleDigit(digit),
+        style: {
+          width: '75px',
+          height: '75px',
+          borderRadius: '50%',
+          background: 'var(--card)',
+          border: '1px solid var(--sep)',
+          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'var(--font)',
+          transition: 'transform 0.1s ease, background 0.1s ease'
+        }
+      },
+        e('span', { style: { fontSize: '28px', fontWeight: 300, color: 'var(--label)' } }, digit),
+        letters && e('span', { style: { fontSize: '10px', fontWeight: 500, color: 'var(--label3)', letterSpacing: '2px', marginTop: '-2px' } }, letters)
+      );
+
+      return e('div', { className: 'app-container', style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: moduleName, onBack: onBack }),
+        e('div', { className: 'screen-content', style: { display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '40px' } },
+          e('div', { style: { fontSize: '60px', marginBottom: '16px' } }, '🔒'),
+          e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '6px' } }, 'Beta Module'),
+          e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '32px' } }, 'Enter access code'),
+
+          // PIN dots
+          e('div', {
+            style: {
+              display: 'flex',
+              gap: '20px',
+              marginBottom: '40px',
+              animation: shake ? 'shake 0.5s ease' : 'none'
+            }
+          },
+            e(PinDot, { filled: pin.length >= 1 }),
+            e(PinDot, { filled: pin.length >= 2 }),
+            e(PinDot, { filled: pin.length >= 3 }),
+            e(PinDot, { filled: pin.length >= 4 })
+          ),
+
+          // Numeric keypad
+          e('div', { style: { display: 'flex', flexDirection: 'column', gap: '12px' } },
+            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
+              e(NumKey, { digit: '1', letters: '' }),
+              e(NumKey, { digit: '2', letters: 'ABC' }),
+              e(NumKey, { digit: '3', letters: 'DEF' })
+            ),
+            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
+              e(NumKey, { digit: '4', letters: 'GHI' }),
+              e(NumKey, { digit: '5', letters: 'JKL' }),
+              e(NumKey, { digit: '6', letters: 'MNO' })
+            ),
+            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
+              e(NumKey, { digit: '7', letters: 'PQRS' }),
+              e(NumKey, { digit: '8', letters: 'TUV' }),
+              e(NumKey, { digit: '9', letters: 'WXYZ' })
+            ),
+            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
+              e('div', { style: { width: '75px', height: '75px' } }), // empty spacer
+              e(NumKey, { digit: '0', letters: '' }),
+              e('button', {
+                onClick: handleDelete,
+                style: {
+                  width: '75px',
+                  height: '75px',
+                  borderRadius: '50%',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'var(--font)'
+                }
+              },
+                e('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+                  e('path', { d: 'M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z' }),
+                  e('line', { x1: '18', y1: '9', x2: '12', y2: '15' }),
+                  e('line', { x1: '12', y1: '9', x2: '18', y2: '15' })
+                )
+              )
+            )
+          )
+        )
+      );
+    }
+
     // ========== SCREENS ==========
 
     // Home Screen
@@ -707,7 +839,7 @@
           modules.map((mod, i) =>
             e(FadeIn, { key: mod.id, delay: 100 + i * 60 },
               e('button', {
-                onClick: () => onSelectModule(mod.id),
+                onClick: () => onSelectModule(mod.beta ? mod.id + '-gate' : mod.id),
                 style: {
                   width: '100%',
                   display: 'flex',
@@ -722,9 +854,24 @@
                   cursor: 'pointer',
                   textAlign: 'left',
                   fontFamily: 'var(--font)',
-                  transition: 'transform 0.2s ease'
+                  transition: 'transform 0.2s ease',
+                  position: 'relative'
                 }
               },
+                // BETA badge (if beta module)
+                mod.beta && e('span', {
+                  style: {
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    background: 'rgba(100,210,255,0.15)',
+                    color: 'var(--cyan)',
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: '6px'
+                  }
+                }, 'BETA'),
                 // Icon square
                 e('div', {
                   style: {
@@ -2442,591 +2589,6 @@
       );
     }
 
-    // ========== CALCIUM & PTH MODULE ==========
-
-    function CalciumModule({ onBack }) {
-      const containerRef = useRef(null);
-      const [step, setStep] = useState(0);
-      const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
-
-      // Screen 0: Calcium input
-      const [useIonised, setUseIonised] = useState(false);
-      const [totalCa, setTotalCa] = useState('');
-      const [albumin, setAlbumin] = useState('');
-      const [ionisedCa, setIonisedCa] = useState('');
-      const [phosphate, setPhosphate] = useState('');
-      const [vitD, setVitD] = useState('');
-      const [magnesium, setMagnesium] = useState('');
-      // Screen 1: PTH (if abnormal)
-      const [calciumDirection, setCalciumDirection] = useState(null);
-      const [pthResult, setPthResult] = useState(null);
-      // Screen 2: Results
-      const [showMgmt, setShowMgmt] = useState(false);
-      const [mgmtType, setMgmtType] = useState(null);
-
-      // Normal calcium: 2 screens (input, results). Abnormal: 3 screens (input, PTH, results)
-      const getTotalScreens = () => calciumDirection === 'normal' ? 2 : 3;
-
-      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
-      const goToStep = (s) => { setStep(s); scrollToTop(); };
-      const handleBack = () => {
-        clearAutoAdvance();
-        if (showMgmt) setShowMgmt(false);
-        else if (step === 0) onBack();
-        else goToStep(step - 1);
-      };
-
-      // Corrected calcium calculation
-      const getCorrectedCa = () => {
-        const ca = parseFloat(totalCa);
-        const alb = parseFloat(albumin);
-        if (!isNaN(ca) && !isNaN(alb)) return (ca + 0.02 * (40 - alb)).toFixed(2);
-        return null;
-      };
-
-      // Get effective calcium value
-      const getEffectiveCa = () => {
-        if (useIonised) return parseFloat(ionisedCa);
-        return parseFloat(getCorrectedCa());
-      };
-
-      // Classify calcium
-      const classifyCa = () => {
-        const ca = getEffectiveCa();
-        if (isNaN(ca)) return null;
-        if (useIonised) {
-          if (ca < 1.12) return 'low';
-          if (ca > 1.30) return 'high';
-          return 'normal';
-        } else {
-          if (ca < 2.15) return 'low';
-          if (ca > 2.55) return 'high';
-          return 'normal';
-        }
-      };
-
-      const getSeverity = () => {
-        const ca = getEffectiveCa();
-        if (isNaN(ca)) return null;
-        if (useIonised) {
-          if (ca > 1.50) return { color: 'var(--red)', text: 'Severe / Crisis' };
-          if (ca > 1.40) return { color: 'var(--orange)', text: 'Moderate' };
-          if (ca > 1.30) return { color: 'var(--orange)', text: 'Mild' };
-          if (ca < 0.9) return { color: 'var(--red)', text: 'Severe' };
-          if (ca < 1.12) return { color: 'var(--orange)', text: 'Low' };
-          return { color: 'var(--green)', text: 'Normal' };
-        } else {
-          if (ca > 3.5) return { color: 'var(--red)', text: 'Severe / Crisis — dehydration, renal failure, coma' };
-          if (ca > 3.0) return { color: 'var(--orange)', text: 'Moderate — nausea, polyuria, confusion' };
-          if (ca > 2.55) return { color: 'var(--orange)', text: 'Mild — often asymptomatic' };
-          if (ca < 1.8) return { color: 'var(--red)', text: 'Severe' };
-          if (ca < 2.15) return { color: 'var(--orange)', text: 'Low' };
-          return { color: 'var(--green)', text: 'Normal' };
-        }
-      };
-
-      const getCaDisplay = () => {
-        const ca = getEffectiveCa();
-        const sev = getSeverity();
-        return { value: useIonised ? `${ionisedCa} mmol/L (ionised)` : `${getCorrectedCa()} mmol/L (corrected)`, interpretation: sev?.text || '', color: sev?.color || 'var(--blue)' };
-      };
-
-      const getPthDisplay = () => {
-        if (calciumDirection === 'high') {
-          if (pthResult === 'high') return { value: 'High / inappropriately normal', interpretation: 'PTH-mediated', color: 'var(--orange)' };
-          return { value: 'Low (suppressed)', interpretation: 'PTH-independent', color: 'var(--blue)' };
-        } else {
-          if (pthResult === 'low') return { value: 'Low / inappropriately normal', interpretation: 'Hypoparathyroidism', color: 'var(--red)' };
-          return { value: 'High (appropriate)', interpretation: 'Secondary hyperparathyroidism', color: 'var(--orange)' };
-        }
-      };
-
-      // Management screens
-      if (showMgmt) {
-        const isHyperCa = mgmtType === 'hyperCa';
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, isHyperCa ? 'Hypercalcaemia' : 'Hypocalcaemia')
-            ),
-            isHyperCa ? e(React.Fragment, null,
-              e(MgmtStep, { number: 1, title: 'IV Normal Saline', color: 'var(--orange)' }, 'Aggressive volume resuscitation. Most patients are profoundly dehydrated from polyuria.'),
-              e(MgmtStep, { number: 2, title: 'Bisphosphonate', color: 'var(--orange)' }, 'Zoledronic acid IV. Onset 2–4 days, peak 4–7 days. Most effective for malignant hypercalcaemia. Requires renal function assessment and dose adjustment.'),
-              e(MgmtStep, { number: 3, title: 'Calcitonin', color: 'var(--orange)' }, 'SC/IM. Rapid onset (hours) but tachyphylaxis within 48h. Bridge until bisphosphonate works.'),
-              e(MgmtStep, { number: 4, title: 'Other Options', color: 'var(--orange)' },
-                e('span', null, e('strong', null, 'Denosumab'), ' — if refractory to bisphosphonates or renal impairment.', e('br'),
-                  e('strong', null, 'Corticosteroids'), ' — for granulomatous disease, lymphoma, vitamin D toxicity, myeloma.', e('br'),
-                  e('strong', null, 'Dialysis'), ' — for life-threatening hypercalcaemia refractory to above.')
-              ),
-              e(WarningBanner, null, e('strong', null, 'Avoid thiazide diuretics'), ' (worsen hypercalcaemia). Loop diuretics ONLY after adequate volume resuscitation.')
-            ) : e(React.Fragment, null,
-              e(MgmtStep, { number: 1, title: 'Acute IV Calcium', color: 'var(--orange)' }, 'Calcium gluconate IV bolus. Can repeat. Dosing per local protocol.'),
-              e(MgmtStep, { number: 2, title: 'Continuous Infusion', color: 'var(--orange)' }, 'Calcium gluconate infusion, titrate to ionised calcium.'),
-              e(WarningBanner, null, e('strong', null, 'Do NOT give calcium through the same line as bicarbonate'), ' — precipitates.'),
-              e(MgmtStep, { number: 3, title: 'Correct Magnesium', color: 'var(--orange)' }, 'IV magnesium replacement if low. Calcium will not correct until Mg is replaced.'),
-              e(MgmtStep, { number: 4, title: 'Cardiac Monitoring', color: 'var(--orange)' }, 'If ionised Ca severely low — risk of arrhythmia. Continuous monitoring advised.'),
-              e(MgmtStep, { number: 5, title: 'Chronic Replacement', color: 'var(--orange)' },
-                e('span', null, e('strong', null, 'Calcium supplements'), ' with food.', e('br'),
-                  e('strong', null, 'Vitamin D'), ' — calcitriol preferred if renal impairment or hypoparathyroidism.')
-              )
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', fontStyle: 'italic', marginTop: '16px', padding: '12px', background: 'var(--bg)', borderRadius: '8px' } },
-              'Dosing should follow local formulary guidelines. This app provides interpretation guidance only.'
-            ),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-          )
-        );
-      }
-
-      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Calcium & PTH', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
-        e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--orange)' }),
-
-          // SCREEN 0: Enter calcium (ValueInputs, Next button)
-          step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter calcium'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Total + albumin for correction, or ionised directly'),
-            // Tab selector
-            e('div', { style: { display: 'flex', background: 'var(--sep)', borderRadius: '10px', padding: '3px', marginBottom: '20px' } },
-              e('button', { onClick: () => setUseIonised(false), style: { flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: !useIonised ? 'var(--card)' : 'transparent', fontWeight: 600, fontSize: '14px', cursor: 'pointer', fontFamily: 'var(--font)', color: !useIonised ? 'var(--label)' : 'var(--label3)' } }, 'Total Ca + Albumin'),
-              e('button', { onClick: () => setUseIonised(true), style: { flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: useIonised ? 'var(--card)' : 'transparent', fontWeight: 600, fontSize: '14px', cursor: 'pointer', fontFamily: 'var(--font)', color: useIonised ? 'var(--label)' : 'var(--label3)' } }, 'Ionised Ca')
-            ),
-            !useIonised ? e(React.Fragment, null,
-              e(ValueInput, { label: 'Total Calcium', unit: 'mmol/L', value: totalCa, onChange: setTotalCa, placeholder: '2.15–2.55', hint: 'Normal: 2.15–2.55' }),
-              e(ValueInput, { label: 'Albumin', unit: 'g/L', value: albumin, onChange: setAlbumin, placeholder: '35–50', hint: 'Normal: 35–50' }),
-              getCorrectedCa() && e(BranchCard, { label: 'Corrected Calcium', value: `${getCorrectedCa()} mmol/L`, interpretation: getSeverity()?.text || '', color: getSeverity()?.color || 'var(--blue)' })
-            ) : e(React.Fragment, null,
-              e(ValueInput, { label: 'Ionised Calcium', unit: 'mmol/L', value: ionisedCa, onChange: setIonisedCa, placeholder: '1.12–1.30', hint: 'Normal: 1.12–1.30' }),
-              ionisedCa && e(BranchCard, { label: 'Ionised Calcium', value: `${ionisedCa} mmol/L`, interpretation: getSeverity()?.text || '', color: getSeverity()?.color || 'var(--blue)' })
-            ),
-            e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'Supporting labs (optional)'),
-            e(ValueInput, { label: 'Phosphate', unit: 'mmol/L', value: phosphate, onChange: setPhosphate, placeholder: '0.75–1.50', hint: 'Normal: 0.75–1.50' }),
-            e(ValueInput, { label: '25(OH) Vitamin D', unit: 'nmol/L', value: vitD, onChange: setVitD, placeholder: '>50 adequate', hint: 'Adequate: >50' }),
-            e(ValueInput, { label: 'Magnesium', unit: 'mmol/L', value: magnesium, onChange: setMagnesium, placeholder: '0.70–1.10', hint: 'Normal: 0.70–1.10' }),
-            e(PrimaryButton, { label: 'Next', disabled: useIonised ? !ionisedCa : (!totalCa || !albumin), color: 'var(--orange)', onClick: () => { const dir = classifyCa(); setCalciumDirection(dir); goToStep(dir === 'normal' ? 2 : 1); } })
-          ),
-
-          // SCREEN 1: What is the PTH? (ChoiceButtons, auto-advance) - only for abnormal calcium
-          step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the PTH?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, calciumDirection === 'high' ? 'PTH is THE key branch point' : 'PTH tells us whether parathyroids are responding'),
-            calciumDirection === 'high' && getEffectiveCa() > 3.0 && e(WarningBanner, null, e('strong', null, 'Urgent.'), ' Calcium >3.0 mmol/L requires immediate IV saline.'),
-            calciumDirection === 'low' && e(WarningBanner, null, e('strong', null, 'Check magnesium.'), ' Hypomagnesaemia causes functional hypoparathyroidism. Calcium won\'t correct until Mg replaced.'),
-            calciumDirection === 'high' ? e(React.Fragment, null,
-              e(ChoiceButton, {
-                label: 'High or inappropriately normal',
-                sublabel: 'PTH-mediated — parathyroids driving this',
-                selected: pthResult === 'high',
-                onClick: () => {
-                  clearAutoAdvance();
-                  setPthResult('high');
-                  scheduleAdvance(() => goToStep(2), false);
-                },
-                color: 'var(--orange)'
-              }),
-              e(ChoiceButton, {
-                label: 'Low (appropriately suppressed)',
-                sublabel: 'PTH-independent — something else causing high Ca',
-                selected: pthResult === 'low',
-                onClick: () => {
-                  clearAutoAdvance();
-                  setPthResult('low');
-                  scheduleAdvance(() => goToStep(2), false);
-                },
-                color: 'var(--blue)'
-              })
-            ) : e(React.Fragment, null,
-              e(ChoiceButton, {
-                label: 'Low or inappropriately normal',
-                sublabel: 'Hypoparathyroidism — parathyroids not responding',
-                selected: pthResult === 'low',
-                onClick: () => {
-                  clearAutoAdvance();
-                  setPthResult('low');
-                  scheduleAdvance(() => goToStep(2), false);
-                },
-                color: 'var(--red)'
-              }),
-              e(ChoiceButton, {
-                label: 'High (appropriate response)',
-                sublabel: 'Secondary hyperparathyroidism — compensating',
-                selected: pthResult === 'high',
-                onClick: () => {
-                  clearAutoAdvance();
-                  setPthResult('high');
-                  scheduleAdvance(() => goToStep(2), false);
-                },
-                color: 'var(--orange)'
-              })
-            )
-          ),
-
-          // SCREEN 2: Results
-          step === 2 && e(FadeIn, null,
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
-            ),
-            e(BranchCard, { label: 'Calcium', ...getCaDisplay() }),
-            calciumDirection !== 'normal' && e(BranchCard, { label: 'PTH', ...getPthDisplay() }),
-
-            // Normal calcium result
-            calciumDirection === 'normal' && e(ResultCard, { title: 'Normal Calcium', severity: 'likely', tags: ['No further workup needed'] }, 'Calcium is within normal range — no further algorithmic interpretation needed.'),
-            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
-
-            // HYPERCALCAEMIA + PTH HIGH
-            calciumDirection === 'high' && pthResult === 'high' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Primary Hyperparathyroidism (PHPT)', severity: 'likely', tags: ['Single adenoma ~85%', 'Hyperplasia ~15%', 'Outpatient #1 cause'], onTap: () => { setMgmtType('hyperCa'); setShowMgmt(true); } }, 'Most common cause of hypercalcaemia in outpatients. Classic: ↑Ca, ↑PTH, ↓PO₄. Often incidental finding.'),
-              e(ResultCard, { title: 'Familial Hypocalciuric Hypercalcaemia (FHH)', severity: 'consider', tags: ['Benign', 'Does NOT need surgery', 'Check CCCR'] }, 'Ca-sensing receptor mutation → higher calcium set point. Distinguished from PHPT by low urinary calcium excretion (CCCR <0.01). Important: surgery does NOT fix FHH.'),
-              e(InfoPanel, { title: 'PHPT vs FHH — CCCR Calculator', color: 'var(--orange)' }, e('p', null, 'CCCR = (Urine Ca × Serum Cr) / (Serum Ca × Urine Cr)', e('br'), 'CCCR > 0.02 → PHPT. CCCR < 0.01 → FHH. 0.01–0.02 → indeterminate.')),
-              e(ResultCard, { title: 'Tertiary Hyperparathyroidism', subtitle: 'Post-CKD or post-transplant', severity: 'consider', tags: ['Autonomous PTH'] }),
-              e(ResultCard, { title: 'Lithium Therapy', severity: 'consider', tags: ['Shifts Ca set point'] })
-            ),
-
-            // HYPERCALCAEMIA + PTH LOW
-            calciumDirection === 'high' && pthResult === 'low' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Malignancy', severity: 'dangerous', tags: ['Hospital #1 cause', 'PTHrP', 'Osteolytic mets', 'Lymphoma'], onTap: () => { setMgmtType('hyperCa'); setShowMgmt(true); } }, 'Most common cause in hospitalised patients. Check PTHrP level. Three mechanisms: humoral (PTHrP), osteolytic metastases, calcitriol-mediated (lymphoma).'),
-              e(InfoPanel, { title: 'Malignancy-Associated Hypercalcaemia', color: 'var(--orange)' },
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Humoral (PTHrP):'), ' ~80%. Tumour secretes PTH-related peptide. NOT detected by standard PTH assay. Common: squamous cell, renal cell, breast.'),
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Osteolytic:'), ' Direct bone destruction. Breast, myeloma, lung. Expect ↑ALP.'),
-                e('p', null, e('strong', null, 'Calcitriol-mediated:'), ' Lymphoma produces 1,25(OH)₂D.')
-              ),
-              e(ResultCard, { title: 'Granulomatous Disease', severity: 'consider', tags: ['Sarcoidosis', 'TB', 'Fungal', 'Check 1,25(OH)₂D'] }, 'Macrophages produce 1,25(OH)₂D autonomously.'),
-              e(ResultCard, { title: 'Vitamin D Toxicity', severity: 'consider', tags: ['Exogenous intake', '25(OH)D >250 nmol/L'] }),
-              e(ResultCard, { title: 'Other', severity: 'rare', tags: ['Thyrotoxicosis', 'Thiazides', 'Immobilisation', 'Milk-alkali'] })
-            ),
-
-            // HYPOCALCAEMIA + PTH LOW
-            calciumDirection === 'low' && pthResult === 'low' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Hypoparathyroidism', severity: 'likely', tags: ['Post-surgical (#1)', 'Autoimmune', 'Infiltrative'], onTap: () => { setMgmtType('hypoCa'); setShowMgmt(true); } }, 'Most commonly post-thyroidectomy or parathyroidectomy. May be transient or permanent.'),
-              magnesium && parseFloat(magnesium) < 0.70 && e(React.Fragment, null,
-                e(WarningBanner, null, e('strong', null, 'Magnesium is low.'), ' Hypomagnesaemia impairs PTH secretion AND end-organ response. Replace magnesium FIRST.'),
-                e(ResultCard, { title: 'Functional Hypoparathyroidism (Mg depletion)', severity: 'dangerous', tags: ['Replace Mg first', 'PTH will not work'] })
-              )
-            ),
-
-            // HYPOCALCAEMIA + PTH HIGH
-            calciumDirection === 'low' && pthResult === 'high' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Vitamin D Deficiency', severity: 'likely', tags: ['Most common globally', 'Check 25(OH)D'], onTap: () => { setMgmtType('hypoCa'); setShowMgmt(true); } }, 'PTH appropriately elevated in response to low calcium. Phosphate typically low (PTH promoting phosphaturia).'),
-              phosphate && e(InfoPanel, { title: 'Phosphate as Discriminator', color: 'var(--orange)' },
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Low phosphate + high PTH'), ' = PTH is working on kidneys. Problem is lack of calcium input (vitamin D deficiency, malabsorption).'),
-                e('p', null, e('strong', null, 'High phosphate + high PTH'), ' = PTH is NOT working on kidneys (renal failure, PTH resistance) OR phosphate load.')
-              ),
-              e(ResultCard, { title: 'CKD', severity: 'consider', tags: ['Impaired 1α-hydroxylation', 'High phosphate', 'Check eGFR'] }, 'Kidneys can\'t convert 25(OH)D to active 1,25(OH)₂D. Need calcitriol, not cholecalciferol.'),
-              e(ResultCard, { title: 'Malabsorption', severity: 'consider', tags: ['Coeliac', 'Crohn\'s', 'Post-bariatric'] }),
-              e(ResultCard, { title: 'Hungry Bone Syndrome', subtitle: 'Post-parathyroidectomy', severity: 'consider', tags: ['Rapid Ca + PO₄ uptake'] }),
-              e(ResultCard, { title: 'Pseudohypoparathyroidism', severity: 'rare', tags: ['PTH resistance', 'Albright hereditary osteodystrophy'] }, 'High PTH but no response — end-organ resistance.')
-            ),
-
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
-            e('div', { style: { marginTop: '16px' } },
-              e(PrimaryButton, { label: 'View Management', color: 'var(--orange)', onClick: () => { setMgmtType(calciumDirection === 'high' ? 'hyperCa' : 'hypoCa'); setShowMgmt(true); } }),
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-            )
-          )
-        )
-      );
-    }
-
-    // ========== CSF ANALYSIS MODULE ==========
-
-    function CSFModule({ onBack }) {
-      const containerRef = useRef(null);
-      const [step, setStep] = useState(0);
-      const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
-
-      // Screen 0: CSF appearance
-      const [appearance, setAppearance] = useState(null);
-      // Screen 1: Immunocompromised?
-      const [isImmunocompromised, setIsImmunocompromised] = useState(null);
-      // Screen 2: CSF results
-      const [openingPressure, setOpeningPressure] = useState('');
-      const [csfWcc, setCsfWcc] = useState('');
-      const [csfRcc, setCsfRcc] = useState('');
-      const [csfDiff, setCsfDiff] = useState(null);
-      const [csfProtein, setCsfProtein] = useState('');
-      const [csfGlucose, setCsfGlucose] = useState('');
-      const [serumGlucose, setSerumGlucose] = useState('');
-      // Screen 3: Results
-      const [showMgmt, setShowMgmt] = useState(false);
-
-      const getTotalScreens = () => 4;
-
-      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'smooth' }); };
-      const goToStep = (s) => { setStep(s); scrollToTop(); };
-      const handleBack = () => {
-        clearAutoAdvance();
-        if (showMgmt) setShowMgmt(false);
-        else if (step === 0) onBack();
-        else goToStep(step - 1);
-      };
-
-      // Traumatic tap correction
-      const getCorrectedWcc = () => {
-        const wcc = parseFloat(csfWcc);
-        const rcc = parseFloat(csfRcc);
-        if (!isNaN(wcc) && !isNaN(rcc) && rcc > 0) {
-          return Math.max(0, wcc - (rcc / 700)).toFixed(0);
-        }
-        return null;
-      };
-
-      const getCorrectedProtein = () => {
-        const prot = parseFloat(csfProtein);
-        const rcc = parseFloat(csfRcc);
-        if (!isNaN(prot) && !isNaN(rcc) && rcc > 0) {
-          return Math.max(0, prot - (rcc * 0.00001)).toFixed(3);
-        }
-        return null;
-      };
-
-      // CSF:Serum glucose ratio
-      const getGlucoseRatio = () => {
-        const csf = parseFloat(csfGlucose);
-        const serum = parseFloat(serumGlucose);
-        if (!isNaN(csf) && !isNaN(serum) && serum > 0) {
-          return (csf / serum).toFixed(2);
-        }
-        return null;
-      };
-
-      const getGlucoseRatioDisplay = () => {
-        const ratio = getGlucoseRatio();
-        if (!ratio) return null;
-        const r = parseFloat(ratio);
-        if (r > 0.6) return { value: ratio, interpretation: 'Normal — effectively excludes bacterial meningitis', color: 'var(--green)' };
-        if (r >= 0.3) return { value: ratio, interpretation: 'Low — consider bacterial, TB, fungal, malignant', color: 'var(--orange)' };
-        return { value: ratio, interpretation: 'Very low — strongly suggests bacterial or TB meningitis', color: 'var(--red)' };
-      };
-
-      const getOPDisplay = () => {
-        if (!openingPressure) return null;
-        const op = parseFloat(openingPressure);
-        if (op < 6) return { value: `${openingPressure} cmH₂O`, interpretation: 'Low — CSF leak, dehydration', color: 'var(--blue)' };
-        if (op <= 20) return { value: `${openingPressure} cmH₂O`, interpretation: 'Normal', color: 'var(--green)' };
-        if (op <= 25) return { value: `${openingPressure} cmH₂O`, interpretation: 'Borderline elevated', color: 'var(--orange)' };
-        if (op <= 40) return { value: `${openingPressure} cmH₂O`, interpretation: 'Elevated', color: 'var(--red)' };
-        return { value: `${openingPressure} cmH₂O`, interpretation: 'Markedly elevated — herniation risk', color: 'var(--red)' };
-      };
-
-      // Determine likely pattern
-      const getLikelyPattern = () => {
-        const lowGlucose = getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6;
-        const highProtein = csfProtein && parseFloat(csfProtein) > 0.45;
-        const highWcc = csfWcc && parseFloat(csfWcc) > 5;
-
-        if (csfDiff === 'polys' && lowGlucose) return 'bacterial';
-        if (csfDiff === 'lymphs' && !lowGlucose) return 'viral';
-        if (csfDiff === 'lymphs' && lowGlucose) return 'tb';
-        if (csfDiff === 'lymphs' && lowGlucose && isImmunocompromised) return 'crypto';
-        return null;
-      };
-
-      // Management screen
-      if (showMgmt) {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Meningitis / Encephalitis')
-            ),
-            e(WarningBanner, null, e('strong', null, 'If LP cannot be done immediately:'), ' blood cultures THEN empiric antibiotics IMMEDIATELY.'),
-            e(MgmtStep, { number: 1, title: 'Empiric Antibiotics', color: 'var(--yellow)' },
-              e('span', null, e('strong', null, 'Adult (community-acquired):'), ' 3rd-gen cephalosporin + dexamethasone.', e('br'),
-                e('strong', null, 'If Listeria risk (>50 years, immunosuppressed, pregnant):'), ' ADD ampicillin or benzylpenicillin.', e('br'),
-                e('strong', null, 'Post-neurosurgical / VP shunt:'), ' Broader gram-positive and gram-negative cover required.')
-            ),
-            e(MgmtStep, { number: 2, title: 'Dexamethasone', color: 'var(--yellow)' }, 'Must be given WITH or BEFORE first antibiotic dose. No benefit if started later.'),
-            e(WarningBanner, null, e('strong', null, 'Do NOT give dexamethasone if:'), ' immunosuppressed, post-neurosurgical, or suspected viral/TB meningitis.'),
-            e(MgmtStep, { number: 3, title: 'HSV Encephalitis', color: 'var(--yellow)' },
-              'IV aciclovir — start empirically if ANY suspicion of encephalitis (confusion, focal neurology, seizures, temporal lobe changes). Do NOT wait for PCR.'
-            ),
-            e(MgmtStep, { number: 4, title: 'TB Meningitis', color: 'var(--yellow)' }, '4-drug anti-TB therapy (induction) then 2-drug continuation phase (total 12 months). Corticosteroids — evidence supports steroids in TB meningitis.'),
-            e(MgmtStep, { number: 5, title: 'Cryptococcal', color: 'var(--yellow)' },
-              e('span', null, 'Amphotericin-based induction, then azole maintenance. ', e('strong', null, 'Therapeutic LP'), ' for raised pressure — serial LPs to reduce opening pressure.')
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', fontStyle: 'italic', marginTop: '16px', padding: '12px', background: 'var(--bg)', borderRadius: '8px' } },
-              'Dosing should follow local formulary/antimicrobial guidelines. This app provides interpretation guidance only.'
-            ),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-          )
-        );
-      }
-
-      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'CSF Analysis', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
-        e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--yellow)' }),
-
-          // SCREEN 0: CSF appearance? (ChoiceButtons, auto-advance)
-          step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'CSF appearance?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'First impression at the bedside'),
-            e(ChoiceButton, {
-              label: 'Crystal clear',
-              sublabel: 'Normal or early/mild infection',
-              selected: appearance === 'clear',
-              onClick: () => {
-                clearAutoAdvance();
-                setAppearance('clear');
-                scheduleAdvance(() => goToStep(1), false);
-              },
-              color: 'var(--green)'
-            }),
-            e(ChoiceButton, {
-              label: 'Turbid / cloudy',
-              sublabel: 'High WCC or protein — bacterial until proven otherwise',
-              selected: appearance === 'turbid',
-              onClick: () => {
-                clearAutoAdvance();
-                setAppearance('turbid');
-                scheduleAdvance(() => goToStep(1), true); // 800ms for warning
-              },
-              color: 'var(--red)'
-            }),
-            e(ChoiceButton, {
-              label: 'Xanthochromic (yellow)',
-              sublabel: 'SAH (if >12h) or very high protein',
-              selected: appearance === 'xanthochromic',
-              onClick: () => {
-                clearAutoAdvance();
-                setAppearance('xanthochromic');
-                scheduleAdvance(() => goToStep(1), false);
-              },
-              color: 'var(--orange)'
-            }),
-            e(ChoiceButton, {
-              label: 'Bloody',
-              sublabel: 'Traumatic tap or subarachnoid haemorrhage',
-              selected: appearance === 'bloody',
-              onClick: () => {
-                clearAutoAdvance();
-                setAppearance('bloody');
-                scheduleAdvance(() => goToStep(1), true); // 800ms for warning
-              },
-              color: 'var(--red)'
-            }),
-            appearance === 'turbid' && e(WarningBanner, null, e('strong', null, 'Turbid CSF.'), ' Treat as bacterial meningitis until proven otherwise. Start empiric antibiotics.'),
-            appearance === 'bloody' && e(WarningBanner, null, e('strong', null, 'Bloody CSF.'), ' Distinguish traumatic tap (blood clears in successive tubes) from SAH (uniform, xanthochromia after 12h).')
-          ),
-
-          // SCREEN 1: Immunocompromised? (ChoiceButtons, auto-advance)
-          step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Immunocompromised?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes the differential significantly'),
-            e(ChoiceButton, {
-              label: 'Yes',
-              sublabel: 'HIV, transplant, chemotherapy, immunosuppressive drugs',
-              selected: isImmunocompromised === true,
-              onClick: () => {
-                clearAutoAdvance();
-                setIsImmunocompromised(true);
-                scheduleAdvance(() => goToStep(2), true); // 800ms for warning
-              },
-              color: 'var(--red)'
-            }),
-            e(ChoiceButton, {
-              label: 'No',
-              sublabel: 'Immunocompetent',
-              selected: isImmunocompromised === false,
-              onClick: () => {
-                clearAutoAdvance();
-                setIsImmunocompromised(false);
-                scheduleAdvance(() => goToStep(2), false);
-              },
-              color: 'var(--green)'
-            }),
-            isImmunocompromised === true && e(WarningBanner, null, e('strong', null, 'Cryptococcal meningitis'), ' must be excluded. Check serum and CSF CrAg. Often presents with markedly elevated opening pressure.')
-          ),
-
-          // SCREEN 2: Enter CSF results (ValueInputs + cell type, Next button)
-          step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter CSF results'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Cell counts, chemistry, and differential'),
-            e(ValueInput, { label: 'Opening Pressure', unit: 'cmH₂O', value: openingPressure, onChange: setOpeningPressure, placeholder: '6–20', hint: 'Normal: 6–20' }),
-            openingPressure && e(BranchCard, { label: 'Opening Pressure', ...getOPDisplay() }),
-            e(ValueInput, { label: 'CSF White Cell Count', unit: 'cells/µL', value: csfWcc, onChange: setCsfWcc, placeholder: 'Normal: 0–5' }),
-            e(ValueInput, { label: 'CSF Red Cell Count', unit: 'cells/µL', value: csfRcc, onChange: setCsfRcc, placeholder: 'Normal: 0', hint: 'For traumatic tap correction' }),
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '16px', marginBottom: '12px' } }, 'Predominant cell type'),
-            e(ChoiceButton, { label: 'Polymorphs (neutrophils)', sublabel: 'Suggests bacterial', selected: csfDiff === 'polys', onClick: () => setCsfDiff('polys'), color: 'var(--red)' }),
-            e(ChoiceButton, { label: 'Lymphocytes', sublabel: 'Viral, TB, fungal, or partially treated bacterial', selected: csfDiff === 'lymphs', onClick: () => setCsfDiff('lymphs'), color: 'var(--blue)' }),
-            e(ChoiceButton, { label: 'Mixed', sublabel: 'Early bacterial, or overlap pattern', selected: csfDiff === 'mixed', onClick: () => setCsfDiff('mixed'), color: 'var(--orange)' }),
-            e(ValueInput, { label: 'CSF Protein', unit: 'g/L', value: csfProtein, onChange: setCsfProtein, placeholder: '0.15–0.45', hint: 'Normal: 0.15–0.45' }),
-            e(ValueInput, { label: 'CSF Glucose', unit: 'mmol/L', value: csfGlucose, onChange: setCsfGlucose, placeholder: '2.8–4.4', hint: 'Normal: 2.8–4.4' }),
-            e(ValueInput, { label: 'Paired Serum Glucose', unit: 'mmol/L', value: serumGlucose, onChange: setSerumGlucose, placeholder: 'For ratio', hint: 'Essential for interpretation' }),
-            csfRcc && parseFloat(csfRcc) > 0 && getCorrectedWcc() && e(React.Fragment, null,
-              e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'Traumatic tap correction'),
-              e(BranchCard, { label: 'Corrected WCC', value: `${getCorrectedWcc()} cells/µL`, interpretation: 'After subtracting RBC contribution', color: 'var(--blue)' }),
-              getCorrectedProtein() && e(BranchCard, { label: 'Corrected Protein', value: `${getCorrectedProtein()} g/L`, interpretation: 'After subtracting RBC contribution', color: 'var(--blue)' })
-            ),
-            getGlucoseRatio() && e(BranchCard, { label: 'CSF:Serum Glucose Ratio', ...getGlucoseRatioDisplay() }),
-            e(PrimaryButton, { label: 'Next', disabled: !csfWcc || !csfDiff, color: 'var(--yellow)', onClick: () => goToStep(3) })
-          ),
-
-          // SCREEN 3: Results
-          step === 3 && e(FadeIn, null,
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Pattern Recognition')
-            ),
-            appearance && e(BranchCard, { label: 'Appearance', value: appearance.charAt(0).toUpperCase() + appearance.slice(1), interpretation: '', color: appearance === 'turbid' || appearance === 'bloody' ? 'var(--red)' : 'var(--green)' }),
-            csfWcc && e(BranchCard, { label: 'CSF WCC', value: `${getCorrectedWcc() || csfWcc} cells/µL`, interpretation: csfDiff === 'polys' ? 'Polymorphs predominant' : csfDiff === 'lymphs' ? 'Lymphocytes predominant' : 'Mixed', color: csfDiff === 'polys' ? 'var(--red)' : 'var(--blue)' }),
-            getGlucoseRatio() && e(BranchCard, { label: 'CSF:Serum Glucose', ...getGlucoseRatioDisplay() }),
-            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
-
-            // Bacterial
-            e(ResultCard, { title: 'Bacterial Meningitis', severity: csfDiff === 'polys' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6 ? 'dangerous' : 'consider', tags: ['Empiric antibiotics BEFORE LP', 'Gram stain', 'Blood cultures', 'Dexamethasone'], onTap: () => setShowMgmt(true) }, 'Classic: turbid CSF, polymorphs, very high WCC, high protein, low glucose. However, early bacterial meningitis can mimic viral (lymphocyte predominance in first 24h).'),
-
-            // Viral
-            e(ResultCard, { title: 'Viral Meningitis', severity: csfDiff === 'lymphs' && (!getGlucoseRatio() || parseFloat(getGlucoseRatio()) > 0.6) ? 'likely' : 'consider', tags: ['Enterovirus most common', 'HSV PCR', 'Self-limiting'] }, 'Clear CSF, lymphocyte predominance, mildly elevated protein, NORMAL glucose. Usually self-limiting. Key concern: rule out HSV encephalitis if confusion/focal neurology/seizures.'),
-
-            // TB
-            (csfDiff === 'lymphs' || csfDiff === 'mixed') && e(ResultCard, { title: 'TB Meningitis', severity: getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6 ? 'dangerous' : 'consider', tags: ['Subacute onset', 'Cranial nerve palsies', 'SIADH', 'Treat empirically if suspected'], onTap: () => setShowMgmt(true) }, 'Lymphocytes, low glucose, high protein. Notoriously difficult to diagnose (AFB smear only 10–20% sensitive). GeneXpert ~60–80% in CSF.'),
-            (csfDiff === 'lymphs' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6) && e(InfoPanel, { title: 'TB Meningitis — the Great Mimicker', color: 'var(--yellow)' },
-              e('p', { style: { marginBottom: '8px' } }, 'Clinical clues: subacute onset (days-weeks), cranial nerve palsies (especially VI), basal meningeal enhancement on MRI, hyponatraemia (SIADH), risk factors.'),
-              e('p', { style: { fontWeight: 700 } }, 'If clinical suspicion is moderate-high, start empiric treatment while awaiting results. Mortality of untreated TB meningitis approaches 100%.')
-            ),
-
-            // Cryptococcal
-            isImmunocompromised && e(ResultCard, { title: 'Cryptococcal Meningitis', severity: 'dangerous', tags: ['Immunosuppressed', 'High opening pressure', 'CrAg', 'Therapeutic LP'], onTap: () => setShowMgmt(true) }, 'Lymphocytes, low glucose, elevated protein, often markedly raised opening pressure. Check serum and CSF cryptococcal antigen (CrAg). Raised pressure is the major cause of morbidity.'),
-
-            // Partially treated
-            e(ResultCard, { title: 'Partially Treated Bacterial', severity: 'consider', tags: ['Prior antibiotics', 'Modified pattern', 'May look viral'] }, 'Prior antibiotics can modify the CSF pattern: lymphocyte shift, less dramatic glucose drop. Treat as bacterial if clinical suspicion high.'),
-
-            // Malignant
-            (csfDiff === 'lymphs' && getGlucoseRatio() && parseFloat(getGlucoseRatio()) < 0.6) && e(ResultCard, { title: 'Malignant Meningitis', severity: 'consider', tags: ['Lymphocytic', 'Low glucose', 'Known malignancy', 'Cytology'] }, 'Carcinomatous or lymphomatous meningitis. Lymphocytes, low glucose, very high protein. Send CSF cytology — may need repeat LPs.'),
-
-            // GBS
-            csfProtein && parseFloat(csfProtein) > 1.0 && csfWcc && parseFloat(csfWcc) < 10 && e(ResultCard, { title: 'Guillain-Barré Syndrome', severity: 'consider', tags: ['High protein', 'Few cells', 'Albuminocytological dissociation'] }, 'Very high protein with few or no cells — \'albuminocytological dissociation\'. Usually presents with ascending weakness, areflexia.'),
-
-            // IIH
-            openingPressure && parseFloat(openingPressure) > 25 && csfWcc && parseFloat(csfWcc) <= 5 && (!getGlucoseRatio() || parseFloat(getGlucoseRatio()) > 0.6) && e(ResultCard, { title: 'Idiopathic Intracranial Hypertension', severity: 'consider', tags: ['Elevated pressure', 'Normal composition', 'Diagnosis of exclusion'] }, 'Elevated opening pressure with completely normal CSF composition. Typical patient: young woman, obesity, headache, papilloedema.'),
-
-            // Investigations
-            e(InfoPanel, { title: 'Specific Investigations to Request', color: 'var(--yellow)' },
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Gram stain'), ' — always. Sensitivity ~60–90%. Negative does NOT exclude bacterial.'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Bacterial culture'), ' — always. Gold standard. 24–48h. Also blood cultures.'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'PCR (multiplex)'), ' — bacterial + viral (HSV, VZV, enterovirus). Higher sensitivity than culture after antibiotics.'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Cryptococcal antigen'), ' — if immunosuppressed, HIV, or lymphocytic with low glucose.'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'TB PCR (GeneXpert)'), ' — if subacute, lymphocytic, low glucose, risk factors. Large volume (>6ml).'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Cytology'), ' — if malignancy suspected. Large volume. May need repeat LPs.'),
-              e('div', { style: { background: 'rgba(255,214,10,0.15)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Oligoclonal bands'), ' — if MS suspected. Paired with serum.')
-            ),
-
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
-            e('div', { style: { marginTop: '16px' } },
-              e(PrimaryButton, { label: 'View Management', color: 'var(--yellow)', onClick: () => setShowMgmt(true) }),
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-            )
-          )
-        )
-      );
-    }
-
     // ========== AKI / URINE BIOCHEM MODULE ==========
 
     function AKIModule({ onBack }) {
@@ -3595,20 +3157,21 @@
         return e(IronModule, { onBack: () => setScreen('home') });
       }
 
-      if (screen === 'calcium') {
-        return e(CalciumModule, { onBack: () => setScreen('home') });
-      }
-
       if (screen === 'coag') {
         return e(CoagModule, { onBack: () => setScreen('home') });
       }
 
-      if (screen === 'aki') {
-        return e(AKIModule, { onBack: () => setScreen('home') });
+      if (screen === 'aki-gate') {
+        return e(BetaGate, {
+          moduleName: 'Urine Biochem',
+          moduleColor: 'var(--cyan)',
+          onSuccess: () => setScreen('aki'),
+          onBack: () => setScreen('home')
+        });
       }
 
-      if (screen === 'csf') {
-        return e(CSFModule, { onBack: () => setScreen('home') });
+      if (screen === 'aki') {
+        return e(AKIModule, { onBack: () => setScreen('home') });
       }
 
       // Placeholder for other modules
