@@ -829,7 +829,6 @@
       const [step, setStep] = useState(0);
       const [acutelyUnwell, setAcutelyUnwell] = useState(null);
       const [tshResult, setTshResult] = useState(null);
-      const [tsh, setTsh] = useState('');
       const [ft4, setFt4] = useState('');
       const [ft3, setFt3] = useState('');
       const [showMgmt, setShowMgmt] = useState(null); // 'hyper' or 'hypo'
@@ -888,9 +887,9 @@
 
       // Get TSH display values
       const getTSHDisplay = () => {
-        if (tshResult === 'low') return { value: tsh ? `${tsh} mU/L` : '< 0.4 mU/L', interp: 'Suppressed', color: 'var(--red)' };
-        if (tshResult === 'high') return { value: tsh ? `${tsh} mU/L` : '> 4.0 mU/L', interp: 'Elevated', color: 'var(--orange)' };
-        return { value: tsh ? `${tsh} mU/L` : '0.4–4.0 mU/L', interp: 'Within range', color: 'var(--green)' };
+        if (tshResult === 'low') return { value: 'Low (< 0.4)', interpretation: 'Suppressed', color: 'var(--red)' };
+        if (tshResult === 'high') return { value: 'High (> 4.0)', interpretation: 'Elevated', color: 'var(--orange)' };
+        return { value: 'Normal (0.4–4.0)', interpretation: 'Within range', color: 'var(--green)' };
       };
 
       const getFT4Display = () => {
@@ -908,7 +907,7 @@
       // Management screens
       if (showMgmt === 'hyper') {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', {
               onClick: () => setShowMgmt(null),
@@ -947,7 +946,7 @@
 
       if (showMgmt === 'hypo') {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', {
               onClick: () => setShowMgmt(null),
@@ -1036,15 +1035,7 @@
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'TSH Result'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'The pituitary is exquisitely sensitive — TSH moves before fT4/fT3 become abnormal')
             ),
-            e(ValueInput, {
-              label: 'TSH',
-              unit: 'mU/L',
-              value: tsh,
-              onChange: setTsh,
-              placeholder: '0.4 – 4.0',
-              hint: 'Normal: 0.4–4.0'
-            }),
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'TSH Interpretation'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'What is the TSH?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 0.4',
               sublabel: 'Pituitary suppressed → excess thyroid hormone (or pituitary failure)',
@@ -1291,15 +1282,12 @@
       const [glucose, setGlucose] = useState('');
 
       // Step 1: Serum Osmolality
-      const [serumOsm, setSerumOsm] = useState('');
       const [serumOsmResult, setSerumOsmResult] = useState(null);
 
       // Step 2: Urine Osmolality
-      const [urineOsm, setUrineOsm] = useState('');
       const [urineOsmResult, setUrineOsmResult] = useState(null);
 
       // Step 3: Urine Sodium
-      const [urineNa, setUrineNa] = useState('');
       const [urineNaResult, setUrineNaResult] = useState(null);
 
       // Management
@@ -1393,29 +1381,29 @@
       };
 
       const getSerumOsmDisplay = () => {
-        if (serumOsmResult === 'low') return { value: serumOsm ? `${serumOsm} mOsm/kg` : '< 275 mOsm/kg', interpretation: 'Hypotonic', color: 'var(--blue)' };
-        if (serumOsmResult === 'normal') return { value: serumOsm ? `${serumOsm} mOsm/kg` : '275–295 mOsm/kg', interpretation: 'Iso-osmolar', color: 'var(--green)' };
-        if (serumOsmResult === 'high') return { value: serumOsm ? `${serumOsm} mOsm/kg` : '> 295 mOsm/kg', interpretation: 'Hyper-osmolar', color: 'var(--orange)' };
+        if (serumOsmResult === 'low') return { value: 'Low (< 275)', interpretation: 'Hypotonic', color: 'var(--blue)' };
+        if (serumOsmResult === 'normal') return { value: 'Normal (275–295)', interpretation: 'Iso-osmolar', color: 'var(--green)' };
+        if (serumOsmResult === 'high') return { value: 'High (> 295)', interpretation: 'Hyper-osmolar', color: 'var(--orange)' };
         if (serumOsmResult === 'skip') return { value: 'Not available', interpretation: 'Assumed hypotonic', color: 'var(--label3)' };
         return { value: '', interpretation: '', color: 'var(--blue)' };
       };
 
       const getUrineOsmDisplay = () => {
-        if (urineOsmResult === 'low') return { value: urineOsm ? `${urineOsm} mOsm/kg` : '< 100 mOsm/kg', interpretation: 'Dilute — kidneys working', color: 'var(--green)' };
-        if (urineOsmResult === 'high') return { value: urineOsm ? `${urineOsm} mOsm/kg` : '> 100 mOsm/kg', interpretation: 'Concentrated — ADH active', color: 'var(--orange)' };
+        if (urineOsmResult === 'low') return { value: 'Low (< 100)', interpretation: 'Dilute — kidneys working', color: 'var(--green)' };
+        if (urineOsmResult === 'high') return { value: 'High (> 100)', interpretation: 'Concentrated — ADH active', color: 'var(--orange)' };
         return { value: '', interpretation: '', color: 'var(--blue)' };
       };
 
       const getUrineNaDisplay = () => {
-        if (urineNaResult === 'low') return { value: urineNa ? `${urineNa} mmol/L` : '< 20–40 mmol/L', interpretation: 'Retained — kidneys conserving', color: 'var(--green)' };
-        if (urineNaResult === 'high') return { value: urineNa ? `${urineNa} mmol/L` : '> 20–40 mmol/L', interpretation: 'Wasted — sodium loss', color: 'var(--orange)' };
+        if (urineNaResult === 'low') return { value: 'Low (< 20–40)', interpretation: 'Retained — kidneys conserving', color: 'var(--green)' };
+        if (urineNaResult === 'high') return { value: 'High (> 20–40)', interpretation: 'Wasted — sodium loss', color: 'var(--orange)' };
         return { value: '', interpretation: '', color: 'var(--blue)' };
       };
 
       // Management screen
       if (showMgmt) {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', {
               onClick: () => setShowMgmt(false),
@@ -1632,16 +1620,7 @@
 
             e(BranchCard, { label: 'Serum Sodium', ...getNaDisplay() }),
 
-            e(ValueInput, {
-              label: 'Serum Osmolality',
-              unit: 'mOsm/kg',
-              value: serumOsm,
-              onChange: setSerumOsm,
-              placeholder: '275 – 295',
-              hint: 'Normal: 275–295'
-            }),
-
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Interpretation'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'What is the serum osmolality?'),
 
             e(ChoiceButton, {
               label: 'Low  ‹ 275',
@@ -1732,15 +1711,6 @@
 
             e(WarningBanner, null, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution if any of these are in use.'),
 
-            e(ValueInput, {
-              label: 'Urine Osmolality',
-              unit: 'mOsm/kg',
-              value: urineOsm,
-              onChange: setUrineOsm,
-              placeholder: '< 100 if appropriate',
-              hint: 'Dilute: <100'
-            }),
-
             e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Is the kidney diluting appropriately?'),
 
             e(ChoiceButton, {
@@ -1777,16 +1747,7 @@
             e(BranchCard, { label: 'Serum Osm', ...getSerumOsmDisplay() }),
             e(BranchCard, { label: 'Urine Osm', ...getUrineOsmDisplay() }),
 
-            e(ValueInput, {
-              label: 'Urine Sodium',
-              unit: 'mmol/L',
-              value: urineNa,
-              onChange: setUrineNa,
-              placeholder: '< 20 if appropriate',
-              hint: 'Low: <20–40'
-            }),
-
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Urine sodium interpretation'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'What is the urine sodium?'),
 
             e(ChoiceButton, {
               label: 'Low  ‹ 20–40',
@@ -1976,7 +1937,6 @@
       const [step, setStep] = useState(0);
       const [hasInflammation, setHasInflammation] = useState(null);
       const [clinicalContext, setClinicalContext] = useState(null);
-      const [ferritin, setFerritin] = useState('');
       const [ferritinResult, setFerritinResult] = useState(null);
       const [serumIron, setSerumIron] = useState('');
       const [transferrin, setTransferrin] = useState('');
@@ -2022,9 +1982,10 @@
       });
 
       const getFerritinDisplay = () => {
-        const labels = { veryLow: '< 15', lowNormal: '15–100', normal: '30–300', high: '> 300', veryHigh: '> 1000' };
+        const labels = { veryLow: 'Very Low (< 15)', lowNormal: 'Low-Normal (15–100)', normal: 'Normal (30–300)', high: 'High (> 300)', veryHigh: 'Very High (> 1000)' };
+        const interps = { veryLow: 'Absolute iron deficiency', lowNormal: 'Possible deficiency', normal: 'Stores adequate', high: 'Elevated', veryHigh: 'Urgent evaluation' };
         const colors = { veryLow: 'var(--red)', lowNormal: 'var(--orange)', normal: 'var(--green)', high: 'var(--orange)', veryHigh: 'var(--red)' };
-        return { value: ferritin ? `${ferritin} µg/L` : labels[ferritinResult] || '', interpretation: ferritinResult === 'veryLow' ? 'Absolute iron deficiency' : ferritinResult === 'veryHigh' ? 'Urgent evaluation needed' : ferritinResult === 'high' ? 'Elevated' : ferritinResult === 'normal' ? 'Normal range' : 'Low-normal', color: colors[ferritinResult] || 'var(--blue)' };
+        return { value: labels[ferritinResult] || '', interpretation: interps[ferritinResult] || '', color: colors[ferritinResult] || 'var(--blue)' };
       };
 
       const getTsatDisplay = () => {
@@ -2036,7 +1997,7 @@
       // Management screen
       if (showMgmt) {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
             e('div', { style: { marginBottom: '20px' } },
@@ -2076,12 +2037,13 @@
             e(ChoiceButton, { label: 'CKD or haemodialysis', sublabel: 'Ferritin <200 with TSAT <20% suggests iron deficiency', selected: clinicalContext === 'ckd', onClick: () => setClinicalContext('ckd'), color: 'var(--red)' }),
             e(ChoiceButton, { label: 'Heart failure', sublabel: 'Ferritin <100, or 100–300 with TSAT <20%', selected: clinicalContext === 'heartFailure', onClick: () => setClinicalContext('heartFailure'), color: 'var(--red)' }),
             e(ChoiceButton, { label: 'None of the above', sublabel: 'Standard thresholds', selected: clinicalContext === 'none', onClick: () => setClinicalContext('none'), color: 'var(--blue)' }),
+            e(PrimaryButton, { label: 'Next → Ferritin', disabled: hasInflammation === null || clinicalContext === null, color: 'var(--red)', onClick: () => goToStep(1) }),
+            e(LearnMoreDivider),
             e(InfoPanel, { title: 'Why Ferritin Is Unreliable in Inflammation', color: 'var(--red)' },
               e('p', { style: { marginBottom: '10px' } }, 'Ferritin synthesis is upregulated by inflammatory cytokines (IL-1, IL-6, TNF-α) independently of iron status. This is part of the innate immune response — the body sequesters iron to deprive bacteria of this essential nutrient (\'nutritional immunity\').'),
               e('p', { style: { marginBottom: '10px' } }, 'Hepcidin — the master iron regulatory hormone — is also upregulated by inflammation, blocking intestinal iron absorption and trapping iron in macrophages.'),
               e('p', null, 'Result: serum iron ↓, ferritin ↑, transferrin ↓ — even if total body iron stores are depleted.')
-            ),
-            e(PrimaryButton, { label: 'Next → Ferritin', disabled: hasInflammation === null || clinicalContext === null, color: 'var(--red)', onClick: () => goToStep(1) })
+            )
           ),
 
           // STEP 1: Ferritin
@@ -2091,8 +2053,7 @@
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'The starting point — but interpret with context')
             ),
             e(BranchCard, { label: 'Inflammation', ...getInflammationDisplay() }),
-            e(ValueInput, { label: 'Ferritin', unit: 'µg/L', value: ferritin, onChange: setFerritin, placeholder: 'Enter value' }),
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Select ferritin interpretation'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'What is the ferritin level?'),
             e(ChoiceButton, { label: 'Very low  ‹ 15 (F) / ‹ 30 (M)', sublabel: 'Absolute iron deficiency — diagnostic regardless of other values', selected: ferritinResult === 'veryLow', onClick: () => setFerritinResult('veryLow'), color: 'var(--red)' }),
             e(ChoiceButton, { label: 'Low-normal  15–100', sublabel: 'Iron deficiency possible, especially with inflammation', selected: ferritinResult === 'lowNormal', onClick: () => setFerritinResult('lowNormal'), color: 'var(--orange)' }),
             e(ChoiceButton, { label: 'Normal  30–300', sublabel: 'Stores probably adequate BUT may be masked by inflammation', selected: ferritinResult === 'normal', onClick: () => setFerritinResult('normal'), color: 'var(--green)' }),
@@ -2206,7 +2167,6 @@
       const [albumin, setAlbumin] = useState('');
       const [ionisedCa, setIonisedCa] = useState('');
       const [calciumDirection, setCalciumDirection] = useState(null);
-      const [pth, setPth] = useState('');
       const [pthResult, setPthResult] = useState(null);
       const [phosphate, setPhosphate] = useState('');
       const [vitD, setVitD] = useState('');
@@ -2286,11 +2246,11 @@
 
       const getPthDisplay = () => {
         if (calciumDirection === 'high') {
-          if (pthResult === 'high') return { value: pth ? `${pth} pmol/L` : 'High/inappropriately normal', interpretation: 'PTH-mediated', color: 'var(--orange)' };
-          return { value: pth ? `${pth} pmol/L` : 'Low (suppressed)', interpretation: 'PTH-independent', color: 'var(--blue)' };
+          if (pthResult === 'high') return { value: 'High / inappropriately normal', interpretation: 'PTH-mediated', color: 'var(--orange)' };
+          return { value: 'Low (suppressed)', interpretation: 'PTH-independent', color: 'var(--blue)' };
         } else {
-          if (pthResult === 'low') return { value: pth ? `${pth} pmol/L` : 'Low/inappropriately normal', interpretation: 'Hypoparathyroidism', color: 'var(--red)' };
-          return { value: pth ? `${pth} pmol/L` : 'High (appropriate)', interpretation: 'Secondary hyperparathyroidism', color: 'var(--orange)' };
+          if (pthResult === 'low') return { value: 'Low / inappropriately normal', interpretation: 'Hypoparathyroidism', color: 'var(--red)' };
+          return { value: 'High (appropriate)', interpretation: 'Secondary hyperparathyroidism', color: 'var(--orange)' };
         }
       };
 
@@ -2298,7 +2258,7 @@
       if (showMgmt) {
         const isHyperCa = mgmtType === 'hyperCa';
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
             e('div', { style: { marginBottom: '20px' } },
@@ -2383,8 +2343,7 @@
             e(BranchCard, { label: 'Calcium', ...getCaDisplay() }),
             calciumDirection === 'high' && getEffectiveCa() > 3.0 && e(WarningBanner, null, 'Calcium >3.0 mmol/L requires urgent treatment. Start IV saline immediately.'),
             calciumDirection === 'low' && e(WarningBanner, null, e('strong', null, 'Always check magnesium.'), ' Hypomagnesaemia causes functional hypoparathyroidism AND end-organ resistance to PTH. Calcium will not correct until magnesium is replaced.'),
-            e(ValueInput, { label: 'PTH', unit: 'pmol/L', value: pth, onChange: setPth, placeholder: '1.6–6.9', hint: 'Normal: 1.6–6.9' }),
-            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'PTH interpretation'),
+            e('div', { style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'What is the PTH?'),
             calciumDirection === 'high' ? e(React.Fragment, null,
               e(ChoiceButton, { label: 'High or inappropriately normal', sublabel: 'PTH-mediated — parathyroids are driving this', selected: pthResult === 'high', onClick: () => setPthResult('high'), color: 'var(--orange)' }),
               e(ChoiceButton, { label: 'Low (appropriately suppressed)', sublabel: 'PTH-independent — something else is causing high calcium', selected: pthResult === 'low', onClick: () => setPthResult('low'), color: 'var(--blue)' })
@@ -2557,7 +2516,7 @@
       // Management screen
       if (showMgmt) {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
             e('div', { style: { marginBottom: '20px' } },
@@ -2642,12 +2601,13 @@
               getCorrectedProtein() && e(BranchCard, { label: 'Corrected Protein', value: `${getCorrectedProtein()} g/L`, interpretation: 'After subtracting RBC contribution', color: 'var(--blue)' })
             ),
             getGlucoseRatio() && e(BranchCard, { label: 'CSF:Serum Glucose Ratio', ...getGlucoseRatioDisplay() }),
+            e(PrimaryButton, { label: 'Match Pattern →', disabled: !csfWcc || !csfDiff, color: 'var(--yellow)', onClick: () => goToStep(2) }),
+            e(LearnMoreDivider),
             e(InfoPanel, { title: 'The Glucose Rule', color: 'var(--yellow)' },
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Low CSF glucose'), ' (ratio <0.6) = organisms or cells consuming glucose. Narrows differential to: bacterial, TB, fungal, malignant meningitis, neurosarcoidosis.'),
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Normal CSF glucose'), ' effectively excludes bacterial meningitis (high negative predictive value). Viral meningitis has NORMAL glucose.'),
               e('p', null, e('strong', null, 'Critical:'), ' Always measure paired serum glucose. Absolute CSF glucose of 3.0 looks normal but is low if serum is 20 (ratio 0.15).')
-            ),
-            e(PrimaryButton, { label: 'Match Pattern →', disabled: !csfWcc || !csfDiff, color: 'var(--yellow)', onClick: () => goToStep(2) })
+            )
           ),
 
           // STEP 2: Pattern matching / Results
@@ -2794,7 +2754,7 @@
       if (showMgmt) {
         const isPreRenal = mgmtType === 'preRenal';
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
             e('div', { style: { marginBottom: '20px' } },
@@ -2847,11 +2807,12 @@
               e(ValueInput, { label: 'Serum Urea', unit: 'mmol/L', value: serumUrea, onChange: setSerumUrea, placeholder: 'Enter' })
             ),
             e(ValueInput, { label: 'Urine Osmolality (optional)', unit: 'mOsm/kg', value: urineOsm, onChange: setUrineOsm, placeholder: 'Optional' }),
+            e(PrimaryButton, { label: 'Calculate →', disabled: onDiuretics === null || !urineNa || !urineCr || !serumNa || !serumCr, color: 'var(--cyan)', onClick: () => goToStep(1) }),
+            e(LearnMoreDivider),
             e(InfoPanel, { title: 'Why FENa Works', color: 'var(--cyan)' },
               e('p', { style: { marginBottom: '8px' } }, 'In pre-renal AKI, kidneys are underperfused but structurally intact → maximally reabsorb sodium (low FENa, <1%) and concentrate urine (high urine osm).'),
               e('p', null, 'In intrinsic AKI (ATN), tubules are damaged → sodium \'leaks\' into urine (high FENa, >2%) and urine osmolality approaches serum (~300).')
-            ),
-            e(PrimaryButton, { label: 'Calculate →', disabled: onDiuretics === null || !urineNa || !urineCr || !serumNa || !serumCr, color: 'var(--cyan)', onClick: () => goToStep(1) })
+            )
           ),
 
           // STEP 1: Calculated Results
@@ -2992,7 +2953,7 @@
 
       if (showMgmt) {
         return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false) }),
+          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
           e('div', { className: 'screen-content' },
             e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
             e('div', { style: { marginBottom: '20px' } },
@@ -3042,14 +3003,15 @@
             e(ChoiceButton, { label: 'Active bleeding', sublabel: 'Urgent — need to identify and correct the problem', selected: clinicalContext === 'bleeding', onClick: () => setClinicalContext('bleeding'), color: 'var(--red)' }),
             e(ChoiceButton, { label: 'Incidental finding', sublabel: 'Abnormal coag on routine tests', selected: clinicalContext === 'incidental', onClick: () => setClinicalContext('incidental'), color: 'var(--blue)' }),
             e(ChoiceButton, { label: 'Pre-operative screening', sublabel: 'Abnormal coag before planned surgery', selected: clinicalContext === 'preOp', onClick: () => setClinicalContext('preOp'), color: 'var(--orange)' }),
+            e(PrimaryButton, { label: 'Identify Pattern →', disabled: !clinicalContext || (!pt && !aptt), color: 'var(--green)', onClick: () => goToStep(1) }),
+            e(LearnMoreDivider),
             e(InfoPanel, { title: 'Which Test Maps to Which Pathway?', color: 'var(--green)' },
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'PT/INR'), ' = Extrinsic + Common pathway. Factor VII is unique. Warfarin affects this.'),
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'APTT'), ' = Intrinsic + Common pathway. Factors VIII, IX, XI, XII are unique. Heparin affects this.'),
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Common pathway'), ' = X → V → II → fibrinogen → fibrin. Abnormalities prolong BOTH.'),
               e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Fibrinogen'), ' = final substrate. Consumed in DIC, massive bleeding.'),
               e('p', null, e('strong', null, 'D-dimer'), ' = fibrin degradation product. Elevated when clot is forming AND breaking down.')
-            ),
-            e(PrimaryButton, { label: 'Identify Pattern →', disabled: !clinicalContext || (!pt && !aptt), color: 'var(--green)', onClick: () => goToStep(1) })
+            )
           ),
 
           // STEP 1: Pattern
