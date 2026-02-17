@@ -578,38 +578,7 @@
       }, label);
     }
 
-    // 11. MgmtStep
-    function MgmtStep({ number, title, color = 'var(--blue)', children }) {
-      return e('div', {
-        style: { display: 'flex', gap: '14px', marginBottom: '16px' }
-      },
-        e('div', {
-          style: {
-            width: '30px',
-            height: '30px',
-            borderRadius: '50%',
-            background: color,
-            color: 'white',
-            fontSize: '14px',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }
-        }, number),
-        e('div', { style: { flex: 1 } },
-          e('div', {
-            style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginBottom: '4px' }
-          }, title),
-          e('div', {
-            style: { fontSize: '13.5px', lineHeight: 1.6, color: 'var(--label2)' }
-          }, children)
-        )
-      );
-    }
-
-    // 12. DiffCard (Collapsible)
+    // 11. DiffCard (Collapsible)
     function DiffCard({ title, description, color = 'var(--blue)' }) {
       const [isOpen, setIsOpen] = useState(false);
       return e('div', {
@@ -1014,7 +983,6 @@
       const [tshResult, setTshResult] = useState(null);
       const [ft4, setFt4] = useState('');
       const [ft3, setFt3] = useState('');
-      const [showMgmt, setShowMgmt] = useState(null); // 'hyper' or 'hypo'
 
       // Auto-advance for ChoiceButton-only screens
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
@@ -1025,9 +993,7 @@
 
       const handleBack = () => {
         clearAutoAdvance();
-        if (showMgmt) {
-          setShowMgmt(null);
-        } else if (step === 0) {
+        if (step === 0) {
           onBack();
         } else if (step === getResultsScreen()) {
           // From results, go back to fT3 (if TSH low) or fT4
@@ -1090,73 +1056,6 @@
         if (ft3Status === 'high') return { value: `${ft3} pmol/L`, interp: 'High', color: 'var(--orange)' };
         return { value: `${ft3} pmol/L`, interp: 'Normal', color: 'var(--green)' };
       };
-
-      // Management screens
-      if (showMgmt === 'hyper') {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', {
-              onClick: () => setShowMgmt(null),
-              style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' }
-            }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '8px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Overt Hyperthyroidism')
-            ),
-            e('div', { style: { marginTop: '20px' } },
-              e(MgmtStep, { number: 1, title: 'Symptom control', color: 'var(--purple)' },
-                'Beta-blockade for tremor, tachycardia, anxiety. Propranolol also inhibits peripheral T4→T3 conversion.'
-              ),
-              e(MgmtStep, { number: 2, title: 'Antithyroid medication', color: 'var(--purple)' },
-                'Carbimazole or propylthiouracil (PTU). Dosing per local guidelines — titrate to TFTs at 4–6 week intervals. PTU preferred in first trimester pregnancy.'
-              ),
-              e(MgmtStep, { number: 3, title: 'Definitive therapy', color: 'var(--purple)' },
-                'Radioiodine ablation or thyroidectomy — decision depends on cause, patient preference, fertility plans, Graves\' eye disease. Specialist referral.'
-              )
-            ),
-            e(WarningBanner, null,
-              e('strong', null, 'Thyroid storm'), ' is a life-threatening emergency requiring ICU admission. Immediate specialist input required.'
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '16px', padding: '12px', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--sep)' } },
-              'Dosing should follow local formulary guidelines. This app provides interpretation guidance only.'
-            )
-          )
-        );
-      }
-
-      if (showMgmt === 'hypo') {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(null), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', {
-              onClick: () => setShowMgmt(null),
-              style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' }
-            }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '8px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Overt Hypothyroidism')
-            ),
-            e('div', { style: { marginTop: '20px' } },
-              e(MgmtStep, { number: 1, title: 'Levothyroxine replacement', color: 'var(--purple)' },
-                'Weight-based dosing in young healthy patients. Start low and titrate slowly in elderly or those with cardiac disease. Dosing per local formulary.'
-              ),
-              e(MgmtStep, { number: 2, title: 'Monitoring', color: 'var(--purple)' },
-                'Recheck TSH 6–8 weeks after starting or any dose change. Take on empty stomach, separate from calcium, iron, PPIs by 4 hours.'
-              ),
-              e(MgmtStep, { number: 3, title: 'Target', color: 'var(--purple)' },
-                'TSH within normal range for most patients. Lower target may be appropriate in pregnancy.'
-              ),
-              e('div', { style: { fontSize: '11px', color: 'var(--label4)', fontStyle: 'italic', marginTop: '16px', padding: '12px', background: 'var(--bg)', borderRadius: '8px' } },
-                'Dosing should follow local formulary guidelines. This app provides interpretation guidance only.'
-              )
-            ),
-            e(WarningBanner, null,
-              'If central hypothyroidism suspected: ', e('strong', null, 'check cortisol and treat adrenal insufficiency BEFORE starting levothyroxine.'), ' Thyroxine increases cortisol metabolism — can precipitate adrenal crisis.'
-            )
-          )
-        );
-      }
 
       // Main TFT flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
@@ -1295,8 +1194,7 @@
               e(ResultCard, {
                 title: 'Overt Hyperthyroidism',
                 severity: 'likely',
-                tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma'],
-                onTap: () => setShowMgmt('hyper')
+                tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
               }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
               (ft3Status === 'high' || !ft3) && e(ResultCard, {
                 title: 'TSH-secreting Pituitary Adenoma',
@@ -1309,8 +1207,7 @@
             tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(ResultCard, {
               title: 'T3 Thyrotoxicosis',
               severity: 'likely',
-              tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma'],
-              onTap: () => setShowMgmt('hyper')
+              tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
             }, 'fT4 normal but fT3 elevated — about 5% of hyperthyroidism presents this way. Common in early Graves\' disease or autonomous thyroid adenoma.'),
 
             tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3 || ft3Status === null) && !(ft3Status === 'high') && e(ResultCard, {
@@ -1337,8 +1234,7 @@
             tshResult === 'high' && ft4Status === 'low' && e(ResultCard, {
               title: 'Overt Hypothyroidism',
               severity: 'likely',
-              tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine'],
-              onTap: () => setShowMgmt('hypo')
+              tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine']
             }, 'Elevated TSH with low fT4 confirms primary hypothyroidism. Most commonly autoimmune (Hashimoto\'s — check TPO antibodies).'),
 
             tshResult === 'high' && ft4Status === 'normal' && e(React.Fragment, null,
@@ -1464,12 +1360,18 @@
       // Screen 4: Urine Sodium (if hypotonic)
       const [urineNaResult, setUrineNaResult] = useState(null);
 
-      // Management
-      const [showMgmt, setShowMgmt] = useState(false);
-
       // Na Correction Rate Calculator
-      const [naEntries, setNaEntries] = useState([{ na: '', hours: '0' }]);
-      const [targetRate, setTargetRate] = useState(10); // Default to 10 mmol/24h
+      const getCurrentDateTime = () => {
+        const now = new Date();
+        const date = now.toISOString().split('T')[0];
+        const time = now.toTimeString().slice(0, 5);
+        return { date, time };
+      };
+      const [naEntries, setNaEntries] = useState(() => {
+        const { date, time } = getCurrentDateTime();
+        return [{ na: '', date, time }];
+      });
+      const [targetRate, setTargetRate] = useState(10);
 
       // Determine path based on serum osmolality
       const isShortPath = serumOsmResult === 'normal' || serumOsmResult === 'high';
@@ -1504,9 +1406,7 @@
 
       const handleBack = () => {
         clearAutoAdvance();
-        if (showMgmt) {
-          setShowMgmt(false);
-        } else if (step === 0) {
+        if (step === 0) {
           onBack();
         } else if (step === getResultsScreen()) {
           // From results, go back to previous screen based on path
@@ -1566,332 +1466,53 @@
         return { value: '', interpretation: '', color: 'var(--blue)' };
       };
 
-      // Na Correction Rate Calculator functions
-      const addNaEntry = () => {
-        setNaEntries([...naEntries, { na: '', hours: '' }]);
+      // Na correction calculator helpers
+      const updateEntry = (index, field, value) => {
+        setNaEntries(prev => prev.map((entry, i) => i === index ? { ...entry, [field]: value } : entry));
       };
 
-      const updateNaEntry = (index, field, value) => {
-        const newEntries = [...naEntries];
-        newEntries[index][field] = value;
-        setNaEntries(newEntries);
+      const addEntry = () => {
+        const { date, time } = getCurrentDateTime();
+        setNaEntries(prev => [...prev, { na: '', date, time }]);
       };
 
-      const removeNaEntry = (index) => {
+      const removeEntry = (index) => {
         if (naEntries.length > 1) {
-          setNaEntries(naEntries.filter((_, i) => i !== index));
+          setNaEntries(prev => prev.filter((_, i) => i !== index));
         }
       };
 
       const calculateCorrectionRate = () => {
-        // Need at least 2 valid entries with different times
+        // Need at least 2 entries with valid data
         const validEntries = naEntries
-          .map(e => ({ na: parseFloat(e.na), hours: parseFloat(e.hours) }))
-          .filter(e => !isNaN(e.na) && !isNaN(e.hours))
-          .sort((a, b) => a.hours - b.hours);
+          .filter(entry => entry.na && entry.date && entry.time)
+          .map(entry => ({
+            na: parseFloat(entry.na),
+            timestamp: new Date(`${entry.date}T${entry.time}`).getTime()
+          }))
+          .filter(entry => !isNaN(entry.na) && !isNaN(entry.timestamp))
+          .sort((a, b) => a.timestamp - b.timestamp);
 
         if (validEntries.length < 2) return null;
 
         const first = validEntries[0];
         const last = validEntries[validEntries.length - 1];
-        const timeDiff = last.hours - first.hours;
+        const hoursElapsed = (last.timestamp - first.timestamp) / (1000 * 60 * 60);
 
-        if (timeDiff <= 0) return null;
+        if (hoursElapsed <= 0) return null;
 
         const naChange = last.na - first.na;
-        const ratePerHour = naChange / timeDiff;
-        const projected24h = ratePerHour * 24;
-
-        // Find peak 24h increment (most rapid correction over any 24h window)
-        let peak24h = Math.abs(naChange);
-        if (timeDiff > 24) {
-          // Check rolling 24h windows
-          for (let i = 0; i < validEntries.length - 1; i++) {
-            for (let j = i + 1; j < validEntries.length; j++) {
-              const windowTime = validEntries[j].hours - validEntries[i].hours;
-              if (windowTime <= 24) {
-                const windowChange = Math.abs(validEntries[j].na - validEntries[i].na);
-                if (windowChange > peak24h) peak24h = windowChange;
-              }
-            }
-          }
-        }
-
-        // Status determination based on target rate
-        let status, color;
-        const absProjected = Math.abs(projected24h);
-        const absPeak = peak24h;
-
-        if (absPeak > targetRate || absProjected > targetRate * 1.2) {
-          status = 'Exceeding target';
-          color = 'var(--red)';
-        } else if (absProjected > targetRate * 0.8) {
-          status = 'Approaching target';
-          color = 'var(--orange)';
-        } else {
-          status = 'Within target';
-          color = 'var(--green)';
-        }
+        const ratePerHour = naChange / hoursElapsed;
+        const ratePer24h = ratePerHour * 24;
 
         return {
           naChange: naChange.toFixed(1),
-          timeDiff: timeDiff.toFixed(1),
+          hoursElapsed: hoursElapsed.toFixed(1),
           ratePerHour: ratePerHour.toFixed(2),
-          projected24h: projected24h.toFixed(1),
-          peak24h: peak24h.toFixed(1),
-          status,
-          color
+          ratePer24h: ratePer24h.toFixed(1),
+          exceeds: Math.abs(ratePer24h) > targetRate
         };
       };
-
-      // Management screen
-      if (showMgmt) {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', {
-              onClick: () => setShowMgmt(false),
-              style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' }
-            }, '‹ Back to results'),
-
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Hyponatraemia')
-            ),
-
-            // Step 1: Seizure or Severe Symptoms
-            e(MgmtStep, { number: 1, title: 'Seizure or Severe Symptoms', color: 'var(--red)' },
-              e('span', null,
-                e('strong', null, 'Hypertonic saline bolus'), ' — 3% NaCl or concentrated sodium bicarbonate over 10–20 minutes.',
-                e('br', null),
-                'Aim to increase Na by a small increment and then hold.',
-                e('br', null),
-                'Can repeat if ongoing seizure. Dosing per local protocol.'
-              )
-            ),
-
-            // Step 2: Treat the Cause
-            e(MgmtStep, { number: 2, title: 'Treat the Cause', color: 'var(--blue)' },
-              e('span', null,
-                'Stop drugs and fluids contributing to hyponatraemia.',
-                e('br', null),
-                'Treat underlying pathology:',
-                e('br', null),
-                '• Thyroxine for hypothyroidism',
-                e('br', null),
-                '• Corticosteroid for adrenal insufficiency',
-                e('br', null),
-                '• Tolvaptan for SIADH',
-                e('br', null),
-                '• Diuretics + ACEi for heart failure',
-                e('br', null),
-                '• Albumin + diuretics for cirrhosis'
-              )
-            ),
-
-            // Step 3: Avoid Dangerous Overcorrection
-            e(MgmtStep, { number: 3, title: 'Avoid Dangerous Overcorrection', color: 'var(--orange)' },
-              e('span', null,
-                'Allow Na to rise by ', e('strong', null, 'max 0.5 mmol/hr'), ' and ', e('strong', null, 'max 8–10 mmol/24hr'), '.'
-              )
-            ),
-
-            e(WarningBanner, null,
-              'Consider ', e('strong', null, 'DDAVP'), ' to prevent uncontrolled free water excretion. This gives you control: NaCl, nothing, or water to raise, stabilise, or lower Na respectively. Dosing per local protocol.'
-            ),
-
-            // Step 4: Fluid Strategy
-            e(MgmtStep, { number: 4, title: 'Fluid Restrict vs Isotonic vs Hypertonic NaCl', color: 'var(--blue)' },
-              e('div', { style: { marginTop: '8px' } },
-                e('div', { style: { display: 'flex', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--sep)', overflow: 'hidden', marginBottom: '8px' } },
-                  e('div', { style: { width: '4px', background: 'var(--blue)', flexShrink: 0 } }),
-                  e('div', { style: { padding: '12px' } },
-                    e('strong', null, 'Fluid restriction'),
-                    e('div', { style: { fontSize: '13px', color: 'var(--label2)', marginTop: '4px' } }, 'If hypervolaemic or euvolaemic. UNLESS already oliguric or high urine osmolality (fluid restriction won\'t work if kidneys are already maximally concentrating).')
-                  )
-                ),
-                e('div', { style: { display: 'flex', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--sep)', overflow: 'hidden', marginBottom: '8px' } },
-                  e('div', { style: { width: '4px', background: 'var(--green)', flexShrink: 0 } }),
-                  e('div', { style: { padding: '12px' } },
-                    e('strong', null, 'Isotonic saline (0.9% NaCl)'),
-                    e('div', { style: { fontSize: '13px', color: 'var(--label2)', marginTop: '4px' } }, 'If hypovolaemic. Replace the volume deficit.')
-                  )
-                ),
-                e('div', { style: { display: 'flex', background: 'var(--card)', borderRadius: '10px', border: '1px solid var(--sep)', overflow: 'hidden' } },
-                  e('div', { style: { width: '4px', background: 'var(--red)', flexShrink: 0 } }),
-                  e('div', { style: { padding: '12px' } },
-                    e('strong', null, 'Hypertonic saline (3% NaCl)'),
-                    e('div', { style: { fontSize: '13px', color: 'var(--label2)', marginTop: '4px' } }, 'If Na is dangerously low or symptomatic. ICU setting. Controlled infusion with frequent Na monitoring.')
-                  )
-                )
-              )
-            ),
-
-            // Na Correction Rate Calculator
-            e('div', { style: { marginTop: '24px', padding: '16px', background: 'var(--card)', borderRadius: '12px', border: '1px solid var(--sep)' } },
-              e('div', { style: { fontSize: '16px', fontWeight: 700, color: 'var(--label)', marginBottom: '4px' } }, 'Na Correction Rate Calculator'),
-              e('div', { style: { fontSize: '13px', color: 'var(--label3)', marginBottom: '16px' } }, 'Track Na over time to monitor correction rate'),
-
-              // Target rate selector
-              e('div', { style: { marginBottom: '16px' } },
-                e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label2)', marginBottom: '8px' } }, '24h target (max acceptable rise):'),
-                e('div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
-                  [6, 8, 10, 12].map(rate =>
-                    e('button', {
-                      key: rate,
-                      onClick: () => setTargetRate(rate),
-                      style: {
-                        padding: '8px 14px',
-                        borderRadius: '8px',
-                        border: targetRate === rate ? '2px solid var(--blue)' : '1px solid var(--sep)',
-                        background: targetRate === rate ? 'rgba(10,132,255,0.1)' : 'var(--bg)',
-                        color: targetRate === rate ? 'var(--blue)' : 'var(--label2)',
-                        fontWeight: 600,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        fontFamily: 'var(--font)'
-                      }
-                    }, `${rate} mmol/24h`)
-                  )
-                )
-              ),
-
-              // Na entries
-              e('div', { style: { marginBottom: '12px' } },
-                naEntries.map((entry, index) =>
-                  e('div', { key: index, style: { display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' } },
-                    e('div', { style: { flex: 1 } },
-                      e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Na (mmol/L)'),
-                      e('input', {
-                        type: 'number',
-                        value: entry.na,
-                        onChange: (ev) => updateNaEntry(index, 'na', ev.target.value),
-                        placeholder: '125',
-                        style: {
-                          width: '100%',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          border: '1px solid var(--sep)',
-                          background: 'var(--bg)',
-                          color: 'var(--label)',
-                          fontSize: '15px',
-                          fontFamily: 'var(--font)'
-                        }
-                      })
-                    ),
-                    e('div', { style: { flex: 1 } },
-                      e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Hours from start'),
-                      e('input', {
-                        type: 'number',
-                        value: entry.hours,
-                        onChange: (ev) => updateNaEntry(index, 'hours', ev.target.value),
-                        placeholder: '0',
-                        style: {
-                          width: '100%',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          border: '1px solid var(--sep)',
-                          background: 'var(--bg)',
-                          color: 'var(--label)',
-                          fontSize: '15px',
-                          fontFamily: 'var(--font)'
-                        }
-                      })
-                    ),
-                    naEntries.length > 1 && e('button', {
-                      onClick: () => removeNaEntry(index),
-                      style: {
-                        padding: '8px',
-                        background: 'none',
-                        border: 'none',
-                        color: 'var(--red)',
-                        cursor: 'pointer',
-                        fontSize: '18px',
-                        marginTop: '16px'
-                      }
-                    }, '×')
-                  )
-                )
-              ),
-
-              e('button', {
-                onClick: addNaEntry,
-                style: {
-                  padding: '10px 16px',
-                  borderRadius: '8px',
-                  border: '1px dashed var(--sep)',
-                  background: 'none',
-                  color: 'var(--blue)',
-                  fontWeight: 600,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--font)',
-                  width: '100%',
-                  marginBottom: '16px'
-                }
-              }, '+ Add timepoint'),
-
-              // Results
-              calculateCorrectionRate() && e('div', { style: { padding: '12px', background: 'var(--bg)', borderRadius: '10px', border: `2px solid ${calculateCorrectionRate().color}` } },
-                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' } },
-                  e('div', { style: { width: '10px', height: '10px', borderRadius: '50%', background: calculateCorrectionRate().color } }),
-                  e('span', { style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().color } }, calculateCorrectionRate().status)
-                ),
-                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' } },
-                  e('div', null,
-                    e('div', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Change'),
-                    e('div', { style: { fontSize: '15px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol`)
-                  ),
-                  e('div', null,
-                    e('div', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Over'),
-                    e('div', { style: { fontSize: '15px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().timeDiff} hours`)
-                  ),
-                  e('div', null,
-                    e('div', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Rate'),
-                    e('div', { style: { fontSize: '15px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/hr`)
-                  ),
-                  e('div', null,
-                    e('div', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Projected 24h'),
-                    e('div', { style: { fontSize: '15px', fontWeight: 600, color: calculateCorrectionRate().color } }, `${calculateCorrectionRate().projected24h} mmol`)
-                  )
-                ),
-                parseFloat(calculateCorrectionRate().timeDiff) < 24 && parseFloat(calculateCorrectionRate().projected24h) > targetRate && e('div', { style: { marginTop: '10px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '12px', color: 'var(--red)' } },
-                  'Warning: At this rate, Na will exceed target by 24h. Consider slowing correction or DDAVP.'
-                )
-              )
-            ),
-
-            e(LearnMoreDivider),
-
-            // ODS Info Panel (updated evidence-based content)
-            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--red)' },
-              e('div', { style: { background: 'rgba(255,69,58,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                e('strong', null, 'How common is it?'),
-                e('p', { style: { fontSize: '13px', marginTop: '4px' } }, 'Risk is approximately ', e('strong', null, '0.05%'), ' of hyponatraemia admissions (large Toronto cohort, n=22,858). However, if Na <110 mmol/L the risk rises to ', e('strong', null, '~3%'), '. Notably, many ODS cases did not have documented rapid correction — the cause is not fully understood.')
-              ),
-              e('div', { style: { background: 'rgba(255,69,58,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                e('strong', null, 'High-risk features'),
-                e('p', { style: { fontSize: '13px', marginTop: '4px' } }, 'Na <110 mmol/L · Alcohol use disorder / beer potomania · Malnutrition · Advanced liver disease · Hypokalaemia · Post-transplant · Elderly')
-              ),
-              e('div', { style: { background: 'rgba(255,69,58,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                e('strong', null, 'Safe rate of correction'),
-                e('p', { style: { fontSize: '13px', marginTop: '4px' } }, 'Evidence is slightly mixed. Some studies report ', e('strong', null, '4× relative risk if rise >10–12 mmol/24h'), ' in severe hyponatraemia. However, a large 2025 JAMA meta-analysis found increased mortality with ', e('strong', null, 'slow'), ' correction — suggesting overcaution also carries risk.'),
-                e('p', { style: { fontSize: '13px', marginTop: '6px' } }, 'Pragmatic target: ', e('strong', null, '≤8–10 mmol/L rise in any 24-hour period.'), ' Risk of ODS tracks to the fastest sodium rise (the peak 24h increment, not the average rate).')
-              ),
-              e('div', { style: { background: 'rgba(255,69,58,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                e('strong', null, 'If overcorrection occurs'),
-                e('p', { style: { fontSize: '13px', marginTop: '4px' } }, 'Re-lower Na with ', e('strong', null, 'DDAVP'), ' + D5W infusion. Aim to bring Na back to a safe correction rate. Consult nephrology.')
-              )
-            ),
-
-            e(PrimaryButton, {
-              label: 'New Analysis',
-              color: 'var(--label3)',
-              onClick: onBack
-            })
-          )
-        );
-      }
 
       // Main flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
@@ -2025,7 +1646,6 @@
               severity: 'consider',
               tags: ['Measurement artefact', 'Check Na on VBG']
             }, 'Usually measurement error secondary to hyperlipidaemia or hyperproteinaemia. Check Na on VBG (direct ion-selective electrode).'),
-            e(PrimaryButton, { label: 'View Management', color: 'var(--blue)', onClick: () => setShowMgmt(true) }),
             e(LearnMoreDivider),
             e(InfoPanel, { title: 'Tonicity vs Osmolality', color: 'var(--blue)' },
               e('p', { style: { marginBottom: '10px' } }, 'Urea and ethanol contribute to measured osmolality but are ineffective osmoles (cross cell membranes freely).'),
@@ -2104,7 +1724,117 @@
               tags: ['Hyperglycaemia', 'Mannitol', 'IVIg'],
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
-            e(PrimaryButton, { label: 'View Management', color: 'var(--blue)', onClick: () => setShowMgmt(true) }),
+
+            e(LearnMoreDivider),
+
+            // Na Correction Rate Calculator
+            e('div', { style: { marginTop: '16px' } },
+              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Na Correction Rate Calculator'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginBottom: '12px' } }, 'Track serial Na measurements to monitor correction rate'),
+
+              // Target rate selector
+              e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' } },
+                e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Target limit:'),
+                e('select', {
+                  value: targetRate,
+                  onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
+                  style: { padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '12px' }
+                },
+                  e('option', { value: 8 }, '8 mmol/24h (severe/chronic)'),
+                  e('option', { value: 10 }, '10 mmol/24h (standard)'),
+                  e('option', { value: 12 }, '12 mmol/24h (acute)')
+                )
+              ),
+
+              // Na entries
+              naEntries.map((entry, index) => e('div', {
+                key: index,
+                style: { display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'flex-end' }
+              },
+                e('div', { style: { flex: '1' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Na'),
+                  e('input', {
+                    type: 'number',
+                    value: entry.na,
+                    onChange: (ev) => updateEntry(index, 'na', ev.target.value),
+                    placeholder: 'mmol/L',
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                e('div', { style: { flex: '1.2' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Date'),
+                  e('input', {
+                    type: 'date',
+                    value: entry.date,
+                    onChange: (ev) => updateEntry(index, 'date', ev.target.value),
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                e('div', { style: { flex: '0.8' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Time'),
+                  e('input', {
+                    type: 'time',
+                    value: entry.time,
+                    onChange: (ev) => updateEntry(index, 'time', ev.target.value),
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                naEntries.length > 1 && e('button', {
+                  onClick: () => removeEntry(index),
+                  style: { padding: '8px', background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px' }
+                }, '×')
+              )),
+
+              e('button', {
+                onClick: addEntry,
+                style: { padding: '8px 12px', background: 'var(--bg2)', border: '1px solid var(--sep)', borderRadius: '8px', color: 'var(--blue)', fontSize: '12px', cursor: 'pointer', marginBottom: '12px' }
+              }, '+ Add measurement'),
+
+              // Results display
+              calculateCorrectionRate() && e('div', {
+                style: {
+                  background: calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.08)' : 'rgba(52,199,89,0.08)',
+                  border: `1px solid ${calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.2)' : 'rgba(52,199,89,0.2)'}`,
+                  borderRadius: '10px',
+                  padding: '12px',
+                  marginTop: '8px'
+                }
+              },
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Na change:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol/L`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Time elapsed:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().hoursElapsed} hours`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Rate:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/L/hr`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between' } },
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)' } }, 'Projected 24h:'),
+                  e('span', {
+                    style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
+                  }, `${calculateCorrectionRate().ratePer24h} mmol/L/24h`)
+                ),
+                calculateCorrectionRate().exceeds && e('div', {
+                  style: { marginTop: '8px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--red)', fontWeight: 500 }
+                }, `⚠ Exceeds target of ${targetRate} mmol/24h — risk of ODS`)
+              )
+            ),
+
+            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
+              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) occurs when chronic hyponatraemia is corrected too rapidly. The brain adapts to low sodium by losing organic osmolytes. Rapid correction causes water to shift out of brain cells.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Safe correction limits:'),
+              e('ul', { style: { margin: '0', paddingLeft: '16px', fontSize: '12px' } },
+                e('li', null, 'Standard: ≤10 mmol/L in 24h'),
+                e('li', null, 'High risk (chronic, malnourished, hypokalaemic): ≤8 mmol/L in 24h'),
+                e('li', null, 'Acute (<48h): Can correct faster if symptomatic')
+              ),
+              e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
+            ),
+
             e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
           ),
 
@@ -2163,8 +1893,7 @@
               e(DiffCard, { title: 'Excess IV fluid', description: 'Iatrogenic. Review fluid orders.' }),
               e(DiffCard, { title: 'Primary polydipsia', description: 'Psychiatric or medication-related. Water intake often >10L/day.' }),
               e(DiffCard, { title: 'Beer potomania', description: 'Very low solute diet limits renal free water excretion capacity.' }),
-              e(DiffCard, { title: 'Reset osmostat', description: 'Rare. Osmostat set lower but regulation intact. No treatment required.' }),
-              e(WarningBanner, null, 'Rx fluid restriction — but beware rapid Na rise, especially if the cause of excess water intake is removed (e.g. stopping IV fluids). Monitor closely for overcorrection.')
+              e(DiffCard, { title: 'Reset osmostat', description: 'Rare. Osmostat set lower but regulation intact. No treatment required.' })
             ),
 
             // PATH B: Low Urine Osm + High Urine Na
@@ -2192,20 +1921,7 @@
               e(DiffCard, { title: 'True hypovolaemia', description: 'Bleeding, GI losses, third-spacing. Look for tachycardia, orthostatic hypotension, poor skin turgor.' }),
               e(DiffCard, { title: 'Heart failure', description: 'Effective hypovolaemia despite total body fluid overload. Poor cardiac output → RAAS activation.' }),
               e(DiffCard, { title: 'Liver failure / cirrhosis', description: 'Splanchnic vasodilation → effective hypovolaemia. Ascites present.' }),
-              e(DiffCard, { title: 'Nephrotic syndrome', description: 'Hypoalbuminaemia → reduced oncotic pressure → effective hypovolaemia.' }),
-              e('div', {
-                style: {
-                  background: 'rgba(48,209,88,0.08)',
-                  border: '1px solid rgba(48,209,88,0.2)',
-                  borderRadius: '14px',
-                  padding: '14px 16px',
-                  marginTop: '12px',
-                  marginBottom: '12px'
-                }
-              },
-                e('div', { style: { fontWeight: 700, color: 'var(--green)', marginBottom: '4px' } }, 'Management note'),
-                e('div', { style: { fontSize: '13px', color: 'var(--label2)', lineHeight: 1.55 } }, 'Rx: ACEi + loop diuretic for heart failure/liver failure/nephrotic syndrome. IV saline for true hypovolaemia. Do NOT fluid restrict oedematous patients — they are intravascularly deplete.')
-              )
+              e(DiffCard, { title: 'Nephrotic syndrome', description: 'Hypoalbuminaemia → reduced oncotic pressure → effective hypovolaemia.' })
             ),
 
             // PATH D: High Urine Osm + High Urine Na
@@ -2276,13 +1992,118 @@
               )
             ),
 
+            e(LearnMoreDivider),
+
+            // Na Correction Rate Calculator (for all hypotonic paths)
+            e('div', { style: { marginTop: '16px' } },
+              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Na Correction Rate Calculator'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginBottom: '12px' } }, 'Track serial Na measurements to monitor correction rate'),
+
+              // Target rate selector
+              e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' } },
+                e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Target limit:'),
+                e('select', {
+                  value: targetRate,
+                  onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
+                  style: { padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '12px' }
+                },
+                  e('option', { value: 8 }, '8 mmol/24h (severe/chronic)'),
+                  e('option', { value: 10 }, '10 mmol/24h (standard)'),
+                  e('option', { value: 12 }, '12 mmol/24h (acute)')
+                )
+              ),
+
+              // Na entries
+              naEntries.map((entry, index) => e('div', {
+                key: index,
+                style: { display: 'flex', gap: '8px', marginBottom: '8px', alignItems: 'flex-end' }
+              },
+                e('div', { style: { flex: '1' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Na'),
+                  e('input', {
+                    type: 'number',
+                    value: entry.na,
+                    onChange: (ev) => updateEntry(index, 'na', ev.target.value),
+                    placeholder: 'mmol/L',
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                e('div', { style: { flex: '1.2' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Date'),
+                  e('input', {
+                    type: 'date',
+                    value: entry.date,
+                    onChange: (ev) => updateEntry(index, 'date', ev.target.value),
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                e('div', { style: { flex: '0.8' } },
+                  e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Time'),
+                  e('input', {
+                    type: 'time',
+                    value: entry.time,
+                    onChange: (ev) => updateEntry(index, 'time', ev.target.value),
+                    style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg2)', color: 'var(--label)', fontSize: '14px' }
+                  })
+                ),
+                naEntries.length > 1 && e('button', {
+                  onClick: () => removeEntry(index),
+                  style: { padding: '8px', background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px' }
+                }, '×')
+              )),
+
+              e('button', {
+                onClick: addEntry,
+                style: { padding: '8px 12px', background: 'var(--bg2)', border: '1px solid var(--sep)', borderRadius: '8px', color: 'var(--blue)', fontSize: '12px', cursor: 'pointer', marginBottom: '12px' }
+              }, '+ Add measurement'),
+
+              // Results display
+              calculateCorrectionRate() && e('div', {
+                style: {
+                  background: calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.08)' : 'rgba(52,199,89,0.08)',
+                  border: `1px solid ${calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.2)' : 'rgba(52,199,89,0.2)'}`,
+                  borderRadius: '10px',
+                  padding: '12px',
+                  marginTop: '8px'
+                }
+              },
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Na change:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol/L`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Time elapsed:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().hoursElapsed} hours`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
+                  e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Rate:'),
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/L/hr`)
+                ),
+                e('div', { style: { display: 'flex', justifyContent: 'space-between' } },
+                  e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)' } }, 'Projected 24h:'),
+                  e('span', {
+                    style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
+                  }, `${calculateCorrectionRate().ratePer24h} mmol/L/24h`)
+                ),
+                calculateCorrectionRate().exceeds && e('div', {
+                  style: { marginTop: '8px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--red)', fontWeight: 500 }
+                }, `⚠ Exceeds target of ${targetRate} mmol/24h — risk of ODS`)
+              )
+            ),
+
+            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
+              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) occurs when chronic hyponatraemia is corrected too rapidly. The brain adapts to low sodium by losing organic osmolytes. Rapid correction causes water to shift out of brain cells.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Safe correction limits:'),
+              e('ul', { style: { margin: '0', paddingLeft: '16px', fontSize: '12px' } },
+                e('li', null, 'Standard: ≤10 mmol/L in 24h'),
+                e('li', null, 'High risk (chronic, malnourished, hypokalaemic): ≤8 mmol/L in 24h'),
+                e('li', null, 'Acute (<48h): Can correct faster if symptomatic')
+              ),
+              e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
+            ),
+
             // Bottom buttons (for all result paths)
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, {
-                label: 'View Management',
-                color: 'var(--blue)',
-                onClick: () => setShowMgmt(true)
-              }),
               e(PrimaryButton, {
                 label: 'New Analysis',
                 color: 'var(--label3)',
@@ -2313,8 +2134,6 @@
       const [tsat, setTsat] = useState('');
       // Screen 4: TSAT interpretation
       const [tsatResult, setTsatResult] = useState(null);
-      // Screen 5: Results
-      const [showMgmt, setShowMgmt] = useState(false);
 
       // 6 screens: Inflammation, Context, Ferritin, TSAT input, TSAT interp, Results
       const getTotalScreens = () => 6;
@@ -2327,8 +2146,7 @@
 
       const handleBack = () => {
         clearAutoAdvance();
-        if (showMgmt) setShowMgmt(false);
-        else if (step === 0) onBack();
+        if (step === 0) onBack();
         else goToStep(step - 1);
       };
 
@@ -2362,32 +2180,6 @@
         if (tsatResult === 'high') return { value: effectiveTsat ? `${effectiveTsat}%` : '> 45%', interpretation: 'High — iron overload', color: 'var(--orange)' };
         return { value: effectiveTsat ? `${effectiveTsat}%` : '16–45%', interpretation: 'Normal', color: 'var(--green)' };
       };
-
-      // Management screen
-      if (showMgmt) {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Iron Deficiency')
-            ),
-            e(MgmtStep, { number: 1, title: 'Oral Iron', color: 'var(--red)' },
-              e('span', null, 'Ferrous salt preparations on empty stomach. ', e('strong', null, 'Alternate day dosing'), ' may improve absorption — hepcidin rises after a dose, reducing next-day absorption.', e('br'), 'Continue 3–6 months after Hb normalises to replenish stores.', e('br'), 'Side effects: nausea, constipation, black stools — major adherence barrier.')
-            ),
-            e(MgmtStep, { number: 2, title: 'IV Iron', color: 'var(--red)' },
-              e('span', null, e('strong', null, 'Preferred if:'), ' oral intolerance, malabsorption, ongoing losses exceeding oral replacement, CKD, heart failure, pre-operative urgency, active IBD.', e('br'), 'Multiple IV iron formulations available (e.g. ferric carboxymaltose, iron polymaltose). Dosing per local formulary.')
-            ),
-            e(WarningBanner, null, e('strong', null, 'Some IV iron formulations can cause hypophosphataemia'), ' — check phosphate at 2 weeks, especially if repeat dosing.'),
-            e(MgmtStep, { number: 3, title: 'Transfusion', color: 'var(--red)' }, 'Reserve for haemodynamic instability or active severe bleeding. Iron deficiency alone is almost never an indication for transfusion.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', fontStyle: 'italic', marginTop: '16px', padding: '12px', background: 'var(--bg)', borderRadius: '8px' } },
-              'Dosing should follow local formulary guidelines. This app provides interpretation guidance only.'
-            ),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-          )
-        );
-      }
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Iron Studies', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
@@ -2638,7 +2430,6 @@
 
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local laboratory\'s reference ranges.'),
             e('div', { style: { marginTop: '16px' } },
-              (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(PrimaryButton, { label: 'View Management', color: 'var(--red)', onClick: () => setShowMgmt(true) }),
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
           )
@@ -2665,9 +2456,6 @@
       const [urineOsm, setUrineOsm] = useState('');
       // Screen 2: Calculated + interpretation
       const [fenaResult, setFenaResult] = useState(null);
-      // Screen 3: Results
-      const [showMgmt, setShowMgmt] = useState(false);
-      const [mgmtType, setMgmtType] = useState(null);
 
       const getTotalScreens = () => 4;
 
@@ -2675,8 +2463,7 @@
       const goToStep = (s) => { setStep(s); scrollToTop(); };
       const handleBack = () => {
         clearAutoAdvance();
-        if (showMgmt) setShowMgmt(false);
-        else if (step === 0) onBack();
+        if (step === 0) onBack();
         else goToStep(step - 1);
       };
 
@@ -2730,36 +2517,6 @@
         if (v >= 350) return { value: `${urineOsm} mOsm/kg`, interpretation: 'Intermediate', color: 'var(--orange)' };
         return { value: `${urineOsm} mOsm/kg`, interpretation: 'Dilute — consistent with ATN', color: 'var(--red)' };
       };
-
-      if (showMgmt) {
-        const isPreRenal = mgmtType === 'preRenal';
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, isPreRenal ? 'Pre-renal AKI' : 'Intrinsic AKI (ATN)')
-            ),
-            isPreRenal ? e(React.Fragment, null,
-              e(MgmtStep, { number: 1, title: 'Volume Resuscitation', color: 'var(--cyan)' }, 'Crystalloid boluses 250–500 ml, reassess after each.'),
-              e(MgmtStep, { number: 2, title: 'Treat Underlying Cause', color: 'var(--cyan)' }, 'Sepsis, bleeding, heart failure, liver failure.'),
-              e(MgmtStep, { number: 3, title: 'Hold Nephrotoxins', color: 'var(--cyan)' }, 'NSAIDs, ACEi/ARB, aminoglycosides.'),
-              e(MgmtStep, { number: 4, title: 'Monitor', color: 'var(--cyan)' }, 'UO target >0.5 ml/kg/hr. Serial creatinine.')
-            ) : e(React.Fragment, null,
-              e(MgmtStep, { number: 1, title: 'Supportive', color: 'var(--cyan)' }, 'No specific treatment for established ATN.'),
-              e(MgmtStep, { number: 2, title: 'Avoid Further Insults', color: 'var(--cyan)' }, 'Nephrotoxins, hypotension, contrast.'),
-              e(MgmtStep, { number: 3, title: 'Manage Complications', color: 'var(--cyan)' }, 'Hyperkalaemia, acidosis, fluid overload.'),
-              e(MgmtStep, { number: 4, title: 'RRT Criteria', color: 'var(--cyan)' }, 'Refractory hyperkalaemia, severe acidosis, fluid overload unresponsive to diuretics, uraemic encephalopathy or pericarditis.')
-            ),
-            e(InfoPanel, { title: 'Post-renal AKI', color: 'var(--cyan)' },
-              e('p', null, 'Relieve obstruction — catheterise (lower tract), nephrostomy/stent (upper tract). Monitor for post-obstructive diuresis — can be massive and cause electrolyte shifts.')
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-          )
-        );
-      }
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Urine Biochem', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
@@ -2869,7 +2626,7 @@
             ].filter(Boolean) }),
 
             fenaResult === 'preRenal' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Pre-renal AKI', severity: 'likely', tags: ['Underperfusion', 'Structurally intact', 'Reversible'], onTap: () => { setMgmtType('preRenal'); setShowMgmt(true); } }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
+              e(ResultCard, { title: 'Pre-renal AKI', severity: 'likely', tags: ['Underperfusion', 'Structurally intact', 'Reversible'] }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
               e(WarningBanner, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling:'),
               e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
                 '• Contrast nephropathy (vasoconstriction)', e('br'),
@@ -2882,7 +2639,7 @@
             ),
 
             fenaResult === 'intrinsic' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Intrinsic AKI (ATN)', severity: 'likely', tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'], onTap: () => { setMgmtType('intrinsic'); setShowMgmt(true); } }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
+              e(ResultCard, { title: 'Intrinsic AKI (ATN)', severity: 'likely', tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'] }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
               e(WarningBanner, null, e('strong', null, 'FENa >1% does NOT always mean intrinsic:')),
               e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
                 '• Diuretic use (falsely elevated)', e('br'),
@@ -2907,7 +2664,6 @@
 
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
             e('div', { style: { marginTop: '16px' } },
-              e(PrimaryButton, { label: 'View Management', color: 'var(--cyan)', onClick: () => { setMgmtType(fenaResult === 'preRenal' ? 'preRenal' : 'intrinsic'); setShowMgmt(true); } }),
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
           )
@@ -2926,8 +2682,6 @@
       const [clinicalContext, setClinicalContext] = useState(null);
       // Screen 1: Pattern
       const [pattern, setPattern] = useState(null);
-      // Screen 2: Results
-      const [showMgmt, setShowMgmt] = useState(false);
       // Optional lab inputs (collapsed on results)
       const [showLabs, setShowLabs] = useState(false);
       const [pt, setPt] = useState('');
@@ -2943,8 +2697,7 @@
       const goToStep = (s) => { setStep(s); scrollToTop(); };
       const handleBack = () => {
         clearAutoAdvance();
-        if (showMgmt) setShowMgmt(false);
-        else if (step === 0) onBack();
+        if (step === 0) onBack();
         else goToStep(step - 1);
       };
 
@@ -2979,39 +2732,6 @@
         if (name === 'D-dimer' && v > 0.5) { interp = 'Elevated'; color = 'var(--orange)'; }
         return { value: `${value} ${unit}`, interpretation: interp, color };
       };
-
-      if (showMgmt) {
-        return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-          e(NavBar, { title: 'Management', onBack: () => setShowMgmt(false), rightAction: e(HomeButton, { onClick: onBack }) }),
-          e('div', { className: 'screen-content' },
-            e('button', { onClick: () => setShowMgmt(false), style: { background: 'none', border: 'none', color: 'var(--blue)', fontSize: '15px', fontWeight: 600, padding: '16px 0', cursor: 'pointer', fontFamily: 'var(--font)' } }, '‹ Back to results'),
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Management'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Coagulopathy')
-            ),
-            e(MgmtStep, { number: 1, title: 'Stop the Cause', color: 'var(--green)' }, 'Stop anticoagulants. Treat sepsis. Control bleeding source.'),
-            e(MgmtStep, { number: 2, title: 'Replace What\'s Missing', color: 'var(--green)' },
-              e('span', null, e('strong', null, 'FFP'), ' if PT/APTT prolonged.', e('br'),
-                e('strong', null, 'Cryoprecipitate'), ' if fibrinogen low (rich in fibrinogen, Factor VIII, vWF, Factor XIII).', e('br'),
-                e('strong', null, 'Platelets'), ' if low and actively bleeding (higher threshold for neurosurgical/ophthalmic).', e('br'),
-                e('strong', null, 'Vitamin K IV'), ' if vitamin K deficiency or warfarin.')
-            ),
-            e(MgmtStep, { number: 3, title: 'Specific Reversal Agents', color: 'var(--green)' },
-              e('span', null, e('strong', null, 'Warfarin:'), ' Prothrombin complex concentrate + Vitamin K.', e('br'),
-                e('strong', null, 'Dabigatran:'), ' Idarucizumab.', e('br'),
-                e('strong', null, 'Rivaroxaban/Apixaban:'), ' Andexanet alfa (if available) or PCC (off-label).', e('br'),
-                e('strong', null, 'Heparin:'), ' Protamine.')
-            ),
-            clinicalContext === 'preOp' && e(InfoPanel, { title: 'Pre-operative Abnormal Coag', color: 'var(--green)' },
-              e('p', null, 'Isolated mildly prolonged APTT in an asymptomatic patient: consider lupus anticoagulant or Factor XII deficiency — ', e('strong', null, 'neither causes bleeding. Do NOT delay surgery.'), e('br'), 'Personal/family history of bleeding is more important than the screening coag result.')
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', fontStyle: 'italic', marginTop: '16px', padding: '12px', background: 'var(--bg)', borderRadius: '8px' } },
-              'Dosing should follow local formulary/massive transfusion protocol. This app provides interpretation guidance only.'
-            ),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
-          )
-        );
-      }
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Coagulation', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
@@ -3186,7 +2906,6 @@
 
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
             e('div', { style: { marginTop: '16px' } },
-              e(PrimaryButton, { label: 'View Management', color: 'var(--green)', onClick: () => setShowMgmt(true) }),
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
           )
