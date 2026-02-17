@@ -636,6 +636,107 @@
       );
     }
 
+    // 12. DiffListItem (Expandable diagnosis card - replaces ResultCard on results screens)
+    function DiffListItem({ title, tags = [], children, warning, infoPanel, defaultOpen = false }) {
+      const [expanded, setExpanded] = useState(defaultOpen);
+
+      return e('div', {
+        style: {
+          background: 'var(--card)',
+          borderRadius: '14px',
+          border: '1px solid var(--sep)',
+          boxShadow: 'var(--shadow-sm)',
+          marginBottom: '8px',
+          overflow: 'hidden'
+        }
+      },
+        // Header (always visible, clickable)
+        e('button', {
+          onClick: () => setExpanded(!expanded),
+          style: {
+            width: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'space-between',
+            padding: '16px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontFamily: 'var(--font)',
+            textAlign: 'left'
+          }
+        },
+          e('div', { style: { flex: 1 } },
+            e('div', {
+              style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', letterSpacing: '-0.02em' }
+            }, title),
+            tags.length > 0 && e('div', {
+              style: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }
+            },
+              tags.map((tag, i) => e('span', {
+                key: i,
+                style: {
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: 'var(--label3)',
+                  background: 'rgba(142,142,147,0.12)',
+                  padding: '3px 8px',
+                  borderRadius: '6px'
+                }
+              }, tag))
+            )
+          ),
+          e('span', {
+            style: {
+              fontSize: '16px',
+              color: 'var(--label3)',
+              marginLeft: '12px',
+              marginTop: '2px',
+              transform: expanded ? 'rotate(90deg)' : 'rotate(0)',
+              transition: 'transform 0.2s ease'
+            }
+          }, '›')
+        ),
+
+        // Expandable content
+        e('div', {
+          style: {
+            maxHeight: expanded ? '2000px' : '0',
+            overflow: 'hidden',
+            transition: 'max-height 0.3s ease'
+          }
+        },
+          e('div', { style: { padding: '0 16px 16px' } },
+            // Description text
+            children && e('div', {
+              style: { fontSize: '13.5px', lineHeight: 1.6, color: 'var(--label2)', marginBottom: warning || infoPanel ? '12px' : '0' }
+            }, children),
+
+            // Warning (if provided)
+            warning && e('div', {
+              style: {
+                display: 'flex',
+                gap: '10px',
+                padding: '12px 14px',
+                background: 'rgba(255,69,58,0.06)',
+                border: '1px solid rgba(255,69,58,0.15)',
+                borderRadius: '12px',
+                marginBottom: infoPanel ? '12px' : '0'
+              }
+            },
+              e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
+              e('div', {
+                style: { fontSize: '12px', lineHeight: 1.5, color: '#C41E10', fontWeight: 500 }
+              }, warning)
+            ),
+
+            // InfoPanel content (if provided)
+            infoPanel
+          )
+        )
+      );
+    }
+
     // 13. LearnMoreDivider
     function LearnMoreDivider() {
       return e('div', {
@@ -1189,61 +1290,52 @@
               ft3 && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
             ].filter(Boolean) }),
 
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+
             // TSH LOW pathways
             tshResult === 'low' && ft4Status === 'high' && e(React.Fragment, null,
-              e(ResultCard, {
+              e(DiffListItem, {
                 title: 'Overt Hyperthyroidism',
-                severity: 'likely',
                 tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
               }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
-              (ft3Status === 'high' || !ft3) && e(ResultCard, {
+              (ft3Status === 'high' || !ft3) && e(DiffListItem, {
                 title: 'TSH-secreting Pituitary Adenoma',
-                subtitle: 'Or thyroid hormone resistance',
-                severity: 'rare',
                 tags: ['TSH should be suppressed', 'Refer endocrinology']
               }, 'TSH inappropriately normal/unsuppressed with elevated thyroid hormones. Very rare — consider TSH-producing adenoma or thyroid hormone resistance syndrome.')
             ),
 
-            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(ResultCard, {
+            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(DiffListItem, {
               title: 'T3 Thyrotoxicosis',
-              severity: 'likely',
               tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
             }, 'fT4 normal but fT3 elevated — about 5% of hyperthyroidism presents this way. Common in early Graves\' disease or autonomous thyroid adenoma.'),
 
-            tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3 || ft3Status === null) && !(ft3Status === 'high') && e(ResultCard, {
+            tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3 || ft3Status === null) && !(ft3Status === 'high') && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
-              severity: 'consider',
               tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk']
             }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks. If persistent, increased risk of atrial fibrillation and osteoporosis.'),
 
-            tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
-              e(ResultCard, {
-                title: 'Central Hypothyroidism',
-                severity: 'dangerous',
-                tags: ['Pituitary failure', 'Check cortisol FIRST'],
-                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.')
-              }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
-              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+            tshResult === 'low' && ft4Status === 'low' && e(DiffListItem, {
+              title: 'Central Hypothyroidism',
+              tags: ['Pituitary failure', 'Check cortisol FIRST'],
+              defaultOpen: true,
+              warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+              infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
                 e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
                 e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
               )
-            ),
+            }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
 
             // TSH HIGH pathways
-            tshResult === 'high' && ft4Status === 'low' && e(ResultCard, {
+            tshResult === 'high' && ft4Status === 'low' && e(DiffListItem, {
               title: 'Overt Hypothyroidism',
-              severity: 'likely',
               tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine']
             }, 'Elevated TSH with low fT4 confirms primary hypothyroidism. Most commonly autoimmune (Hashimoto\'s — check TPO antibodies).'),
 
-            tshResult === 'high' && ft4Status === 'normal' && e(React.Fragment, null,
-              e(ResultCard, {
-                title: 'Subclinical Hypothyroidism',
-                severity: 'consider',
-                tags: ['Recheck 6–8 weeks', 'Check TPO antibodies', 'Treat if TSH >10']
-              }, 'TSH elevated but fT4 still normal. Common finding. Check TPO antibodies and recheck in 6–8 weeks. Treatment threshold depends on TSH level, symptoms, and antibody status.'),
-              e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism', color: 'var(--purple)' },
+            tshResult === 'high' && ft4Status === 'normal' && e(DiffListItem, {
+              title: 'Subclinical Hypothyroidism',
+              tags: ['Recheck 6–8 weeks', 'Check TPO antibodies', 'Treat if TSH >10'],
+              infoPanel: e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism', color: 'var(--purple)' },
                 e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
                   e('strong', { style: { color: 'var(--green)' } }, 'TREAT IF:'), ' TSH >10 (even if asymptomatic) · TSH 4–10 with positive TPOAb · Symptoms attributable to hypothyroidism · Pregnant or planning pregnancy (target TSH <2.5)'
                 ),
@@ -1251,38 +1343,34 @@
                   e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — higher TSH may be physiological · Recovery from acute illness'
                 )
               )
-            ),
+            }, 'TSH elevated but fT4 still normal. Common finding. Check TPO antibodies and recheck in 6–8 weeks. Treatment threshold depends on TSH level, symptoms, and antibody status.'),
 
-            tshResult === 'high' && ft4Status === 'high' && e(ResultCard, {
+            tshResult === 'high' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference or TSH-oma',
-              severity: 'rare',
               tags: ['Biotin interference', 'Heterophile antibodies', 'Refer endocrinology']
             }, 'TSH elevated with high fT4 is discordant — TSH should be suppressed. Consider biotin supplement interference, heterophile antibodies, or rare TSH-secreting pituitary adenoma.'),
 
             // TSH NORMAL pathways
-            tshResult === 'normal' && ft4Status === 'normal' && e(ResultCard, {
+            tshResult === 'normal' && ft4Status === 'normal' && e(DiffListItem, {
               title: 'Euthyroid',
-              severity: 'likely',
-              tags: ['Normal thyroid function']
+              tags: ['Normal thyroid function'],
+              defaultOpen: true
             }, 'TSH and fT4 both normal. Symptoms unlikely to be thyroid-related.'),
 
-            tshResult === 'normal' && ft4Status === 'low' && e(React.Fragment, null,
-              e(ResultCard, {
-                title: 'Central Hypothyroidism',
-                severity: 'dangerous',
-                tags: ['Pituitary failure', 'Investigate urgently'],
-                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.')
-              }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
-              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+            tshResult === 'normal' && ft4Status === 'low' && e(DiffListItem, {
+              title: 'Central Hypothyroidism',
+              tags: ['Pituitary failure', 'Investigate urgently'],
+              defaultOpen: true,
+              warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+              infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
                 e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
                 e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
               )
-            ),
+            }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
 
-            tshResult === 'normal' && ft4Status === 'high' && e(ResultCard, {
+            tshResult === 'normal' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference',
-              severity: 'consider',
               tags: ['Biotin supplements', 'Heterophile antibodies', 'Recheck']
             }, 'Normal TSH with high fT4 is discordant. Most commonly caused by biotin supplement interference. Stop biotin for 48h and recheck, or request repeat on different assay platform.'),
 
@@ -1641,16 +1729,15 @@
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() }
             ] }),
-            e(ResultCard, {
+            e(DiffListItem, {
               title: 'Pseudohyponatraemia',
-              severity: 'consider',
-              tags: ['Measurement artefact', 'Check Na on VBG']
+              tags: ['Measurement artefact', 'Check Na on VBG'],
+              defaultOpen: true,
+              infoPanel: e(InfoPanel, { title: 'Tonicity vs Osmolality', color: 'var(--blue)' },
+                e('p', { style: { marginBottom: '10px' } }, 'Urea and ethanol contribute to measured osmolality but are ineffective osmoles (cross cell membranes freely).'),
+                e('p', null, 'Tonicity = Osmolality − Urea. If in doubt, calculate tonicity or check Na on VBG.')
+              )
             }, 'Usually measurement error secondary to hyperlipidaemia or hyperproteinaemia. Check Na on VBG (direct ion-selective electrode).'),
-            e(LearnMoreDivider),
-            e(InfoPanel, { title: 'Tonicity vs Osmolality', color: 'var(--blue)' },
-              e('p', { style: { marginBottom: '10px' } }, 'Urea and ethanol contribute to measured osmolality but are ineffective osmoles (cross cell membranes freely).'),
-              e('p', null, 'Tonicity = Osmolality − Urea. If in doubt, calculate tonicity or check Na on VBG.')
-            ),
             e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
           ),
 
@@ -1718,10 +1805,10 @@
               { label: 'Serum Osm', ...getSerumOsmDisplay() },
               getCorrectedNa() && { label: 'Corrected Na', value: `${getCorrectedNa()} mmol/L`, color: 'var(--blue)' }
             ].filter(Boolean) }),
-            e(ResultCard, {
+            e(DiffListItem, {
               title: 'Hyper-osmolar Hyponatraemia',
-              severity: 'likely',
               tags: ['Hyperglycaemia', 'Mannitol', 'IVIg'],
+              defaultOpen: true,
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
 
@@ -1880,14 +1967,13 @@
             ] }),
 
             e('div', {
-              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginBottom: '10px' }
-            }, 'Differential'),
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
+            }, 'Consistent diagnoses'),
 
             // PATH A: Low Urine Osm + Low Urine Na
             urineOsmResult === 'low' && urineNaResult === 'low' && e(React.Fragment, null,
-              e(ResultCard, {
+              e(DiffListItem, {
                 title: 'Excess Water Intake',
-                severity: 'likely',
                 tags: ['Polydipsia', 'Excess IV fluid', 'Beer potomania']
               }, 'Huge water intake exceeding renal capacity to defend tonicity, even with maximally dilute urine.'),
               e(DiffCard, { title: 'Excess IV fluid', description: 'Iatrogenic. Review fluid orders.' }),
@@ -1898,9 +1984,8 @@
 
             // PATH B: Low Urine Osm + High Urine Na
             urineOsmResult === 'low' && urineNaResult === 'high' && e(React.Fragment, null,
-              e(ResultCard, {
+              e(DiffListItem, {
                 title: 'Renal Salt & Water Wasting',
-                severity: 'consider',
                 tags: ['AKI', 'Post-obstructive', 'ATN']
               }, 'Kidneys are wasting both salt and water — unable to concentrate or conserve sodium.'),
               e(DiffCard, { title: 'AKI (GFR <15)', description: 'Severely reduced GFR impairs all tubular function.' }),
@@ -1910,14 +1995,13 @@
 
             // PATH C: High Urine Osm + Low Urine Na
             urineOsmResult === 'high' && urineNaResult === 'low' && e(React.Fragment, null,
-              e(ResultCard, {
+              e(DiffListItem, {
                 title: 'Hypovolaemia or Effective Hypovolaemia',
-                severity: 'likely',
-                tags: ['Volume depletion', 'Heart failure', 'Liver failure', 'Nephrotic syndrome']
+                tags: ['Volume depletion', 'Heart failure', 'Liver failure', 'Nephrotic syndrome'],
+                infoPanel: e(InfoPanel, { title: 'Volume over Tonicity', color: 'var(--blue)' },
+                  e('p', null, 'The baroreceptor reflex is a stronger stimulus for ADH release than the osmoreceptor reflex. When intravascular volume is low (or perceived as low — heart failure, liver failure), the body will retain water even at the expense of worsening hyponatraemia. This is because volume depletion kills faster than low sodium.')
+                )
               }, 'Actual or effective hypovolaemia → RAAS overactivation. The body is defending volume over tonicity → water retention.'),
-              e(InfoPanel, { title: 'Volume over Tonicity', color: 'var(--blue)' },
-                e('p', null, 'The baroreceptor reflex is a stronger stimulus for ADH release than the osmoreceptor reflex. When intravascular volume is low (or perceived as low — heart failure, liver failure), the body will retain water even at the expense of worsening hyponatraemia. This is because volume depletion kills faster than low sodium.')
-              ),
               e(DiffCard, { title: 'True hypovolaemia', description: 'Bleeding, GI losses, third-spacing. Look for tachycardia, orthostatic hypotension, poor skin turgor.' }),
               e(DiffCard, { title: 'Heart failure', description: 'Effective hypovolaemia despite total body fluid overload. Poor cardiac output → RAAS activation.' }),
               e(DiffCard, { title: 'Liver failure / cirrhosis', description: 'Splanchnic vasodilation → effective hypovolaemia. Ascites present.' }),
@@ -1926,27 +2010,15 @@
 
             // PATH D: High Urine Osm + High Urine Na
             urineOsmResult === 'high' && urineNaResult === 'high' && e(React.Fragment, null,
-              e(ResultCard, {
+              e(DiffListItem, {
                 title: 'Water Retention with Sodium Wasting',
-                severity: 'likely',
-                tags: ['SIADH', 'Adrenal insufficiency', 'Hypothyroidism', 'Cerebral salt wasting']
+                tags: ['SIADH', 'Adrenal insufficiency', 'Hypothyroidism', 'Cerebral salt wasting'],
+                warning: 'Must exclude adrenal insufficiency before diagnosing SIADH. Check morning cortisol ± short synacthen test.'
               }, 'ADH is active (water retention) AND kidneys are wasting sodium. This is the broadest differential — clinical context is critical.'),
 
               e(DiffCard, { title: 'SIADH', description: 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine).' }),
 
               e(DiffCard, { title: 'Adrenal insufficiency (Addison\'s, pan-hypopit)', description: 'Aldosterone deficiency → Na wasting. Cortisol deficiency → impaired free water excretion.' }),
-              e('div', {
-                style: {
-                  background: 'rgba(255,69,58,0.06)',
-                  border: '1px solid rgba(255,69,58,0.15)',
-                  borderRadius: '10px',
-                  padding: '10px 12px',
-                  marginBottom: '6px',
-                  fontSize: '12px',
-                  color: '#C41E10',
-                  fontWeight: 500
-                }
-              }, 'Must exclude adrenal insufficiency before diagnosing SIADH. Check morning cortisol ± short synacthen test.'),
 
               e(DiffCard, { title: 'Hypothyroidism', description: 'Mechanism unclear but well-recognised association. Check TFTs.' }),
 
@@ -2382,44 +2454,69 @@
               { label: 'TSAT', ...getTsatDisplay() }
             ] }),
 
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+
             // Pattern: Ferritin low/low-normal + TSAT low
-            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(ResultCard, {
+            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
               title: 'Iron Deficiency Anaemia',
-              severity: 'likely',
               tags: ['Classic pattern', 'Investigate cause'],
               warning: e(React.Fragment, null, e('strong', null, 'Iron deficiency demands investigation.'), ' All males and post-menopausal females require GI endoscopy to exclude malignancy.')
             }, 'Low ferritin + low TSAT = straightforward iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport).'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
-            ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(React.Fragment, null,
-              e(ResultCard, { title: 'Iron Deficiency Masked by Inflammation', severity: 'likely', tags: ['Ferritin falsely normal', 'TSAT is the giveaway'] }, 'This is the most common diagnostic trap in hospital medicine. Ferritin appears \'normal\' because inflammation has raised it, but low TSAT reveals inadequate iron delivery to the marrow.'),
-              e(InfoPanel, { title: 'The Hardest Call in Iron Studies', color: 'var(--red)' },
+            ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
+              title: 'Iron Deficiency Masked by Inflammation',
+              tags: ['Ferritin falsely normal', 'TSAT is the giveaway'],
+              infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
                 e('p', null, e('strong', null, 'Pragmatic approach:'), ' If in doubt and the patient is symptomatic, a trial of IV iron is both diagnostic and therapeutic. If Hb rises, they were iron deficient.')
               )
-            ),
+            }, 'This is the most common diagnostic trap in hospital medicine. Ferritin appears \'normal\' because inflammation has raised it, but low TSAT reveals inadequate iron delivery to the marrow.'),
 
             // Pattern: Ferritin normal + TSAT normal (with inflammation)
-            ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(ResultCard, { title: 'Anaemia of Chronic Disease', severity: 'consider', tags: ['Inflammatory iron sequestration', 'Iron trapped in macrophages'] }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
+            ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
+              title: 'Anaemia of Chronic Disease',
+              tags: ['Inflammatory iron sequestration', 'Iron trapped in macrophages']
+            }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
 
             // Pattern: Ferritin high + TSAT high
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Iron Overload', severity: 'dangerous', tags: ['Haemochromatosis', 'Transfusional', 'Check HFE genotype'] }, 'Elevated ferritin with TSAT >45% (especially >60%) strongly suggests true iron overload. Check HFE gene (C282Y homozygosity = hereditary haemochromatosis). If transfusion-dependent, consider chelation therapy.'),
-              e(ResultCard, { title: 'Liver Disease', subtitle: 'Can mimic iron overload', severity: 'consider', tags: ['Hepatocyte damage', 'Ferritin leak'] }, 'Damaged hepatocytes leak ferritin into serum. TSAT may be normal or elevated. Check LFTs. Liver disease + iron overload can coexist (e.g. haemochromatosis with cirrhosis).')
+              e(DiffListItem, {
+                title: 'Iron Overload',
+                tags: ['Haemochromatosis', 'Transfusional', 'Check HFE genotype'],
+                defaultOpen: true
+              }, 'Elevated ferritin with TSAT >45% (especially >60%) strongly suggests true iron overload. Check HFE gene (C282Y homozygosity = hereditary haemochromatosis). If transfusion-dependent, consider chelation therapy.'),
+              e(DiffListItem, {
+                title: 'Liver Disease',
+                tags: ['Hepatocyte damage', 'Ferritin leak']
+              }, 'Damaged hepatocytes leak ferritin into serum. TSAT may be normal or elevated. Check LFTs. Liver disease + iron overload can coexist (e.g. haemochromatosis with cirrhosis).')
             ),
 
             // Pattern: Ferritin high + TSAT normal
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'normal' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Acute Phase Response', severity: 'likely', tags: ['Inflammation', 'Liver disease', 'Recheck when stable'] }, 'Elevated ferritin with normal TSAT most likely reflects an acute phase response rather than true iron overload. Recheck when inflammation has resolved.'),
-              e(ResultCard, { title: 'Liver Disease', severity: 'consider', tags: ['Ferritin leak from hepatocytes'] })
+              e(DiffListItem, {
+                title: 'Acute Phase Response',
+                tags: ['Inflammation', 'Liver disease', 'Recheck when stable']
+              }, 'Elevated ferritin with normal TSAT most likely reflects an acute phase response rather than true iron overload. Recheck when inflammation has resolved.'),
+              e(DiffListItem, {
+                title: 'Liver Disease',
+                tags: ['Ferritin leak from hepatocytes']
+              })
             ),
 
             // Pattern: Ferritin high + TSAT low
-            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'low' && e(ResultCard, { title: 'Anaemia of Chronic Disease (severe)', severity: 'consider', tags: ['Hepcidin-mediated', 'Iron trapped'] }, 'High ferritin (inflammation) + low TSAT (no iron reaching marrow). Iron is present in stores but trapped by hepcidin-mediated sequestration.'),
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'low' && e(DiffListItem, {
+              title: 'Anaemia of Chronic Disease (severe)',
+              tags: ['Hepcidin-mediated', 'Iron trapped']
+            }, 'High ferritin (inflammation) + low TSAT (no iron reaching marrow). Iron is present in stores but trapped by hepcidin-mediated sequestration.'),
 
             // Ferritin very high
-            ferritinResult === 'veryHigh' && e(ResultCard, { title: 'Urgent Evaluation Required', severity: 'dangerous', tags: ['HLH', 'Malignancy', 'Hepatic necrosis', 'Still\'s disease'] }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
+            ferritinResult === 'veryHigh' && e(DiffListItem, {
+              title: 'Urgent Evaluation Required',
+              tags: ['HLH', 'Malignancy', 'Hepatic necrosis', 'Still\'s disease'],
+              defaultOpen: true
+            }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
 
             // Investigation info for iron deficiency
             (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'When to Scope', color: 'var(--red)' },
@@ -2625,33 +2722,24 @@
               urineOsm && { label: 'Urine Osm', ...getUrineOsmDisplay() }
             ].filter(Boolean) }),
 
-            fenaResult === 'preRenal' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Pre-renal AKI', severity: 'likely', tags: ['Underperfusion', 'Structurally intact', 'Reversible'] }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
-              e(WarningBanner, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling:'),
-              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
-                '• Contrast nephropathy (vasoconstriction)', e('br'),
-                '• Rhabdomyolysis (early)', e('br'),
-                '• Early sepsis (renal vasoconstriction)', e('br'),
-                '• Acute glomerulonephritis (glomerular injury, tubules intact)', e('br'),
-                '• Early interstitial nephritis', e('br'),
-                '• Acute urinary obstruction (early)'
-              )
-            ),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
 
-            fenaResult === 'intrinsic' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Intrinsic AKI (ATN)', severity: 'likely', tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'] }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
-              e(WarningBanner, null, e('strong', null, 'FENa >1% does NOT always mean intrinsic:')),
-              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', padding: '12px', marginBottom: '12px', fontSize: '13px', color: 'var(--label2)' } },
-                '• Diuretic use (falsely elevated)', e('br'),
-                '• CKD baseline (chronic nephron loss)', e('br'),
-                '• Adrenal insufficiency (lack of aldosterone)', e('br'),
-                '• Cerebral salt wasting', e('br'),
-                '• IV saline administration', e('br'),
-                '• Glycosuria (osmotic diuresis)'
-              )
-            ),
+            fenaResult === 'preRenal' && e(DiffListItem, {
+              title: 'Pre-renal AKI',
+              tags: ['Underperfusion', 'Structurally intact', 'Reversible'],
+              warning: e(React.Fragment, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling: contrast nephropathy, early rhabdomyolysis, early sepsis, acute glomerulonephritis, early interstitial nephritis, acute urinary obstruction.')
+            }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
 
-            fenaResult === 'indeterminate' && e(ResultCard, { title: 'Evolving AKI', severity: 'consider', tags: ['May be transitioning', 'Serial measurements', 'Trend'] }, 'Borderline values — may be evolving from pre-renal to intrinsic. Serial measurement over 6–12 hours is more useful than a single value.'),
+            fenaResult === 'intrinsic' && e(DiffListItem, {
+              title: 'Intrinsic AKI (ATN)',
+              tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'],
+              warning: e(React.Fragment, null, e('strong', null, 'FENa >1% does NOT always mean intrinsic.'), ' Can be caused by: diuretic use, CKD baseline, adrenal insufficiency, cerebral salt wasting, IV saline administration, glycosuria.')
+            }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
+
+            fenaResult === 'indeterminate' && e(DiffListItem, {
+              title: 'Evolving AKI',
+              tags: ['May be transitioning', 'Serial measurements', 'Trend']
+            }, 'Borderline values — may be evolving from pre-renal to intrinsic. Serial measurement over 6–12 hours is more useful than a single value.'),
 
             e(InfoPanel, { title: 'Urine Microscopy — the Forgotten Tool', color: 'var(--cyan)' },
               e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Muddy brown granular casts:'), ' ATN — pathognomonic'),
@@ -2837,28 +2925,34 @@
               { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-op' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
               { label: 'Pattern', value: pattern === 'A' ? 'PT ↑' : pattern === 'B' ? 'APTT ↑' : pattern === 'C' ? 'Both ↑' : 'Both normal', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }
             ] }),
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginBottom: '10px' } }, 'Differential'),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
 
             // Pattern A: Isolated prolonged PT
             pattern === 'A' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Warfarin', severity: 'likely', tags: ['Most common', 'Check INR target'] }),
-              e(ResultCard, { title: 'Early Liver Disease', severity: 'consider', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] }),
-              e(ResultCard, { title: 'Vitamin K Deficiency', severity: 'consider', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] }),
-              e(ResultCard, { title: 'DOAC (Rivaroxaban/Apixaban)', severity: 'consider', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] }),
-              e(ResultCard, { title: 'Factor VII Deficiency', severity: 'rare', tags: ['Congenital', 'Only extrinsic factor'] })
+              e(DiffListItem, { title: 'Warfarin', tags: ['Most common', 'Check INR target'] }),
+              e(DiffListItem, { title: 'Early Liver Disease', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] }),
+              e(DiffListItem, { title: 'Vitamin K Deficiency', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] }),
+              e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] }),
+              e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] })
             ),
 
             // Pattern B: Isolated prolonged APTT
             pattern === 'B' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Heparin (UFH)', severity: 'likely', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] }),
-              e(ResultCard, { title: 'Haemophilia A (Factor VIII ↓)', severity: 'consider', tags: ['X-linked', 'Severity correlates with level'] }),
-              e(ResultCard, { title: 'Haemophilia B (Factor IX ↓)', severity: 'consider', tags: ['X-linked', 'Clinically identical to A'] }),
-              e(ResultCard, { title: 'von Willebrand Disease', severity: 'consider', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] }),
-              e(ResultCard, { title: 'Factor XI Deficiency', severity: 'consider', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] }),
-              e(ResultCard, { title: 'Factor XII Deficiency', severity: 'rare', tags: ['NO bleeding risk', 'Do NOT delay surgery'] }, 'Prolongs APTT but causes NO bleeding risk whatsoever. Safe for surgery.'),
-              e(WarningBanner, null, e('strong', null, 'Factor XII deficiency and lupus anticoagulant prolong APTT but do NOT cause bleeding.'), ' Do NOT delay surgery for either of these.'),
-              e(ResultCard, { title: 'Lupus Anticoagulant', severity: 'consider', tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical'] }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
-              e(ResultCard, { title: 'Dabigatran', severity: 'consider', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] }),
+              e(DiffListItem, { title: 'Heparin (UFH)', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] }),
+              e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] }),
+              e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] }),
+              e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] }),
+              e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] }),
+              e(DiffListItem, {
+                title: 'Factor XII Deficiency',
+                tags: ['NO bleeding risk', 'Do NOT delay surgery'],
+                warning: 'Factor XII deficiency and lupus anticoagulant prolong APTT but do NOT cause bleeding. Do NOT delay surgery for either of these.'
+              }, 'Prolongs APTT but causes NO bleeding risk whatsoever. Safe for surgery.'),
+              e(DiffListItem, {
+                title: 'Lupus Anticoagulant',
+                tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
+              }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
+              e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] }),
               e(InfoPanel, { title: 'The Mixing Study', color: 'var(--green)' },
                 e('p', { style: { marginBottom: '8px' } }, 'When APTT is prolonged, mix 1:1 patient plasma with normal plasma:'),
                 e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
@@ -2868,7 +2962,11 @@
 
             // Pattern C: Both prolonged
             pattern === 'C' && e(React.Fragment, null,
-              e(ResultCard, { title: 'DIC', severity: 'dangerous', tags: ['Consumption', '↓Fibrinogen', '↓Platelets', '↑D-dimer', 'Schistocytes'] }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
+              e(DiffListItem, {
+                title: 'DIC',
+                tags: ['Consumption', '↓Fibrinogen', '↓Platelets', '↑D-dimer', 'Schistocytes'],
+                defaultOpen: true
+              }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
               // Collapsible DIC Score Calculator
               e('button', {
                 onClick: () => setShowLabs(!showLabs),
@@ -2884,24 +2982,27 @@
                 e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
                 calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)' })
               ),
-              e(ResultCard, { title: 'Severe Liver Disease', severity: 'likely', tags: ['Impaired synthesis', 'Factor VIII normal/↑ (distinguishes from DIC)'] }),
-              e(InfoPanel, { title: 'Liver vs DIC', color: 'var(--green)' },
-                e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Factor VIII is the key.'), ' Normal/high in liver disease (Factor VIII made by endothelium). Low in DIC (consumed).'),
-                e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
-              ),
-              e(ResultCard, { title: 'Massive Transfusion / Dilution', severity: 'consider', tags: ['Dilution of factors + platelets'] }),
-              e(ResultCard, { title: 'Vitamin K Deficiency (severe)', severity: 'consider', tags: ['All K-dependent factors'] }),
-              e(ResultCard, { title: 'Supratherapeutic Warfarin', severity: 'consider', tags: ['Very high INR'] }),
-              e(ResultCard, { title: 'Direct Thrombin Inhibitor (high dose)', severity: 'consider', tags: ['Dabigatran', 'Argatroban'] })
+              e(DiffListItem, {
+                title: 'Severe Liver Disease',
+                tags: ['Impaired synthesis', 'Factor VIII normal/↑ (distinguishes from DIC)'],
+                infoPanel: e(InfoPanel, { title: 'Liver vs DIC', color: 'var(--green)' },
+                  e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
+                  e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Factor VIII is the key.'), ' Normal/high in liver disease (Factor VIII made by endothelium). Low in DIC (consumed).'),
+                  e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
+                )
+              }),
+              e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] }),
+              e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] }),
+              e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] }),
+              e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] })
             ),
 
             // Pattern D: Both normal
             pattern === 'D' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Platelet Disorder', severity: 'likely', tags: ['Thrombocytopenia', 'Platelet dysfunction', 'Aspirin', 'Uraemia'] }),
-              e(ResultCard, { title: 'Mild von Willebrand Disease', severity: 'consider', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] }),
-              e(ResultCard, { title: 'Factor XIII Deficiency', severity: 'rare', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] }),
-              e(ResultCard, { title: 'Vascular Cause', severity: 'rare', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] })
+              e(DiffListItem, { title: 'Platelet Disorder', tags: ['Thrombocytopenia', 'Platelet dysfunction', 'Aspirin', 'Uraemia'] }),
+              e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] }),
+              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] }),
+              e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] })
             ),
 
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
