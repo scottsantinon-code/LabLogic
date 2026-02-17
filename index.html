@@ -367,11 +367,11 @@
     }
 
     // 7. Warning Banner
-    function WarningBanner({ children }) {
+    function WarningBanner({ children, onContinue }) {
       return e('div', {
         style: {
           display: 'flex',
-          gap: '10px',
+          flexDirection: 'column',
           padding: '14px 16px',
           background: 'rgba(255,69,58,0.06)',
           border: '1px solid rgba(255,69,58,0.15)',
@@ -379,10 +379,30 @@
           marginBottom: '12px'
         }
       },
-        e('span', { style: { fontSize: '16px', flexShrink: 0 } }, '⚠️'),
-        e('div', {
-          style: { fontSize: '13px', lineHeight: 1.55, color: '#C41E10', fontWeight: 500 }
-        }, children)
+        e('div', { style: { display: 'flex', gap: '10px' } },
+          e('span', { style: { fontSize: '16px', flexShrink: 0 } }, '⚠️'),
+          e('div', {
+            style: { fontSize: '13px', lineHeight: 1.55, color: '#C41E10', fontWeight: 500 }
+          }, children)
+        ),
+        onContinue && e('button', {
+          onClick: onContinue,
+          style: {
+            alignSelf: 'flex-end',
+            background: 'none',
+            border: 'none',
+            color: '#C41E10',
+            fontSize: '15px',
+            fontWeight: 700,
+            padding: '12px 0',
+            marginTop: '12px',
+            cursor: 'pointer',
+            fontFamily: 'var(--font)',
+            minHeight: '44px',
+            display: 'flex',
+            alignItems: 'center'
+          }
+        }, 'Continue →')
       );
     }
 
@@ -415,8 +435,31 @@
       );
     }
 
+    // 8b. InputSummaryStrip (compact summary of user inputs on results screens)
+    function InputSummaryStrip({ items }) {
+      return e('div', {
+        style: {
+          background: 'var(--card)',
+          borderRadius: '14px',
+          border: '1px solid var(--sep)',
+          padding: '14px 16px',
+          marginBottom: '20px'
+        }
+      },
+        e('div', {
+          style: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 0' }
+        },
+          items.map((item, i) => e(React.Fragment, { key: i },
+            i > 0 && e('span', { style: { color: 'var(--label3)', margin: '0 8px', fontSize: '12px' } }, '·'),
+            e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginRight: '4px' } }, item.label),
+            e('span', { style: { fontSize: '14px', fontWeight: 700, color: item.color || 'var(--label)' } }, item.value)
+          ))
+        )
+      );
+    }
+
     // 9. ResultCard
-    function ResultCard({ title, subtitle, tags = [], severity, children, onTap }) {
+    function ResultCard({ title, subtitle, tags = [], severity, children, warning, onTap }) {
       const severityStyles = {
         likely: { color: '#0A84FF', bg: 'rgba(10,132,255,0.08)', border: 'rgba(10,132,255,0.2)', label: 'LIKELY' },
         dangerous: { color: '#FF453A', bg: 'rgba(255,69,58,0.08)', border: 'rgba(255,69,58,0.2)', label: 'URGENT' },
@@ -463,6 +506,22 @@
         children && e('div', {
           style: { fontSize: '13.5px', lineHeight: 1.6, color: 'var(--label2)', marginTop: '6px' }
         }, children),
+        warning && e('div', {
+          style: {
+            display: 'flex',
+            gap: '10px',
+            padding: '12px 14px',
+            background: 'rgba(255,69,58,0.06)',
+            border: '1px solid rgba(255,69,58,0.15)',
+            borderRadius: '12px',
+            marginTop: '12px'
+          }
+        },
+          e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
+          e('div', {
+            style: { fontSize: '12px', lineHeight: 1.5, color: '#C41E10', fontWeight: 500 }
+          }, warning)
+        ),
         tags.length > 0 && e('div', {
           style: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }
         },
@@ -1116,7 +1175,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setAcutelyUnwell(true);
-                scheduleAdvance(() => goToStep(1), true); // 800ms delay for warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--orange)'
             }),
@@ -1131,7 +1190,7 @@
               },
               color: 'var(--purple)'
             }),
-            acutelyUnwell === true && e(WarningBanner, null,
+            acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
               e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause ↓fT3, ↓fT4, and ↓TSH in acute illness. Do NOT diagnose or treat thyroid disease from TFTs in acute illness unless TSH is markedly abnormal (>20 or <0.1).'
             )
           ),
@@ -1224,14 +1283,12 @@
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Based on the algorithmic pathway'),
 
-            // Branch cards showing path (only on Results screen)
-            e(BranchCard, { label: 'TSH', ...getTSHDisplay() }),
-            ft4 && e(BranchCard, { label: 'fT4', ...getFT4Display() }),
-            ft3 && tshResult === 'low' && e(BranchCard, { label: 'fT3', ...getFT3Display() }),
-
-            e('div', {
-              style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' }
-            }, 'DIFFERENTIAL DIAGNOSIS'),
+            // Compact input summary
+            e(InputSummaryStrip, { items: [
+              { label: 'TSH', ...getTSHDisplay() },
+              ft4 && { label: 'fT4', ...getFT4Display() },
+              ft3 && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
+            ].filter(Boolean) }),
 
             // TSH LOW pathways
             tshResult === 'low' && ft4Status === 'high' && e(React.Fragment, null,
@@ -1266,11 +1323,9 @@
               e(ResultCard, {
                 title: 'Central Hypothyroidism',
                 severity: 'dangerous',
-                tags: ['Pituitary failure', 'Check cortisol FIRST']
+                tags: ['Pituitary failure', 'Check cortisol FIRST'],
+                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.')
               }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
-              e(WarningBanner, null,
-                e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis (thyroxine increases cortisol metabolism).'
-              ),
               e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
                 e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
@@ -1319,11 +1374,9 @@
               e(ResultCard, {
                 title: 'Central Hypothyroidism',
                 severity: 'dangerous',
-                tags: ['Pituitary failure', 'Investigate urgently']
+                tags: ['Pituitary failure', 'Investigate urgently'],
+                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.')
               }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
-              e(WarningBanner, null,
-                e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis (thyroxine increases cortisol metabolism).'
-              ),
               e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
                 e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
@@ -1367,8 +1420,8 @@
               )
             ),
 
-            // Assay interference panel
-            e(InfoPanel, { title: 'Assay Interference — the Hidden Trap', color: 'var(--purple)' },
+            // Assay interference panel - only show when relevant
+            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoPanel, { title: 'Assay Interference — the Hidden Trap', color: 'var(--purple)' },
               e('p', { style: { marginBottom: '10px' } },
                 e('strong', null, 'Biotin (Vitamin B7):'), ' High-dose biotin supplements (common in "hair and nails" products, also MS treatment) interfere with streptavidin-biotin immunoassays. Can cause falsely ↑fT4, ↑fT3, ↓TSH — mimicking hyperthyroidism.'
               ),
@@ -1878,7 +1931,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setChronicity('acute');
-                scheduleAdvance(() => goToStep(2), true); // 800ms - show warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--red)'
             }),
@@ -1889,7 +1942,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setChronicity('chronic');
-                scheduleAdvance(() => goToStep(2), true); // 800ms - show warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--orange)'
             }),
@@ -1904,8 +1957,8 @@
               },
               color: 'var(--blue)'
             }),
-            chronicity === 'acute' && e(WarningBanner, null, 'Higher risk of cerebral oedema. But safer to correct faster than in chronic hyponatraemia.'),
-            chronicity === 'chronic' && e(WarningBanner, null, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
+            chronicity === 'acute' && e(WarningBanner, { onContinue: () => goToStep(2) }, 'Higher risk of cerebral oedema. But safer to correct faster than in chronic hyponatraemia.'),
+            chronicity === 'chronic' && e(WarningBanner, { onContinue: () => goToStep(2) }, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
           ),
 
           // SCREEN 2: Serum osmolality? (ChoiceButtons, auto-advance, branches)
@@ -1963,8 +2016,10 @@
           step === 3 && isIsoOsmolar && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Iso-osmolar hyponatraemia'),
-            e(BranchCard, { label: 'Serum Sodium', ...getNaDisplay() }),
-            e(BranchCard, { label: 'Serum Osm', ...getSerumOsmDisplay() }),
+            e(InputSummaryStrip, { items: [
+              { label: 'Na', ...getNaDisplay() },
+              { label: 'Serum Osm', ...getSerumOsmDisplay() }
+            ] }),
             e(ResultCard, {
               title: 'Pseudohyponatraemia',
               severity: 'consider',
@@ -2026,11 +2081,11 @@
               onClick: () => {
                 clearAutoAdvance();
                 setUrineOsmResult('high');
-                scheduleAdvance(() => goToStep(4), true); // 800ms - show warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--orange)'
             }),
-            urineOsmResult === 'high' && e(WarningBanner, null, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution.')
+            urineOsmResult === 'high' && e(WarningBanner, { onContinue: () => goToStep(4) }, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution.')
           ),
 
           // SCREEN 4: Path-dependent
@@ -2038,20 +2093,17 @@
           step === 4 && isHyperOsmolar && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hyper-osmolar hyponatraemia'),
-            e(BranchCard, { label: 'Serum Sodium', ...getNaDisplay() }),
-            e(BranchCard, { label: 'Serum Osm', ...getSerumOsmDisplay() }),
-            getCorrectedNa() && e(BranchCard, {
-              label: 'Corrected Na',
-              value: `${getCorrectedNa()} mmol/L`,
-              interpretation: 'Predicted Na once glucose normalises',
-              color: 'var(--blue)'
-            }),
+            e(InputSummaryStrip, { items: [
+              { label: 'Na', ...getNaDisplay() },
+              { label: 'Serum Osm', ...getSerumOsmDisplay() },
+              getCorrectedNa() && { label: 'Corrected Na', value: `${getCorrectedNa()} mmol/L`, color: 'var(--blue)' }
+            ].filter(Boolean) }),
             e(ResultCard, {
               title: 'Hyper-osmolar Hyponatraemia',
               severity: 'likely',
-              tags: ['Hyperglycaemia', 'Mannitol', 'IVIg']
+              tags: ['Hyperglycaemia', 'Mannitol', 'IVIg'],
+              warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
-            e(WarningBanner, null, 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'),
             e(PrimaryButton, { label: 'View Management', color: 'var(--blue)', onClick: () => setShowMgmt(true) }),
             e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
           ),
@@ -2089,15 +2141,17 @@
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hypotonic hyponatraemia'),
 
-            // Branch cards showing path (only on Results)
-            e(BranchCard, { label: 'Serum Sodium', ...getNaDisplay() }),
-            e(BranchCard, { label: 'Serum Osm', ...getSerumOsmDisplay() }),
-            e(BranchCard, { label: 'Urine Osm', ...getUrineOsmDisplay() }),
-            e(BranchCard, { label: 'Urine Na', ...getUrineNaDisplay() }),
+            // Compact input summary
+            e(InputSummaryStrip, { items: [
+              { label: 'Na', ...getNaDisplay() },
+              { label: 'Serum Osm', ...getSerumOsmDisplay() },
+              { label: 'Urine Osm', ...getUrineOsmDisplay() },
+              { label: 'Urine Na', ...getUrineNaDisplay() }
+            ] }),
 
             e('div', {
-              style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' }
-            }, 'DIFFERENTIAL DIAGNOSIS'),
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginBottom: '10px' }
+            }, 'Differential'),
 
             // PATH A: Low Urine Osm + Low Urine Na
             urineOsmResult === 'low' && urineNaResult === 'low' && e(React.Fragment, null,
@@ -2351,7 +2405,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setHasInflammation(true);
-                scheduleAdvance(() => goToStep(1), true); // 800ms for warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--orange)'
             }),
@@ -2366,7 +2420,7 @@
               },
               color: 'var(--green)'
             }),
-            hasInflammation === true && e(WarningBanner, null, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.')
+            hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.')
           ),
 
           // SCREEN 1: Specific clinical context? (ChoiceButtons, auto-advance)
@@ -2419,7 +2473,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFerritinResult('veryLow');
-                scheduleAdvance(() => goToStep(3), true); // 800ms for warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--red)'
             }),
@@ -2463,12 +2517,12 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFerritinResult('veryHigh');
-                scheduleAdvance(() => goToStep(3), true); // 800ms for warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--red)'
             }),
-            ferritinResult === 'veryLow' && e(WarningBanner, null, e('strong', null, 'Diagnostic.'), ' Ferritin this low confirms iron deficiency regardless of other values.'),
-            ferritinResult === 'veryHigh' && e(WarningBanner, null, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
+            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin this low confirms iron deficiency regardless of other values.'),
+            ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
           ),
 
           // SCREEN 3: Transferrin saturation (ValueInputs, Next button)
@@ -2530,16 +2584,19 @@
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Pattern recognition')
             ),
-            e(BranchCard, { label: 'Inflammation', ...getInflammationDisplay() }),
-            e(BranchCard, { label: 'Ferritin', ...getFerritinDisplay() }),
-            e(BranchCard, { label: 'TSAT', ...getTsatDisplay() }),
-            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Inflammation', ...getInflammationDisplay() },
+              { label: 'Ferritin', ...getFerritinDisplay() },
+              { label: 'TSAT', ...getTsatDisplay() }
+            ] }),
 
             // Pattern: Ferritin low/low-normal + TSAT low
-            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(React.Fragment, null,
-              e(ResultCard, { title: 'Iron Deficiency Anaemia', severity: 'likely', tags: ['Classic pattern', 'Investigate cause'] }, 'Low ferritin + low TSAT = straightforward iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport).'),
-              e(WarningBanner, null, e('strong', null, 'Iron deficiency demands investigation.'), ' All males and post-menopausal females require upper + lower GI endoscopy to exclude malignancy. Check coeliac serology (tissue transglutaminase antibody) in all unexplained cases.')
-            ),
+            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(ResultCard, {
+              title: 'Iron Deficiency Anaemia',
+              severity: 'likely',
+              tags: ['Classic pattern', 'Investigate cause'],
+              warning: e(React.Fragment, null, e('strong', null, 'Iron deficiency demands investigation.'), ' All males and post-menopausal females require GI endoscopy to exclude malignancy.')
+            }, 'Low ferritin + low TSAT = straightforward iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport).'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(React.Fragment, null,
@@ -2720,7 +2777,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setOnDiuretics(true);
-                scheduleAdvance(() => goToStep(1), true); // 800ms for warning
+                // No auto-advance — warning gates progression
               },
               color: 'var(--orange)'
             }),
@@ -2735,7 +2792,7 @@
               },
               color: 'var(--green)'
             }),
-            onDiuretics === true && e(WarningBanner, null, e('strong', null, 'FENa unreliable.'), ' Diuretics force sodium excretion, making FENa falsely elevated. Use FEUrea instead.')
+            onDiuretics === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'FENa unreliable.'), ' Diuretics force sodium excretion, making FENa falsely elevated. Use FEUrea instead.')
           ),
 
           // SCREEN 1: Enter values for FENa (ValueInputs, Next button)
@@ -2805,10 +2862,11 @@
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
             ),
-            !onDiuretics && calcFENa() && e(BranchCard, { label: 'FENa', ...getFENaDisplay() }),
-            onDiuretics && calcFEUrea() && e(BranchCard, { label: 'FEUrea', ...getFEUreaDisplay() }),
-            urineOsm && e(BranchCard, { label: 'Urine Osmolality', ...getUrineOsmDisplay() }),
-            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'INTERPRETATION'),
+            e(InputSummaryStrip, { items: [
+              !onDiuretics && calcFENa() && { label: 'FENa', ...getFENaDisplay() },
+              onDiuretics && calcFEUrea() && { label: 'FEUrea', ...getFEUreaDisplay() },
+              urineOsm && { label: 'Urine Osm', ...getUrineOsmDisplay() }
+            ].filter(Boolean) }),
 
             fenaResult === 'preRenal' && e(React.Fragment, null,
               e(ResultCard, { title: 'Pre-renal AKI', severity: 'likely', tags: ['Underperfusion', 'Structurally intact', 'Reversible'], onTap: () => { setMgmtType('preRenal'); setShowMgmt(true); } }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
@@ -2971,7 +3029,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setClinicalContext('bleeding');
-                scheduleAdvance(() => goToStep(1), true); // 800ms for urgent
+                // No auto-advance — warning gates progression
               },
               color: 'var(--red)'
             }),
@@ -2997,7 +3055,7 @@
               },
               color: 'var(--orange)'
             }),
-            clinicalContext === 'bleeding' && e(WarningBanner, null, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.')
+            clinicalContext === 'bleeding' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.')
           ),
 
           // SCREEN 1: What pattern do you see? (ChoiceButtons, auto-advance)
@@ -3055,9 +3113,11 @@
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
             ),
-            e(BranchCard, { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-operative' : 'Incidental', interpretation: clinicalContext === 'bleeding' ? 'Urgent' : 'Non-urgent', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' }),
-            e(BranchCard, { label: 'Pattern', value: pattern === 'A' ? 'PT prolonged only' : pattern === 'B' ? 'APTT prolonged only' : pattern === 'C' ? 'Both prolonged' : 'Both normal', interpretation: pattern === 'A' ? 'Extrinsic pathway' : pattern === 'B' ? 'Intrinsic pathway' : pattern === 'C' ? 'Common/global' : 'Platelet/vascular', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }),
-            e('div', { style: { fontSize: '12px', fontWeight: 700, color: 'var(--label3)', letterSpacing: '0.05em', marginTop: '20px', marginBottom: '12px' } }, 'DIFFERENTIAL DIAGNOSIS'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-op' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
+              { label: 'Pattern', value: pattern === 'A' ? 'PT ↑' : pattern === 'B' ? 'APTT ↑' : pattern === 'C' ? 'Both ↑' : 'Both normal', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }
+            ] }),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginBottom: '10px' } }, 'Differential'),
 
             // Pattern A: Isolated prolonged PT
             pattern === 'A' && e(React.Fragment, null,
