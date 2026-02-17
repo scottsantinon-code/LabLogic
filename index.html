@@ -1203,7 +1203,10 @@
                 scheduleAdvance(() => goToStep(2), false);
               },
               color: 'var(--orange)'
-            })
+            }),
+            e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
+            }, '💡 In first trimester pregnancy, TSH as low as 0.1 can be physiological due to hCG cross-reactivity. Use trimester-specific reference ranges.')
           ),
 
           // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
@@ -1252,7 +1255,11 @@
           // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
           step === 3 && tshResult === 'low' && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT3?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Needed to detect T3 thyrotoxicosis when fT4 is normal'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
+              ft4Status === 'high' ? 'Confirms degree of thyrotoxicosis' :
+              ft4Status === 'low' ? 'Helps distinguish central hypothyroidism from sick euthyroid' :
+              'Needed to detect T3 thyrotoxicosis when fT4 is normal'
+            ),
             e(ChoiceButton, {
               label: 'Low  ‹ 3.1 pmol/L',
               sublabel: 'Below reference range',
@@ -1303,16 +1310,10 @@
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
 
             // TSH LOW pathways
-            tshResult === 'low' && ft4Status === 'high' && e(React.Fragment, null,
-              e(DiffListItem, {
-                title: 'Overt Hyperthyroidism',
-                tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
-              }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
-              (ft3Status === 'high' || !ft3Status) && e(DiffListItem, {
-                title: 'TSH-secreting Pituitary Adenoma',
-                tags: ['TSH should be suppressed', 'Refer endocrinology']
-              }, 'TSH inappropriately normal/unsuppressed with elevated thyroid hormones. Very rare — consider TSH-producing adenoma or thyroid hormone resistance syndrome.')
-            ),
+            tshResult === 'low' && ft4Status === 'high' && e(DiffListItem, {
+              title: 'Overt Hyperthyroidism',
+              tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
+            }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
 
             tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(DiffListItem, {
               title: 'T3 Thyrotoxicosis',
@@ -1324,17 +1325,23 @@
               tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk']
             }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks. If persistent, increased risk of atrial fibrillation and osteoporosis.'),
 
-            tshResult === 'low' && ft4Status === 'low' && e(DiffListItem, {
-              title: 'Central Hypothyroidism',
-              tags: ['Pituitary failure', 'Check cortisol FIRST'],
-              defaultOpen: true,
-              warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
-              infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
-                e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
-                e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
-              )
-            }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
+            tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
+              e(DiffListItem, {
+                title: 'Central Hypothyroidism',
+                tags: ['Pituitary failure', 'Check cortisol FIRST'],
+                defaultOpen: true,
+                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+                  e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
+                  e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
+                  e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
+                )
+              }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
+              e(DiffListItem, {
+                title: 'Non-Thyroidal Illness (Recovery Phase)',
+                tags: ['Sick euthyroid', 'Transient', 'Recheck when well']
+              }, 'TSH can transiently suppress during recovery from acute illness while fT4 is still low. If the patient was recently unwell, recheck TFTs in 4–6 weeks before investigating for pituitary pathology.')
+            ),
 
             // TSH HIGH pathways
             tshResult === 'high' && ft4Status === 'low' && e(DiffListItem, {
@@ -1347,10 +1354,10 @@
               tags: ['Recheck 6–8 weeks', 'Check TPO antibodies', 'Treat if TSH >10'],
               infoPanel: e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism', color: 'var(--purple)' },
                 e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
-                  e('strong', { style: { color: 'var(--green)' } }, 'TREAT IF:'), ' TSH >10 (even if asymptomatic) · TSH 4–10 with positive TPOAb · Symptoms attributable to hypothyroidism · Pregnant or planning pregnancy (target TSH <2.5)'
+                  e('strong', { style: { color: 'var(--green)' } }, 'TREAT IF:'), ' TSH >10 (except consider observation in >70y) · TSH 4–10 with positive TPOAb and symptoms · Pregnant or planning pregnancy (target TSH <2.5)'
                 ),
                 e('div', { style: { background: 'rgba(255,159,10,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                  e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — higher TSH may be physiological · Recovery from acute illness'
+                  e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment (TRUST trial) · Recovery from acute illness'
                 )
               )
             }, 'TSH elevated but fT4 still normal. Common finding. Check TPO antibodies and recheck in 6–8 weeks. Treatment threshold depends on TSH level, symptoms, and antibody status.'),
@@ -1383,6 +1390,11 @@
               title: 'Assay Interference',
               tags: ['Biotin supplements', 'Heterophile antibodies', 'Recheck']
             }, 'Normal TSH with high fT4 is discordant. Most commonly caused by biotin supplement interference. Stop biotin for 48h and recheck, or request repeat on different assay platform.'),
+
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
             e(PrimaryButton, {
               label: 'New Analysis',
@@ -1425,6 +1437,15 @@
               e('p', null,
                 e('strong', null, 'Hook effect:'), ' Very high analyte concentrations can saturate assay and give falsely low/normal results. Rare but relevant in pregnancy and severe thyrotoxicosis.'
               )
+            ),
+
+            e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction', color: 'var(--purple)' },
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Amiodarone:'),
+              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for treatment. TFTs should be monitored every 6 months on amiodarone.'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Lithium:'),
+              e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release. Monitor TFTs at baseline, 6 months, then annually.'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Other drugs:'),
+              e('p', null, 'Immune checkpoint inhibitors (pembrolizumab, nivolumab) → thyroiditis then hypothyroidism. Tyrosine kinase inhibitors → hypothyroidism. Dopamine/glucocorticoids → suppress TSH.')
             )
           )
         )
@@ -1526,12 +1547,12 @@
         return { color: 'var(--red)', interp: 'Severe — seizures, coma, cerebral oedema risk' };
       };
 
-      // Corrected Na calculation
+      // Corrected Na calculation (Katz formula)
       const getCorrectedNa = () => {
         const na = parseFloat(naValue);
         const glu = parseFloat(glucose);
-        if (isNaN(na) || isNaN(glu) || glu <= 10) return null;
-        return (na + glu / 4).toFixed(1);
+        if (isNaN(na) || isNaN(glu) || glu <= 5.5) return null;
+        return (na + 0.3 * (glu - 5.5)).toFixed(1);
       };
 
       // Na display for branch cards
@@ -1559,8 +1580,8 @@
       };
 
       const getUrineNaDisplay = () => {
-        if (urineNaResult === 'low') return { value: 'Low (< 20–40)', interpretation: 'Retained — kidneys conserving', color: 'var(--green)' };
-        if (urineNaResult === 'high') return { value: 'High (> 20–40)', interpretation: 'Wasted — sodium loss', color: 'var(--orange)' };
+        if (urineNaResult === 'low') return { value: 'Low (< 30)', interpretation: 'Retained — kidneys conserving', color: 'var(--green)' };
+        if (urineNaResult === 'high') return { value: 'High (> 30)', interpretation: 'Wasted — sodium loss', color: 'var(--orange)' };
         return { value: '', interpretation: '', color: 'var(--blue)' };
       };
 
@@ -1642,7 +1663,7 @@
           // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'How quickly did this develop?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines safe correction rate'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'If last known normal Na was >48h ago or unknown, treat as chronic'),
             e(ChoiceButton, {
               label: 'Acute  ‹ 48 hours',
               sublabel: 'Higher risk of cerebral oedema. More aggressive correction tolerated.',
@@ -1719,7 +1740,7 @@
             }),
             e(ChoiceButton, {
               label: 'Not available',
-              sublabel: 'Assume hypotonic and proceed',
+              sublabel: 'Assume hypotonic — but check glucose first (if >15, osm may be elevated)',
               selected: serumOsmResult === 'skip',
               onClick: () => {
                 clearAutoAdvance();
@@ -1739,6 +1760,9 @@
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() }
             ] }),
+            e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', marginBottom: '12px', padding: '10px 12px', background: 'rgba(10,132,255,0.06)', borderRadius: '10px' }
+            }, '💡 If iso-osmolar but clinical picture doesn\'t fit pseudohyponatraemia, check cortisol to exclude adrenal insufficiency.'),
             e(DiffListItem, {
               title: 'Pseudohyponatraemia',
               tags: ['Measurement artefact', 'Check Na on VBG'],
@@ -1748,6 +1772,10 @@
                 e('p', null, 'Tonicity = Osmolality − Urea. If in doubt, calculate tonicity or check Na on VBG.')
               )
             }, 'Usually measurement error secondary to hyperlipidaemia or hyperproteinaemia. Check Na on VBG (direct ion-selective electrode).'),
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
             e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
           ),
 
@@ -1915,6 +1943,9 @@
                     style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
                   }, `${calculateCorrectionRate().ratePer24h} mmol/L/24h`)
                 ),
+                e('div', {
+                  style: { fontSize: '10px', color: 'var(--label3)', marginTop: '6px', fontStyle: 'italic' }
+                }, 'Projection based on current rate — correction often slows as Na rises. Recheck frequently.'),
                 calculateCorrectionRate().exceeds && e('div', {
                   style: { marginTop: '8px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--red)', fontWeight: 500 }
                 }, `⚠ Exceeds target of ${targetRate} mmol/24h — risk of ODS`)
@@ -1931,6 +1962,11 @@
               ),
               e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
             ),
+
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
             e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
           ),
@@ -1975,6 +2011,8 @@
               { label: 'Urine Osm', ...getUrineOsmDisplay() },
               { label: 'Urine Na', ...getUrineNaDisplay() }
             ] }),
+
+            e(WarningBanner, null, e('strong', null, 'Always exclude adrenal insufficiency.'), ' Check morning cortisol (or short synacthen test) in any unexplained hyponatraemia — it is one of the most dangerous missed diagnoses.'),
 
             e('div', {
               style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
@@ -2026,7 +2064,7 @@
                 warning: 'Must exclude adrenal insufficiency before diagnosing SIADH. Check morning cortisol ± short synacthen test.'
               }, 'ADH is active (water retention) AND kidneys are wasting sodium. This is the broadest differential — clinical context is critical.'),
 
-              e(DiffCard, { title: 'SIADH', description: 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine).' }),
+              e(DiffCard, { title: 'SIADH', description: 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine). Tip: Low serum uric acid (<4 mg/dL) is a useful supportive clue.' }),
 
               e(DiffCard, { title: 'Adrenal insufficiency (Addison\'s, pan-hypopit)', description: 'Aldosterone deficiency → Na wasting. Cortisol deficiency → impaired free water excretion.' }),
 
@@ -2167,6 +2205,9 @@
                     style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
                   }, `${calculateCorrectionRate().ratePer24h} mmol/L/24h`)
                 ),
+                e('div', {
+                  style: { fontSize: '10px', color: 'var(--label3)', marginTop: '6px', fontStyle: 'italic' }
+                }, 'Projection based on current rate — correction often slows as Na rises. Recheck frequently.'),
                 calculateCorrectionRate().exceeds && e('div', {
                   style: { marginTop: '8px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--red)', fontWeight: 500 }
                 }, `⚠ Exceeds target of ${targetRate} mmol/24h — risk of ODS`)
@@ -2183,6 +2224,11 @@
               ),
               e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
             ),
+
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
             // Bottom buttons (for all result paths)
             e('div', { style: { marginTop: '20px' } },
@@ -2535,7 +2581,9 @@
               e('p', null, e('strong', null, 'Coeliac serology'), ' should be checked in all cases of unexplained iron deficiency.')
             ),
 
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local laboratory\'s reference ranges.'),
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
             e('div', { style: { marginTop: '16px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
@@ -2664,7 +2712,7 @@
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, onDiuretics ? 'Enter values for FEUrea' : 'Enter values for FENa'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Urine and serum biochemistry'),
             e(ValueInput, { label: 'Urine Sodium', unit: 'mmol/L', value: urineNa, onChange: setUrineNa, placeholder: 'Enter' }),
-            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter' }),
+            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter', hint: 'Most Australian labs report in mmol/L' }),
             e(ValueInput, { label: 'Serum Sodium', unit: 'mmol/L', value: serumNa, onChange: setSerumNa, placeholder: '135–145' }),
             e(ValueInput, { label: 'Serum Creatinine', unit: 'µmol/L', value: serumCr, onChange: setSerumCr, placeholder: 'Enter' }),
             onDiuretics && e(React.Fragment, null,
@@ -2732,12 +2780,14 @@
               urineOsm && { label: 'Urine Osm', ...getUrineOsmDisplay() }
             ].filter(Boolean) }),
 
+            e(WarningBanner, null, e('strong', null, 'Always exclude obstruction.'), ' Perform renal tract ultrasound before attributing AKI to pre-renal or intrinsic causes. Post-renal obstruction is the most treatable cause of AKI.'),
+
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
 
             fenaResult === 'preRenal' && e(DiffListItem, {
               title: 'Pre-renal AKI',
               tags: ['Underperfusion', 'Structurally intact', 'Reversible'],
-              warning: e(React.Fragment, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling: contrast nephropathy, early rhabdomyolysis, early sepsis, acute glomerulonephritis, early interstitial nephritis, acute urinary obstruction.')
+              warning: e(React.Fragment, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling: contrast nephropathy, rhabdomyolysis, pigment nephropathy, early sepsis, acute glomerulonephritis, early interstitial nephritis, acute urinary obstruction, calcineurin inhibitor toxicity (cyclosporin, tacrolimus).')
             }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
 
             fenaResult === 'intrinsic' && e(DiffListItem, {
@@ -2760,7 +2810,9 @@
               e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Crystals:'), ' Crystal nephropathy (tumour lysis, ethylene glycol)')
             ),
 
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
             e('div', { style: { marginTop: '16px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
@@ -2812,7 +2864,7 @@
         const fib = parseFloat(fibrinogen);
         if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
         if (dd <= 0.5) score += 0; else if (dd <= 5) score += 1; else score += 2;
-        const ptProlongation = ptVal - 13;
+        const ptProlongation = ptVal - 12;
         if (ptProlongation < 3) score += 0; else if (ptProlongation <= 6) score += 1; else score += 2;
         if (fib >= 1.0) score += 0; else score += 2;
         return score;
@@ -2963,6 +3015,12 @@
                 tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
               }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
               e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] }),
+              e(DiffListItem, {
+                title: 'Acquired Factor VIII Inhibitor',
+                tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
+                defaultOpen: true,
+                warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
+              }, 'Autoantibody against Factor VIII. Characteristically presents in elderly patients or postpartum. APTT does not correct with mixing study (time-dependent inhibitor — Bethesda assay at 2 hours). Factor VIII level very low. Distinct from congenital haemophilia. Requires immunosuppression + bypassing agents.'),
               e(InfoPanel, { title: 'The Mixing Study', color: 'var(--green)' },
                 e('p', { style: { marginBottom: '8px' } }, 'When APTT is prolonged, mix 1:1 patient plasma with normal plasma:'),
                 e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
@@ -3002,6 +3060,11 @@
                 )
               }),
               e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] }),
+              e(DiffListItem, {
+                title: 'TTP / HUS',
+                tags: ['ADAMTS13', 'Schistocytes', 'Fibrinogen NORMAL', 'Haematology emergency'],
+                warning: 'If schistocytes on blood film + thrombocytopenia + AKI or neurological features → suspect TTP until proven otherwise. Do NOT delay plasma exchange for ADAMTS13 result.'
+              }, 'Thrombotic thrombocytopenic purpura and haemolytic uraemic syndrome cause microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen is typically NORMAL in TTP (minimal consumption coagulopathy). Check blood film for schistocytes, LDH, haptoglobin, ADAMTS13 activity.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] }),
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] }),
               e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] })
@@ -3009,13 +3072,36 @@
 
             // Pattern D: Both normal
             pattern === 'D' && e(React.Fragment, null,
-              e(DiffListItem, { title: 'Platelet Disorder', tags: ['Thrombocytopenia', 'Platelet dysfunction', 'Aspirin', 'Uraemia'] }),
+              e(DiffListItem, {
+                title: 'Antiplatelet Drug Effect',
+                tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor', 'Most common cause'],
+                defaultOpen: true
+              }, 'Antiplatelet agents cause clinically significant bleeding with completely normal PT and APTT. This is the most common cause of "normal coags but bleeding" — always take a thorough medication history including over-the-counter aspirin and NSAIDs.'),
+              e(DiffListItem, {
+                title: 'Thrombocytopenia or Platelet Dysfunction',
+                tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
+              }, 'Low platelet count or dysfunctional platelets (uraemia, myelodysplasia, inherited platelet disorders). PT and APTT are normal because they only test the coagulation cascade, not primary haemostasis.'),
               e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] }),
               e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] }),
               e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] })
             ),
 
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center' } }, 'Reference ranges vary by laboratory.'),
+            e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?', color: 'var(--green)' },
+              e('p', { style: { marginBottom: '10px' } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem:'),
+              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } },
+                e('strong', null, 'Dabigatran (direct thrombin inhibitor):'), ' Prolongs APTT and thrombin time. Thrombin time is very sensitive — if normal, dabigatran effect is excluded. For quantification: dilute thrombin time (Hemoclot).'
+              ),
+              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } },
+                e('strong', null, 'Rivaroxaban / Apixaban (anti-Xa):'), ' May prolong PT (rivaroxaban > apixaban). Standard PT/APTT are unreliable for measuring effect. Use calibrated anti-Xa level.'
+              ),
+              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px' } },
+                e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
+              )
+            ),
+
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
             e('div', { style: { marginTop: '16px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--label3)', onClick: onBack })
             )
