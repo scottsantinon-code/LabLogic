@@ -124,29 +124,30 @@
       }, children);
     }
 
-    // 1b. ProgressBar (step dots - shows discrete screens)
+    // 1b. ProgressBar (step dots - current step is elongated pill)
     function ProgressBar({ current, total, color = 'var(--blue)' }) {
-      // Generate array of dot indices (0 to total-1)
-      const dots = Array.from({ length: total }, (_, i) => i);
       return e('div', {
         style: {
           display: 'flex',
           justifyContent: 'center',
-          gap: '8px',
-          marginBottom: '20px'
+          gap: '6px',
+          marginBottom: '20px',
+          padding: '4px 0'
         }
       },
-        dots.map(i => e('div', {
-          key: i,
-          style: {
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: i < current ? color : (i === current ? color : 'var(--sep)'),
-            opacity: i <= current ? 1 : 0.4,
-            transition: 'all 0.2s ease'
-          }
-        }))
+        Array.from({ length: total }, (_, i) =>
+          e('div', {
+            key: i,
+            style: {
+              width: i === current ? '20px' : '8px',
+              height: '8px',
+              borderRadius: '4px',
+              background: i <= current ? color : 'var(--sep)',
+              opacity: i <= current ? 1 : 0.4,
+              transition: 'all 0.25s ease'
+            }
+          })
+        )
       );
     }
 
@@ -1352,7 +1353,14 @@
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
           step === getResultsScreen() && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Based on the algorithmic pathway'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
+              (() => {
+                const tsh = tshResult === 'low' ? 'TSH ↓' : tshResult === 'high' ? 'TSH ↑' : 'TSH normal';
+                const ft4 = ft4Status === 'low' ? ' · fT4 ↓' : ft4Status === 'high' ? ' · fT4 ↑' : ' · fT4 normal';
+                const ft3 = tshResult === 'low' && ft3Status ? (ft3Status === 'high' ? ' · fT3 ↑' : ft3Status === 'low' ? ' · fT3 ↓' : ' · fT3 normal') : '';
+                return tsh + ft4 + ft3;
+              })()
+            ),
 
             // Compact input summary
             e(InputSummaryStrip, { items: [
@@ -2641,7 +2649,13 @@
           step === 5 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } }, 'Pattern recognition')
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
+                (() => {
+                  const ferr = { veryLow: 'Ferritin ↓↓', lowNormal: 'Ferritin low-normal', normal: 'Ferritin normal', high: 'Ferritin ↑', veryHigh: 'Ferritin ↑↑' }[ferritinResult] || '';
+                  const ts = { low: ' · TSAT ↓', normal: ' · TSAT normal', high: ' · TSAT ↑' }[tsatResult] || '';
+                  return ferr + ts;
+                })()
+              )
             ),
             e(InputSummaryStrip, { items: [
               { label: 'Inflammation', ...getInflammationDisplay() },
@@ -2944,7 +2958,10 @@
           // SCREEN 4: Results
           step === 4 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
+                fenaResult === 'preRenal' ? 'Pre-renal pattern' : fenaResult === 'intrinsic' ? 'Intrinsic (ATN) pattern' : 'Indeterminate'
+              )
             ),
             e(InputSummaryStrip, { items: [
               !onDiuretics && calcFENa() && { label: 'FENa', ...getFENaDisplay() },
@@ -3209,7 +3226,10 @@
           // SCREEN 2: Results
           step === 2 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
+                pattern === 'A' ? 'Isolated prolonged PT' : pattern === 'B' ? 'Isolated prolonged APTT' : pattern === 'C' ? 'Both PT and APTT prolonged' : 'Both normal'
+              )
             ),
             e(InputSummaryStrip, { items: [
               { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-op' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
