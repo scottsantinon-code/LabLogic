@@ -2755,7 +2755,7 @@
       // Screen 2: Calculated + interpretation
       const [fenaResult, setFenaResult] = useState(null);
 
-      const getTotalScreens = () => 4;
+      const getTotalScreens = () => 5;
 
       const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
       const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
@@ -2864,25 +2864,40 @@
             onDiuretics === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'FENa unreliable.'), ' Diuretics force sodium excretion, making FENa falsely elevated. Use FEUrea instead.')
           ),
 
-          // SCREEN 1: Enter urine and serum biochemistry (ValueInputs, Next button)
+          // SCREEN 1: Urine biochemistry
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter urine and serum biochemistry'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Urine and serum biochemistry'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter the urine biochemistry'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'From the spot urine sample'),
             e(ValueInput, { label: 'Urine Sodium', unit: 'mmol/L', value: urineNa, onChange: setUrineNa, placeholder: 'Enter' }),
-            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter', hint: 'Most Australian labs report in mmol/L' }),
-            e(ValueInput, { label: 'Serum Sodium', unit: 'mmol/L', value: serumNa, onChange: setSerumNa, placeholder: '135–145' }),
-            e(ValueInput, { label: 'Serum Creatinine', unit: 'µmol/L', value: serumCr, onChange: setSerumCr, placeholder: 'Enter' }),
-            onDiuretics && e(React.Fragment, null,
-              e('div', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label3)', marginTop: '16px', marginBottom: '8px' } }, 'FEUrea inputs'),
-              e(ValueInput, { label: 'Urine Urea', unit: 'mmol/L', value: urineUrea, onChange: setUrineUrea, placeholder: 'Enter' }),
-              e(ValueInput, { label: 'Serum Urea', unit: 'mmol/L', value: serumUrea, onChange: setSerumUrea, placeholder: 'Enter' })
-            ),
-            e(ValueInput, { label: 'Urine Osmolality (optional)', unit: 'mOsm/kg', value: urineOsm, onChange: setUrineOsm, placeholder: 'Optional' }),
-            e(PrimaryButton, { label: 'Next', disabled: !urineNa || !urineCr || !serumNa || !serumCr || (onDiuretics && (!urineUrea || !serumUrea)), color: 'var(--cyan)', onClick: () => goToStep(2) })
+            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter', hint: 'Most labs report in mmol/L' }),
+            onDiuretics && e(ValueInput, { label: 'Urine Urea', unit: 'mmol/L', value: urineUrea, onChange: setUrineUrea, placeholder: 'Enter' }),
+            e(PrimaryButton, {
+              label: 'Next',
+              disabled: !urineNa || !urineCr || (onDiuretics && !urineUrea),
+              color: 'var(--cyan)',
+              onClick: () => goToStep(2)
+            })
           ),
 
-          // SCREEN 2: Calculated results + interpretation (ChoiceButtons, auto-advance)
+          // SCREEN 2: Serum biochemistry
           step === 2 && e(FadeIn, null,
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter the serum biochemistry'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'From the blood panel'),
+            e(ValueInput, { label: 'Serum Sodium', unit: 'mmol/L', value: serumNa, onChange: setSerumNa, placeholder: '135–145' }),
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', fontWeight: 600, marginBottom: '4px', marginTop: '-8px' } }, '⚠ Note: Serum creatinine is in µmol/L — not mmol/L'),
+            e(ValueInput, { label: 'Serum Creatinine', unit: 'µmol/L', value: serumCr, onChange: setSerumCr, placeholder: '50–120' }),
+            onDiuretics && e(ValueInput, { label: 'Serum Urea', unit: 'mmol/L', value: serumUrea, onChange: setSerumUrea, placeholder: 'Enter' }),
+            e(ValueInput, { label: 'Urine Osmolality (optional)', unit: 'mOsm/kg', value: urineOsm, onChange: setUrineOsm, placeholder: 'Optional' }),
+            e(PrimaryButton, {
+              label: 'Next',
+              disabled: !serumNa || !serumCr || (onDiuretics && !serumUrea),
+              color: 'var(--cyan)',
+              onClick: () => goToStep(3)
+            })
+          ),
+
+          // SCREEN 3: Calculated results + interpretation (ChoiceButtons, auto-advance)
+          step === 3 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Classify the AKI'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Use the calculated indices to decide'),
             calcFENa() && !onDiuretics && e(BranchCard, { label: 'FENa', value: `${calcFENa()}%`, interpretation: 'Pre-renal <1% · Indeterminate 1–2% · Intrinsic >2%', color: 'var(--label)' }),
@@ -2898,7 +2913,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFenaResult('preRenal');
-                scheduleAdvance(() => goToStep(3), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--green)'
             }),
@@ -2909,7 +2924,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFenaResult('intrinsic');
-                scheduleAdvance(() => goToStep(3), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--red)'
             }),
@@ -2920,14 +2935,14 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFenaResult('indeterminate');
-                scheduleAdvance(() => goToStep(3), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--orange)'
             })
           ),
 
-          // SCREEN 3: Results
-          step === 3 && e(FadeIn, null,
+          // SCREEN 4: Results
+          step === 4 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation')
             ),
