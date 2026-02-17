@@ -94,9 +94,9 @@
     const modules = [
       { id: "hypona", name: "Hyponatraemia", icon: "💧", color: "#0A84FF", gradient: "linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
       { id: "tft", name: "Thyroid Function", icon: "🦋", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
-      { id: "iron", name: "Iron Studies", icon: "🩸", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Pattern recognition with ferritin traps", tag: "Fe" },
-      { id: "coag", name: "Coagulation", icon: "🔬", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT / APTT pattern analysis", tag: "Coag" },
-      { id: "aki", name: "Urine Biochem", icon: "⚗️", color: "#64D2FF", gradient: "linear-gradient(135deg, #64D2FF 0%, #32B4E0 100%)", desc: "FENa & AKI workup", tag: "AKI", beta: true }
+      { id: "iron", name: "Iron Studies", icon: "🩸", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Ferritin, TSAT & the inflammation trap", tag: "Fe" },
+      { id: "coag", name: "Coagulation", icon: "🔬", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT & APTT — from pattern to diagnosis", tag: "Coag" },
+      { id: "aki", name: "Urine Biochem", icon: "⚗️", color: "#64D2FF", gradient: "linear-gradient(135deg, #64D2FF 0%, #32B4E0 100%)", desc: "Pre-renal vs intrinsic — FENa calculator", tag: "AKI", beta: true }
     ];
 
     // Reference ranges
@@ -1550,7 +1550,7 @@
               ft3Status && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
             ].filter(Boolean) }),
 
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
             // TSH LOW pathways
             tshResult === 'low' && ft4Status === 'high' && e(DiffListItem, {
@@ -1954,15 +1954,18 @@
             }),
             e(ChoiceButton, {
               label: 'Not available',
-              sublabel: 'Assume hypotonic — but check glucose first (if >15, osm may be elevated)',
+              sublabel: 'Will assume hypotonic',
               selected: serumOsmResult === 'skip',
               onClick: () => {
                 clearAutoAdvance();
                 setSerumOsmResult('skip');
-                scheduleAdvance(() => goToStep(3), false); // Continue to urine osm
+                // No auto-advance — warning gates progression
               },
               color: 'var(--label3)'
-            })
+            }),
+            serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(3) },
+              'If glucose is significantly elevated (>15 mmol/L), serum osmolality may be high — check glucose before assuming hypotonic.'
+            )
           ),
 
           // SCREEN 3: Path-dependent
@@ -2138,7 +2141,7 @@
 
             e('div', {
               style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
-            }, 'Consistent diagnoses'),
+            }, 'Differential'),
 
             // PATH A: Low Urine Osm + Low Urine Na
             urineOsmResult === 'low' && urineNaResult === 'low' && e(React.Fragment, null,
@@ -2364,7 +2367,7 @@
           // SCREEN 0: Is the patient inflamed? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient inflamed?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'CRP elevated — this changes ferritin interpretation'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
               label: 'Yes — CRP elevated',
               sublabel: 'Ferritin may be falsely normal',
@@ -2600,7 +2603,7 @@
               { label: 'TSAT', ...getTsatDisplay() }
             ] }),
 
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
             // Pattern: Ferritin low/low-normal + TSAT low
             (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
@@ -2908,7 +2911,7 @@
 
             e(WarningBanner, null, e('strong', null, 'Always exclude obstruction.'), ' Perform renal tract ultrasound before attributing AKI to pre-renal or intrinsic causes. Post-renal obstruction is the most treatable cause of AKI.'),
 
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
             fenaResult === 'preRenal' && e(DiffListItem, {
               title: 'Pre-renal AKI',
@@ -3065,8 +3068,8 @@
               color: 'var(--blue)'
             }),
             e(ChoiceButton, {
-              label: 'Pre-operative screening',
-              sublabel: 'Abnormal coag before planned surgery',
+              label: 'Pre-procedure / pre-operative',
+              sublabel: 'Abnormal coag before a planned procedure',
               selected: clinicalContext === 'preOp',
               onClick: () => {
                 clearAutoAdvance();
@@ -3098,7 +3101,20 @@
               )
             ),
 
-            // Auto-suggest if values entered
+            // Individual value feedback
+            ptEntry && !apttEntry && e('div', {
+              style: { fontSize: '12px', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', borderRadius: '10px',
+                color: parseFloat(ptEntry) > 13.5 ? 'var(--orange)' : 'var(--green)',
+                background: parseFloat(ptEntry) > 13.5 ? 'rgba(255,159,10,0.06)' : 'rgba(48,209,88,0.06)' }
+            }, parseFloat(ptEntry) > 13.5 ? `PT ${ptEntry}s — prolonged (>13.5)` : `PT ${ptEntry}s — normal`),
+
+            apttEntry && !ptEntry && e('div', {
+              style: { fontSize: '12px', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', borderRadius: '10px',
+                color: parseFloat(apttEntry) > 38 ? 'var(--orange)' : 'var(--green)',
+                background: parseFloat(apttEntry) > 38 ? 'rgba(255,159,10,0.06)' : 'rgba(48,209,88,0.06)' }
+            }, parseFloat(apttEntry) > 38 ? `APTT ${apttEntry}s — prolonged (>38)` : `APTT ${apttEntry}s — normal`),
+
+            // Combined pattern suggestion
             ptEntry && apttEntry && e('div', {
               style: { fontSize: '12px', color: 'var(--blue)', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', background: 'rgba(10,132,255,0.06)', borderRadius: '10px' }
             },
@@ -3169,10 +3185,10 @@
               )
             ),
             e(InputSummaryStrip, { items: [
-              { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-op' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
+              { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-procedure' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
               { label: 'Pattern', value: pattern === 'A' ? 'PT ↑' : pattern === 'B' ? 'APTT ↑' : pattern === 'C' ? 'Both ↑' : 'Both normal', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }
             ] }),
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
+            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
             // Pattern A: Isolated prolonged PT
             pattern === 'A' && e(React.Fragment, null,
