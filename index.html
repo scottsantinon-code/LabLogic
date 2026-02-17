@@ -3239,20 +3239,30 @@
 
             // Pattern A: Isolated prolonged PT
             pattern === 'A' && e(React.Fragment, null,
-              e(DiffListItem, { title: 'Warfarin', tags: ['Most common', 'Check INR target'] }),
-              e(DiffListItem, { title: 'Early Liver Disease', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] }),
-              e(DiffListItem, { title: 'Vitamin K Deficiency', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] }),
-              e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] }),
-              e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] })
+              e(DiffListItem, { title: 'Warfarin', tags: ['Most common', 'Check INR target'] },
+                'Check INR — is it in therapeutic range for the indication? Supratherapeutic INR: hold warfarin, give vitamin K (oral if INR 5–9 and not bleeding, IV if active bleeding). Repeat INR in 6–12 hours.'),
+              e(DiffListItem, { title: 'Early Liver Disease', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] },
+                'Factor VII has the shortest half-life (~6 hours) — PT rises before APTT in hepatic synthetic failure. Check albumin, bilirubin, and other LFTs.'),
+              e(DiffListItem, { title: 'Vitamin K Deficiency', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] },
+                'Fat-soluble vitamin. Common in malabsorption (coeliac, IBD, short gut), malnutrition, prolonged antibiotics (gut flora produce vitamin K), and obstructive jaundice (bile salts needed for absorption). Responds to IV/oral vitamin K within 12–24 hours.'),
+              e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] },
+                'Anti-Xa DOACs variably prolong PT (rivaroxaban more than apixaban) but standard coag is unreliable for measuring drug effect. Use calibrated anti-Xa level. If urgent reversal needed: andexanet alfa (specific) or prothrombin complex concentrate (PCC).'),
+              e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] },
+                'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding. Recombinant Factor VIIa (NovoSeven) available for severe bleeding.')
             ),
 
             // Pattern B: Isolated prolonged APTT
             pattern === 'B' && e(React.Fragment, null,
-              e(DiffListItem, { title: 'Heparin (UFH)', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] }),
-              e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] }),
-              e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] }),
-              e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] }),
-              e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] }),
+              e(DiffListItem, { title: 'Heparin (UFH)', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] },
+                'Most common cause of isolated prolonged APTT in hospital. Check whether the patient is on a heparin infusion, prophylactic heparin, or has a heparin-coated line. Protamine reverses UFH.'),
+              e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
+                'X-linked recessive. Severity correlates with factor level: severe <1% (spontaneous bleeds), moderate 1–5%, mild 5–40%. Treat with Factor VIII concentrate or desmopressin (mild). Target levels depend on bleed severity and location.'),
+              e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
+                'Clinically identical to Haemophilia A — can only distinguish by factor levels. Treat with Factor IX concentrate (not desmopressin, which has no effect on Factor IX).'),
+              e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
+                'Most common inherited bleeding disorder (~1% prevalence). vWF stabilises Factor VIII in circulation — low vWF causes secondary Factor VIII deficiency. Check vWF antigen, vWF activity (ristocetin cofactor), and Factor VIII level. Type 1 (most common) responds to desmopressin.'),
+              e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
+                'Common in Ashkenazi Jewish populations (up to 8% carrier rate). Bleeding risk does not correlate well with factor level — some patients with very low levels bleed minimally. Unpredictable post-surgical bleeding is the main concern.'),
               e(DiffListItem, {
                 title: 'Factor XII Deficiency',
                 tags: ['NO bleeding risk', 'Do NOT delay surgery'],
@@ -3262,7 +3272,8 @@
                 title: 'Lupus Anticoagulant',
                 tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
               }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
-              e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] }),
+              e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
+                'Direct thrombin inhibitor. Prolongs APTT and strongly prolongs thrombin time (TT). Normal TT effectively excludes clinically significant dabigatran effect. Specific reversal: idarucizumab (Praxbind).'),
               e(DiffListItem, {
                 title: 'Acquired Factor VIII Inhibitor',
                 tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
@@ -3307,15 +3318,19 @@
                   e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
                 )
               }),
-              e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] }),
+              e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] },
+                'Occurs after large-volume resuscitation with crystalloid, colloid, or packed red cells without adequate FFP and platelets. Follow massive transfusion protocol — aim for FFP:RBC ratio of at least 1:2.'),
               e(DiffListItem, {
                 title: 'TTP / HUS',
                 tags: ['ADAMTS13', 'Schistocytes', 'Fibrinogen NORMAL', 'Haematology emergency'],
                 warning: 'If schistocytes on blood film + thrombocytopenia + AKI or neurological features → suspect TTP until proven otherwise. Do NOT delay plasma exchange for ADAMTS13 result.'
               }, 'Thrombotic thrombocytopenic purpura and haemolytic uraemic syndrome cause microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen is typically NORMAL in TTP (minimal consumption coagulopathy). Check blood film for schistocytes, LDH, haptoglobin, ADAMTS13 activity.'),
-              e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] }),
-              e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] }),
-              e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] })
+              e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] },
+                'Severe deficiency affects Factors II, VII, IX, and X — prolonging both PT (extrinsic) and APTT (intrinsic). Common causes: prolonged malnutrition, warfarin (iatrogenic). IV vitamin K produces measurable improvement in 6–8 hours.'),
+              e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] },
+                'Very high INR with both PT and APTT prolonged. If no active bleeding: hold warfarin, oral vitamin K 1–2 mg. If active bleeding: IV vitamin K + prothrombin complex concentrate (PCC) for immediate reversal. FFP is second-line.'),
+              e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
+                'At high levels, direct thrombin inhibitors prolong both APTT and PT. For dabigatran: check Hemoclot assay, reverse with idarucizumab. For argatroban (IV, used in HIT): reduce infusion rate, no specific reversal.')
             ),
 
             // Pattern D: Both normal
@@ -3329,9 +3344,12 @@
                 title: 'Thrombocytopenia or Platelet Dysfunction',
                 tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
               }, 'Low platelet count or dysfunctional platelets (uraemia, myelodysplasia, inherited platelet disorders). PT and APTT are normal because they only test the coagulation cascade, not primary haemostasis.'),
-              e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] }),
-              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] }),
-              e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] })
+              e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
+                'Mild Type 1 vWD may have a normal APTT because Factor VIII remains above the threshold for APTT prolongation (~30%). Always check vWF antigen, vWF activity, and Factor VIII level if vWD is suspected clinically.'),
+              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] },
+                'Factor XIII cross-links fibrin after clot formation. Deficiency means the clot forms normally (PT/APTT normal) but is unstable and breaks down. Classic presentation: delayed bleeding 24–48h post-surgery, umbilical stump bleeding in neonates. Diagnose with urea clot lysis test or Factor XIII level.'),
+              e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
+                'Vascular fragility from connective tissue disorders (Ehlers-Danlos, Marfan), vasculitis (Henoch-Schönlein purpura, other small-vessel vasculitides), or scurvy (vitamin C deficiency — perifollicular haemorrhage, corkscrew hairs). All have normal coagulation studies.')
             ),
 
             e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?', color: 'var(--green)' },
