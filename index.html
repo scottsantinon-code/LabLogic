@@ -1082,8 +1082,8 @@
       const [step, setStep] = useState(0);
       const [acutelyUnwell, setAcutelyUnwell] = useState(null);
       const [tshResult, setTshResult] = useState(null);
-      const [ft4, setFt4] = useState('');
-      const [ft3, setFt3] = useState('');
+      const [ft4Status, setFt4Status] = useState(null); // 'low', 'normal', 'high'
+      const [ft3Status, setFt3Status] = useState(null); // 'low', 'normal', 'high'
 
       // Auto-advance for ChoiceButton-only screens
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
@@ -1111,34 +1111,6 @@
         }
       };
 
-      // Interpret values
-      const interpretTSH = (val) => {
-        const n = parseFloat(val);
-        if (isNaN(n)) return null;
-        if (n < 0.4) return 'low';
-        if (n > 4.0) return 'high';
-        return 'normal';
-      };
-
-      const interpretFT4 = (val) => {
-        const n = parseFloat(val);
-        if (isNaN(n)) return null;
-        if (n < 12) return 'low';
-        if (n > 22) return 'high';
-        return 'normal';
-      };
-
-      const interpretFT3 = (val) => {
-        const n = parseFloat(val);
-        if (isNaN(n)) return null;
-        if (n < 3.1) return 'low';
-        if (n > 6.8) return 'high';
-        return 'normal';
-      };
-
-      const ft4Status = interpretFT4(ft4);
-      const ft3Status = interpretFT3(ft3);
-
       // Get TSH display values
       const getTSHDisplay = () => {
         if (tshResult === 'low') return { value: 'Low (< 0.4)', interpretation: 'Suppressed', color: 'var(--red)' };
@@ -1147,15 +1119,15 @@
       };
 
       const getFT4Display = () => {
-        if (ft4Status === 'low') return { value: `${ft4} pmol/L`, interp: 'Low', color: 'var(--red)' };
-        if (ft4Status === 'high') return { value: `${ft4} pmol/L`, interp: 'High', color: 'var(--orange)' };
-        return { value: `${ft4} pmol/L`, interp: 'Normal', color: 'var(--green)' };
+        if (ft4Status === 'low') return { value: 'Low (< 12)', interp: 'Below range', color: 'var(--red)' };
+        if (ft4Status === 'high') return { value: 'High (> 22)', interp: 'Above range', color: 'var(--orange)' };
+        return { value: 'Normal (12–22)', interp: 'Within range', color: 'var(--green)' };
       };
 
       const getFT3Display = () => {
-        if (ft3Status === 'low') return { value: `${ft3} pmol/L`, interp: 'Low', color: 'var(--red)' };
-        if (ft3Status === 'high') return { value: `${ft3} pmol/L`, interp: 'High', color: 'var(--orange)' };
-        return { value: `${ft3} pmol/L`, interp: 'Normal', color: 'var(--green)' };
+        if (ft3Status === 'low') return { value: 'Low (< 3.1)', interp: 'Below range', color: 'var(--red)' };
+        if (ft3Status === 'high') return { value: 'High (> 6.8)', interp: 'Above range', color: 'var(--orange)' };
+        return { value: 'Normal (3.1–6.8)', interp: 'Within range', color: 'var(--green)' };
       };
 
       // Main TFT flow
@@ -1234,47 +1206,85 @@
             })
           ),
 
-          // SCREEN 2: Enter fT4 (ValueInput, Next button)
+          // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter fT4'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT4?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
               tshResult === 'low' ? 'TSH is suppressed — fT4 helps classify' :
               tshResult === 'high' ? 'TSH is elevated — fT4 distinguishes overt from subclinical' :
               'TSH normal — fT4 checks for rare discordance'
             ),
-            e(ValueInput, {
-              label: 'fT4',
-              unit: 'pmol/L',
-              value: ft4,
-              onChange: setFt4,
-              placeholder: '12 – 22',
-              hint: 'Normal: 12–22'
+            e(ChoiceButton, {
+              label: 'Low  ‹ 12 pmol/L',
+              sublabel: 'Below reference range',
+              selected: ft4Status === 'low',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt4Status('low');
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+              },
+              color: 'var(--red)'
             }),
-            e(PrimaryButton, {
-              label: tshResult === 'low' ? 'Next → fT3' : 'Interpret →',
-              disabled: !ft4,
-              color: 'var(--purple)',
-              onClick: () => goToStep(tshResult === 'low' ? 3 : getResultsScreen())
+            e(ChoiceButton, {
+              label: 'Normal  12–22 pmol/L',
+              sublabel: 'Within reference range',
+              selected: ft4Status === 'normal',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt4Status('normal');
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+              },
+              color: 'var(--green)'
+            }),
+            e(ChoiceButton, {
+              label: 'High  › 22 pmol/L',
+              sublabel: 'Above reference range',
+              selected: ft4Status === 'high',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt4Status('high');
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+              },
+              color: 'var(--orange)'
             })
           ),
 
-          // SCREEN 3: Enter fT3 (only if TSH low, ValueInput, Next button)
+          // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
           step === 3 && tshResult === 'low' && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter fT3'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'fT3 is needed to detect T3 thyrotoxicosis when fT4 is normal'),
-            e(ValueInput, {
-              label: 'fT3',
-              unit: 'pmol/L',
-              value: ft3,
-              onChange: setFt3,
-              placeholder: '3.1 – 6.8',
-              hint: 'Normal: 3.1–6.8'
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT3?'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Needed to detect T3 thyrotoxicosis when fT4 is normal'),
+            e(ChoiceButton, {
+              label: 'Low  ‹ 3.1 pmol/L',
+              sublabel: 'Below reference range',
+              selected: ft3Status === 'low',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt3Status('low');
+                scheduleAdvance(() => goToStep(4), false);
+              },
+              color: 'var(--red)'
             }),
-            e(PrimaryButton, {
-              label: 'Interpret →',
-              disabled: !ft3,
-              color: 'var(--purple)',
-              onClick: () => goToStep(4)
+            e(ChoiceButton, {
+              label: 'Normal  3.1–6.8 pmol/L',
+              sublabel: 'Within reference range',
+              selected: ft3Status === 'normal',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt3Status('normal');
+                scheduleAdvance(() => goToStep(4), false);
+              },
+              color: 'var(--green)'
+            }),
+            e(ChoiceButton, {
+              label: 'High  › 6.8 pmol/L',
+              sublabel: 'Above reference range',
+              selected: ft3Status === 'high',
+              onClick: () => {
+                clearAutoAdvance();
+                setFt3Status('high');
+                scheduleAdvance(() => goToStep(4), false);
+              },
+              color: 'var(--orange)'
             })
           ),
 
@@ -1286,8 +1296,8 @@
             // Compact input summary
             e(InputSummaryStrip, { items: [
               { label: 'TSH', ...getTSHDisplay() },
-              ft4 && { label: 'fT4', ...getFT4Display() },
-              ft3 && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
+              ft4Status && { label: 'fT4', ...getFT4Display() },
+              ft3Status && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
             ].filter(Boolean) }),
 
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Consistent diagnoses'),
@@ -1298,7 +1308,7 @@
                 title: 'Overt Hyperthyroidism',
                 tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
               }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
-              (ft3Status === 'high' || !ft3) && e(DiffListItem, {
+              (ft3Status === 'high' || !ft3Status) && e(DiffListItem, {
                 title: 'TSH-secreting Pituitary Adenoma',
                 tags: ['TSH should be suppressed', 'Refer endocrinology']
               }, 'TSH inappropriately normal/unsuppressed with elevated thyroid hormones. Very rare — consider TSH-producing adenoma or thyroid hormone resistance syndrome.')
@@ -1309,7 +1319,7 @@
               tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
             }, 'fT4 normal but fT3 elevated — about 5% of hyperthyroidism presents this way. Common in early Graves\' disease or autonomous thyroid adenoma.'),
 
-            tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3 || ft3Status === null) && !(ft3Status === 'high') && e(DiffListItem, {
+            tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3Status) && !(ft3Status === 'high') && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
               tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk']
             }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks. If persistent, increased risk of atrial fibrillation and osteoporosis.'),
