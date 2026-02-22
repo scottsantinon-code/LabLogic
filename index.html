@@ -93,6 +93,7 @@
     // Module data
     const modules = [
       { id: "hypona", name: "Hyponatraemia", icon: "💧", color: "#0A84FF", gradient: "linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
+      { id: "nacorr", name: "Na Correction Rate", icon: "📈", color: "#5E5CE6", gradient: "linear-gradient(135deg, #5E5CE6 0%, #4B48B8 100%)", desc: "Track serial sodium measurements", tag: "Na⁺" },
       { id: "tft", name: "Thyroid Function", icon: "🦋", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
       { id: "iron", name: "Iron Studies", icon: "🩸", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Ferritin, TSAT & the inflammation trap", tag: "Fe" },
       { id: "coag", name: "Coagulation", icon: "🔬", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT & APTT — from pattern to diagnosis", tag: "Coag" },
@@ -1793,6 +1794,213 @@
       );
     }
 
+    // ========== NA CORRECTION RATE MODULE ==========
+
+    function NaCorrectionModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [targetRate, setTargetRate] = useState(10);
+
+      const getCurrentDateTime = () => {
+        const now = new Date();
+        const date = now.toISOString().split('T')[0];
+        const time = now.toTimeString().slice(0, 5);
+        return { date, time };
+      };
+
+      const [naEntries, setNaEntries] = useState(() => {
+        const { date, time } = getCurrentDateTime();
+        return [{ na: '', date, time }, { na: '', date, time }];
+      });
+
+      const updateEntry = (index, field, value) => {
+        setNaEntries(prev => prev.map((entry, i) => i === index ? { ...entry, [field]: value } : entry));
+      };
+
+      const addEntry = () => {
+        const { date, time } = getCurrentDateTime();
+        setNaEntries(prev => [...prev, { na: '', date, time }]);
+      };
+
+      const removeEntry = (index) => {
+        if (naEntries.length > 2) {
+          setNaEntries(prev => prev.filter((_, i) => i !== index));
+        }
+      };
+
+      const resetModule = () => {
+        const { date, time } = getCurrentDateTime();
+        setNaEntries([{ na: '', date, time }, { na: '', date, time }]);
+        setTargetRate(10);
+        if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
+      };
+
+      const calculateCorrectionRate = () => {
+        const validEntries = naEntries
+          .filter(entry => entry.na && entry.date && entry.time)
+          .map(entry => ({
+            na: parseFloat(entry.na),
+            timestamp: new Date(`${entry.date}T${entry.time}`).getTime()
+          }))
+          .filter(entry => !isNaN(entry.na) && !isNaN(entry.timestamp))
+          .sort((a, b) => a.timestamp - b.timestamp);
+
+        if (validEntries.length < 2) return null;
+
+        const first = validEntries[0];
+        const last = validEntries[validEntries.length - 1];
+        const hoursElapsed = (last.timestamp - first.timestamp) / (1000 * 60 * 60);
+        if (hoursElapsed <= 0) return null;
+
+        const naChange = last.na - first.na;
+        const ratePerHour = naChange / hoursElapsed;
+        const ratePer24h = ratePerHour * 24;
+
+        return {
+          naChange: naChange.toFixed(1),
+          hoursElapsed: hoursElapsed.toFixed(1),
+          ratePerHour: ratePerHour.toFixed(2),
+          ratePer24h: ratePer24h.toFixed(1),
+          exceeds: Math.abs(ratePer24h) > targetRate
+        };
+      };
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'Na Correction Rate', onBack: onBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e('div', { className: 'screen-content' },
+          e(FadeIn, null,
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Track sodium correction'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '16px' } }, 'Enter serial sodium measurements to monitor correction rate'),
+
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '10px 12px', borderRadius: '8px', marginBottom: '16px', lineHeight: '1.5' } },
+              'This tool monitors sodium correction rate. Correction targets should be determined by the treating team based on chronicity, symptoms, and risk factors.'
+            ),
+
+            // Target rate selector
+            e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' } },
+              e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Alert threshold:'),
+              e('select', {
+                value: targetRate,
+                onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
+                style: { padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
+              },
+                e('option', { value: 6 }, '6 mmol/24h'),
+                e('option', { value: 8 }, '8 mmol/24h'),
+                e('option', { value: 10 }, '10 mmol/24h'),
+                e('option', { value: 12 }, '12 mmol/24h')
+              )
+            ),
+
+            // Na entries
+            e('div', { style: { marginBottom: '12px' } },
+              naEntries.map((entry, index) => e('div', {
+                key: index,
+                style: { display: 'flex', gap: '6px', alignItems: 'flex-end', marginBottom: '10px', background: 'var(--card)', padding: '12px', borderRadius: '12px', border: '1px solid var(--sep)' }
+              },
+                e('div', { style: { flex: '1' } },
+                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, `Na #${index + 1}`),
+                  e('input', {
+                    type: 'number', inputMode: 'decimal', value: entry.na,
+                    onChange: (ev) => updateEntry(index, 'na', ev.target.value),
+                    placeholder: 'mmol/L',
+                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '16px', fontFamily: 'var(--font)' }
+                  })
+                ),
+                e('div', { style: { flex: '1' } },
+                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, 'Date'),
+                  e('input', {
+                    type: 'date', value: entry.date,
+                    onChange: (ev) => updateEntry(index, 'date', ev.target.value),
+                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
+                  })
+                ),
+                e('div', { style: { flex: '0.7' } },
+                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, 'Time'),
+                  e('input', {
+                    type: 'time', value: entry.time,
+                    onChange: (ev) => updateEntry(index, 'time', ev.target.value),
+                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
+                  })
+                ),
+                naEntries.length > 2 && e('button', {
+                  onClick: () => removeEntry(index),
+                  style: { padding: '10px 12px', background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '18px', minWidth: '40px' }
+                }, '×')
+              ))
+            ),
+
+            e('button', {
+              onClick: addEntry,
+              style: { width: '100%', padding: '12px', background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', color: 'var(--blue)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font)', marginBottom: '16px' }
+            }, '+ Add measurement'),
+
+            // Results display
+            calculateCorrectionRate() && e('div', {
+              style: {
+                background: calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.08)' : 'rgba(52,199,89,0.08)',
+                border: `1px solid ${calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.3)' : 'rgba(52,199,89,0.3)'}`,
+                borderRadius: '14px',
+                padding: '16px',
+                marginBottom: '16px'
+              }
+            },
+              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Correction Rate'),
+              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
+                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Na change:'),
+                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol/L`)
+              ),
+              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
+                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Time elapsed:'),
+                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().hoursElapsed} hours`)
+              ),
+              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
+                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Rate:'),
+                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/L/hr`)
+              ),
+              e('div', { style: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid var(--sep)', marginTop: '8px' } },
+                e('span', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Projected 24h rate:'),
+                e('span', {
+                  style: { fontSize: '18px', fontWeight: 800, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
+                }, `${calculateCorrectionRate().ratePer24h} mmol/L`)
+              ),
+              e('div', {
+                style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px', fontStyle: 'italic' }
+              }, 'Projection assumes linear rate — actual correction often slows as Na rises.'),
+              calculateCorrectionRate().exceeds && e('div', {
+                style: { marginTop: '10px', padding: '10px 12px', background: 'rgba(255,69,58,0.12)', borderRadius: '8px', fontSize: '12px', color: 'var(--red)', fontWeight: 600 }
+              }, `Exceeds alert threshold of ${targetRate} mmol/24h`)
+            ),
+
+            !calculateCorrectionRate() && e('div', {
+              style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '20px', textAlign: 'center', marginBottom: '16px' }
+            },
+              e('div', { style: { fontSize: '14px', color: 'var(--label3)' } }, 'Enter at least 2 measurements to calculate correction rate')
+            ),
+
+            e(InfoPanel, { title: 'About Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
+              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
+              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
+                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+                e('li', null, 'Hypokalaemia'),
+                e('li', null, 'Malnutrition or alcoholism'),
+                e('li', null, 'Advanced liver disease')
+              )
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Reset', color: 'var(--indigo)', onClick: resetModule }),
+              e('button', {
+                onClick: onBack,
+                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
+              }, '← All modules')
+            )
+          )
+        )
+      );
+    }
+
     // ========== HYPONATRAEMIA MODULE ==========
 
     function HyponatraemiaModule({ onBack }) {
@@ -1819,19 +2027,6 @@
 
       // Screen 4: Urine Sodium (if hypotonic)
       const [urineNaResult, setUrineNaResult] = useState(null);
-
-      // Na Correction Rate Calculator
-      const getCurrentDateTime = () => {
-        const now = new Date();
-        const date = now.toISOString().split('T')[0];
-        const time = now.toTimeString().slice(0, 5);
-        return { date, time };
-      };
-      const [naEntries, setNaEntries] = useState(() => {
-        const { date, time } = getCurrentDateTime();
-        return [{ na: '', date, time }];
-      });
-      const [targetRate, setTargetRate] = useState(10);
 
       // Determine path based on serum osmolality
       const isShortPath = serumOsmResult === 'normal' || serumOsmResult === 'high';
@@ -1873,9 +2068,6 @@
         setGlucose('');
         setUrineOsmResult(null);
         setUrineNaResult(null);
-        const { date, time } = getCurrentDateTime();
-        setNaEntries([{ na: '', date, time }]);
-        setTargetRate(10);
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
 
@@ -1949,6 +2141,9 @@
 
           // SCREEN 0: Serum sodium (ValueInput, Next button)
           step === 0 && e(FadeIn, null,
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
+              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
+            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the serum sodium?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines the severity'),
             e(ValueInput, {
@@ -2165,19 +2360,19 @@
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
 
-            e(NaCorrectionCalculator, { naEntries, setNaEntries, targetRate, setTargetRate }),
-
             e(LearnMoreDivider),
 
             e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
-              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) occurs when chronic hyponatraemia is corrected too rapidly. The brain adapts to low sodium by losing organic osmolytes. Rapid correction causes water to shift out of brain cells.'),
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Safe correction limits:'),
-              e('ul', { style: { margin: '0', paddingLeft: '16px', fontSize: '12px' } },
-                e('li', null, 'Standard: ≤10 mmol/L in 24h'),
-                e('li', null, 'High risk (chronic, malnourished, hypokalaemic): ≤8 mmol/L in 24h'),
-                e('li', null, 'Acute (<48h): Can correct faster if symptomatic')
-              ),
-              e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
+              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
+              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
+                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+                e('li', null, 'Hypokalaemia'),
+                e('li', null, 'Malnutrition or alcoholism'),
+                e('li', null, 'Advanced liver disease')
+              )
             ),
 
             e('div', {
@@ -2320,30 +2515,43 @@
                 e('div', { style: { display: 'flex', gap: '8px', marginBottom: '12px' } },
                   e('div', { style: { flex: 1, background: 'rgba(10,132,255,0.08)', borderRadius: '10px', padding: '10px 12px' } },
                     e('strong', { style: { color: 'var(--blue)' } }, 'SIADH:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic or mildly hypervolaemic. Oliguric. Urine osm typically >300. Treatment: fluid restriction, tolvaptan.')
+                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic or mildly hypervolaemic. Oliguric (low urine output). Urine osm typically >300.')
                   ),
                   e('div', { style: { flex: 1, background: 'rgba(255,159,10,0.08)', borderRadius: '10px', padding: '10px 12px' } },
                     e('strong', { style: { color: 'var(--orange)' } }, 'CSW:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric. High urine output. Treatment: isotonic or hypertonic saline (fluid restriction will worsen hypovolaemia and Na).')
+                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric (high urine output). Signs of volume depletion (tachycardia, orthostatic hypotension).')
                   )
                 ),
-                e('p', { style: { fontWeight: 600, color: 'var(--red)' } }, 'Getting this wrong matters: fluid restricting a CSW patient worsens their hypovolaemia and hyponatraemia.')
+                e('p', { style: { fontWeight: 600, color: 'var(--red)' } }, 'Distinguishing these matters: management differs significantly and misdiagnosis can worsen outcomes.')
               )
             ),
-
-            e(NaCorrectionCalculator, { naEntries, setNaEntries, targetRate, setTargetRate }),
 
             e(LearnMoreDivider),
 
             e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
-              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) occurs when chronic hyponatraemia is corrected too rapidly. The brain adapts to low sodium by losing organic osmolytes. Rapid correction causes water to shift out of brain cells.'),
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Safe correction limits:'),
-              e('ul', { style: { margin: '0', paddingLeft: '16px', fontSize: '12px' } },
-                e('li', null, 'Standard: ≤10 mmol/L in 24h'),
-                e('li', null, 'High risk (chronic, malnourished, hypokalaemic): ≤8 mmol/L in 24h'),
-                e('li', null, 'Acute (<48h): Can correct faster if symptomatic')
-              ),
-              e('p', { style: { marginTop: '8px', color: 'var(--red)', fontWeight: 500 } }, 'If overcorrected: Consider DDAVP + D5W to re-lower sodium.')
+              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
+              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
+                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+                e('li', null, 'Hypokalaemia'),
+                e('li', null, 'Malnutrition or alcoholism'),
+                e('li', null, 'Advanced liver disease')
+              )
+            ),
+
+            e(InfoPanel, { title: 'When Interpretation Requires Nephrology/Endocrinology Input', color: 'var(--purple)' },
+              e('p', { style: { marginBottom: '8px' } }, 'Consider specialist consultation for:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
+                e('li', null, 'Severe hyponatraemia (<120 mmol/L) or symptomatic hyponatraemia'),
+                e('li', null, 'Uncertain aetiology after initial workup'),
+                e('li', null, 'Suspected SIADH — to confirm diagnosis and identify underlying cause'),
+                e('li', null, 'Suspected adrenal insufficiency — for endocrine workup'),
+                e('li', null, 'Cerebral salt wasting vs SIADH distinction — volume status assessment'),
+                e('li', null, 'Chronic hyponatraemia with risk factors for ODS'),
+                e('li', null, 'Recurrent or refractory hyponatraemia')
+              )
             ),
 
             e('div', {
@@ -3543,6 +3751,10 @@
 
       if (screen === 'hypona') {
         return e(HyponatraemiaModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'nacorr') {
+        return e(NaCorrectionModule, { onBack: () => setScreen('home') });
       }
 
       if (screen === 'iron') {
