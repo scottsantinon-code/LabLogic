@@ -3150,6 +3150,9 @@
 
           // SCREEN 0: Is the patient on diuretics? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
+              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
+            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient on diuretics?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes which index is reliable'),
             e(ChoiceButton, {
@@ -3295,6 +3298,19 @@
               e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Eosinophiluria:'), ' Allergic interstitial nephritis (low sensitivity)'),
               e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Bland sediment:'), ' Pre-renal, obstruction, or HRS'),
               e('div', { style: { background: 'rgba(100,210,255,0.08)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Crystals:'), ' Crystal nephropathy (tumour lysis, ethylene glycol)')
+            ),
+
+            e(InfoPanel, { title: 'When Interpretation Requires Nephrology Input', color: 'var(--purple)' },
+              e('p', { style: { marginBottom: '8px' } }, 'Consider nephrology consultation for:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
+                e('li', null, 'AKI with active urinary sediment (casts, dysmorphic RBCs) — suggests glomerulonephritis'),
+                e('li', null, 'AKI with proteinuria >1g/day — glomerular pathology likely'),
+                e('li', null, 'AKI not responding to volume resuscitation — may need further workup'),
+                e('li', null, 'Suspected interstitial nephritis (eosinophiluria, white cell casts, drug exposure)'),
+                e('li', null, 'AKI requiring renal replacement therapy consideration'),
+                e('li', null, 'Unexplained AKI — particularly if serology or biopsy may be indicated'),
+                e('li', null, 'AKI in transplant patients or immunosuppressed patients')
+              )
             ),
 
             e('div', {
