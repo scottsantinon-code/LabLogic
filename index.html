@@ -3193,6 +3193,17 @@
 
           // SCREEN 0: Is the patient bleeding? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '12px', textAlign: 'center' } },
+              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
+            ),
+            e(InfoPanel, { title: 'Sample Artefacts', color: 'var(--blue)', collapsed: true },
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Common causes of spurious coag results:'),
+              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Underfilled tube:'), ' Citrate excess relative to blood prolongs PT/APTT. Reject samples <80% filled.'),
+              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Clotted sample:'), ' Activates and consumes factors. Spuriously normal or shortened times.'),
+              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Haemolysed sample:'), ' Releases phospholipids and tissue factor — may shorten clotting times.'),
+              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Heparin contamination:'), ' From flushed lines. Strongly prolongs APTT.'),
+              e('p', null, e('strong', null, 'High haematocrit (>55%):'), ' Altered citrate:plasma ratio prolongs PT/APTT. Paediatric polycythaemia, myeloproliferative neoplasms.')
+            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient bleeding?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines urgency'),
             e(ChoiceButton, {
@@ -3224,11 +3235,12 @@
               onClick: () => {
                 clearAutoAdvance();
                 setClinicalContext('preOp');
-                scheduleAdvance(() => goToStep(1), false);
+                // No auto-advance — info banner shown
               },
               color: 'var(--orange)'
             }),
-            clinicalContext === 'bleeding' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.')
+            clinicalContext === 'bleeding' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.'),
+            clinicalContext === 'preOp' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Bleeding history is more predictive than coags.'), ' A structured bleeding history (prior surgery, dental extractions, trauma, menstrual history) predicts surgical bleeding risk better than routine coagulation tests.')
           ),
 
           // SCREEN 1: What pattern do you see? (ChoiceButtons, auto-advance)
@@ -3238,7 +3250,7 @@
 
             // Optional value entry
             e('div', {
-              style: { display: 'flex', gap: '10px', marginBottom: '16px' }
+              style: { display: 'flex', gap: '10px', marginBottom: '8px' }
             },
               e('div', { style: { flex: 1 } },
                 e(ValueInput, { label: 'PT', unit: 'sec', value: ptEntry, onChange: (v) => {
@@ -3249,6 +3261,9 @@
               e('div', { style: { flex: 1 } },
                 e(ValueInput, { label: 'APTT', unit: 'sec', value: apttEntry, onChange: setApttEntry, placeholder: '25–38', hint: 'Optional' })
               )
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label3)', marginBottom: '16px', textAlign: 'center' } },
+              'For warfarin monitoring, use INR (reagent-standardised) rather than PT in seconds.'
             ),
 
             // Individual value feedback
@@ -3356,8 +3371,15 @@
 
             // Pattern B: Isolated prolonged APTT
             pattern === 'B' && e(React.Fragment, null,
-              e(DiffListItem, { title: 'Heparin (UFH)', tags: ['Most common in hospital', 'Check anti-Xa or APTT ratio'] },
-                'Most common cause of isolated prolonged APTT in hospital. Check whether the patient is on a heparin infusion, prophylactic heparin, or has a heparin-coated line. Protamine reverses UFH.'),
+              e(DiffListItem, {
+                title: 'Heparin',
+                tags: ['Most common in hospital', 'UFH vs LMWH'],
+                infoPanel: e(InfoPanel, { title: 'UFH vs LMWH', color: 'var(--green)' },
+                  e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Unfractionated heparin (UFH):'), ' Strongly prolongs APTT. Monitor with APTT ratio or anti-Xa level. Reversed with protamine.'),
+                  e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'LMWH (enoxaparin, dalteparin):'), ' Minimal effect on APTT — may be normal even at therapeutic doses. Monitor with anti-Xa level (peak 4h post-dose). Protamine partially reverses (~60%).'),
+                  e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
+                )
+              }, 'Most common cause of isolated prolonged APTT in hospital. Check whether the patient is on a heparin infusion, prophylactic LMWH, or has a heparin-coated line.'),
               e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
                 'X-linked recessive. Severity correlates with factor level: severe <1% (spontaneous bleeds), moderate 1–5%, mild 5–40%. Treat with Factor VIII concentrate or desmopressin (mild). Target levels depend on bleed severity and location.'),
               e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
@@ -3408,6 +3430,9 @@
               showLabs && e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '16px' } },
                 e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400' }),
                 e(ValueInput, { label: 'D-dimer', unit: 'mg/L', value: dDimer, onChange: setDDimer, placeholder: '<0.5' }),
+                e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
+                  'Units vary: mg/L FEU, µg/mL, ng/mL. Confirm your lab\'s units and threshold.'
+                ),
                 e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
                 e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
                 calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)' })
@@ -3433,7 +3458,11 @@
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] },
                 'Very high INR with both PT and APTT prolonged. If no active bleeding: hold warfarin, oral vitamin K 1–2 mg. If active bleeding: IV vitamin K + prothrombin complex concentrate (PCC) for immediate reversal. FFP is second-line.'),
               e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
-                'At high levels, direct thrombin inhibitors prolong both APTT and PT. For dabigatran: check Hemoclot assay, reverse with idarucizumab. For argatroban (IV, used in HIT): reduce infusion rate, no specific reversal.')
+                'At high levels, direct thrombin inhibitors prolong both APTT and PT. For dabigatran: check Hemoclot assay, reverse with idarucizumab. For argatroban (IV, used in HIT): reduce infusion rate, no specific reversal.'),
+              e(DiffListItem, {
+                title: 'Isolated Hypofibrinogenaemia',
+                tags: ['Congenital', 'Acquired', 'L-asparaginase', 'Liver failure']
+              }, 'Fibrinogen <1.5 g/L with relatively preserved PT/APTT suggests isolated hypofibrinogenaemia. Congenital: afibrinogenaemia, hypofibrinogenaemia, dysfibrinogenaemia. Acquired: L-asparaginase therapy, severe liver disease, massive transfusion. Check thrombin time (prolonged) and reptilase time (distinguishes heparin effect).')
             ),
 
             // Pattern D: Both normal
@@ -3465,6 +3494,20 @@
               ),
               e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px' } },
                 e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
+              )
+            ),
+
+            e(InfoPanel, { title: 'When Interpretation Requires Haematology Input', color: 'var(--purple)' },
+              e('p', { style: { marginBottom: '8px' } }, 'Consider haematology consultation for:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
+                e('li', null, 'Suspected acquired Factor VIII inhibitor (elderly with new bleeding + very prolonged APTT that doesn\'t correct)'),
+                e('li', null, 'Unexplained prolonged APTT with bleeding — mixing study interpretation'),
+                e('li', null, 'Congenital factor deficiency suspected (young patient, family history)'),
+                e('li', null, 'ISTH DIC score ≥5 in a patient with unclear underlying cause'),
+                e('li', null, 'Thrombocytopenia + schistocytes (TTP/HUS must be excluded urgently)'),
+                e('li', null, 'Coagulopathy with normal PT/APTT — Factor XIII deficiency, platelet function disorders'),
+                e('li', null, 'Isolated low fibrinogen (<1.5 g/L) without explanation'),
+                e('li', null, 'Pre-operative patient with bleeding history but normal coags')
               )
             ),
 
