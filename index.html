@@ -2441,8 +2441,8 @@
       });
 
       const getFerritinDisplay = () => {
-        const labels = { veryLow: 'Very Low (< 15)', lowNormal: 'Low-Normal (15–100)', normal: 'Normal (30–300)', high: 'High (> 300)', veryHigh: 'Very High (> 1000)' };
-        const interps = { veryLow: 'Absolute iron deficiency', lowNormal: 'Possible deficiency', normal: 'Stores adequate', high: 'Elevated', veryHigh: 'Urgent evaluation' };
+        const labels = { veryLow: '< 30 µg/L', lowNormal: '30–100 µg/L', normal: '100–300 µg/L', high: '300–1000 µg/L', veryHigh: '> 1000 µg/L' };
+        const interps = { veryLow: 'Iron deficiency', lowNormal: 'Possible deficiency', normal: 'Stores adequate', high: 'Elevated', veryHigh: 'Urgent evaluation' };
         const colors = { veryLow: 'var(--red)', lowNormal: 'var(--orange)', normal: 'var(--green)', high: 'var(--orange)', veryHigh: 'var(--red)' };
         return { value: labels[ferritinResult] || '', interpretation: interps[ferritinResult] || '', color: colors[ferritinResult] || 'var(--blue)' };
       };
@@ -2460,6 +2460,9 @@
 
           // SCREEN 0: Is the patient inflamed? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
+              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
+            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient inflamed?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
@@ -2530,8 +2533,8 @@
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the ferritin (µg/L)?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'The starting point — interpret with context'),
             e(ChoiceButton, {
-              label: 'Very low  ‹ 15 (F) / ‹ 30 (M)',
-              sublabel: 'Absolute iron deficiency — diagnostic',
+              label: 'Very low  ‹ 30 µg/L',
+              sublabel: 'Diagnostic for iron deficiency',
               selected: ferritinResult === 'veryLow',
               onClick: () => {
                 clearAutoAdvance();
@@ -2541,8 +2544,8 @@
               color: 'var(--red)'
             }),
             e(ChoiceButton, {
-              label: 'Low-normal  15–100',
-              sublabel: 'Iron deficiency possible',
+              label: 'Low-normal  30–100 µg/L',
+              sublabel: 'Iron deficiency possible, especially with inflammation',
               selected: ferritinResult === 'lowNormal',
               onClick: () => {
                 clearAutoAdvance();
@@ -2552,7 +2555,7 @@
               color: 'var(--orange)'
             }),
             e(ChoiceButton, {
-              label: 'Normal  30–300',
+              label: 'Normal  100–300 µg/L',
               sublabel: 'Stores adequate (may be masked by inflammation)',
               selected: ferritinResult === 'normal',
               onClick: () => {
@@ -2563,7 +2566,7 @@
               color: 'var(--green)'
             }),
             e(ChoiceButton, {
-              label: 'High  › 300',
+              label: 'High  300–1000 µg/L',
               sublabel: 'Iron overload OR acute phase response',
               selected: ferritinResult === 'high',
               onClick: () => {
@@ -2574,7 +2577,7 @@
               color: 'var(--orange)'
             }),
             e(ChoiceButton, {
-              label: 'Very high  › 1000',
+              label: 'Very high  › 1000 µg/L',
               sublabel: 'Iron overload, malignancy, liver necrosis, HLH',
               selected: ferritinResult === 'veryHigh',
               onClick: () => {
@@ -2584,7 +2587,7 @@
               },
               color: 'var(--red)'
             }),
-            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin this low confirms iron deficiency regardless of other values.'),
+            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin <30 µg/L indicates iron deficiency regardless of other values.'),
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
           ),
 
@@ -2676,7 +2679,10 @@
                 scheduleAdvance(() => goToStep(5), false);
               },
               color: 'var(--orange)'
-            })
+            }),
+            e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(255,69,58,0.06)', borderRadius: '10px' }
+            }, '💡 Thresholds vary by context: In CKD on ESAs, TSAT <30% may indicate iron deficiency. Some sources use <20% as the threshold in inflammatory states.')
           ),
 
           // SCREEN 5: Results
@@ -2701,10 +2707,19 @@
 
             // Pattern: Ferritin low/low-normal + TSAT low
             (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
-              title: 'Iron Deficiency Anaemia',
+              title: 'Iron Deficiency',
               tags: ['Classic pattern', 'Investigate cause'],
-              warning: e(React.Fragment, null, e('strong', null, 'Iron deficiency demands investigation.'), ' All males and post-menopausal females require GI endoscopy to exclude malignancy.')
-            }, 'Low ferritin + low TSAT = straightforward iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport).'),
+              defaultOpen: true,
+              infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD', color: 'var(--red)' },
+                e('p', { style: { marginBottom: '10px' } }, 'In CKD, iron deficiency thresholds are higher due to impaired iron utilisation with ESA therapy.'),
+                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'KDIGO thresholds:'), ' TSAT <30% and ferritin <500 µg/L may benefit from IV iron in CKD patients on ESAs.'),
+                e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Kidney Disease: Improving Global Outcomes (KDIGO) Anemia Guideline 2012.')
+              ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure', color: 'var(--red)' },
+                e('p', { style: { marginBottom: '10px' } }, 'Iron deficiency in HF is defined as ferritin <100 µg/L, OR ferritin 100–300 µg/L with TSAT <20%.'),
+                e('p', { style: { marginBottom: '10px' } }, 'FAIR-HF and AFFIRM-AHF trials demonstrated improved symptoms, functional capacity, and reduced HF hospitalisations with IV iron.'),
+                e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Ponikowski P et al. Eur Heart J 2016; ESC Heart Failure Guidelines 2021.')
+              ) : null
+            }, 'Low ferritin + low TSAT indicates iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport). Investigate the underlying cause.'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
@@ -2716,6 +2731,23 @@
                 e('p', null, e('strong', null, 'Pragmatic approach:'), ' If in doubt and the patient is symptomatic, a trial of IV iron is both diagnostic and therapeutic. If Hb rises, they were iron deficient.')
               )
             }, 'This is the most common diagnostic trap in hospital medicine. Ferritin appears \'normal\' because inflammation has raised it, but low TSAT reveals inadequate iron delivery to the marrow.'),
+
+            // Pattern: Ferritin normal + TSAT low (WITHOUT inflammation) = functional or early deficiency
+            ferritinResult === 'normal' && tsatResult === 'low' && !hasInflammation && e(DiffListItem, {
+              title: 'Functional Iron Deficiency',
+              tags: ['Stores adequate', 'Impaired mobilisation'],
+              infoPanel: e(InfoPanel, { title: 'Functional Iron Deficiency', color: 'var(--orange)' },
+                e('p', { style: { marginBottom: '10px' } }, 'Iron stores are present (normal ferritin) but delivery to erythroid precursors is inadequate (low TSAT).'),
+                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Common in:'), ' CKD (especially on ESAs), chronic inflammation not reflected in CRP, high erythropoietic demand (haemolysis, bleeding).'),
+                e('p', null, e('strong', null, 'Also consider:'), ' Early true iron deficiency — stores depleting but ferritin not yet fallen. Repeat testing in 4–6 weeks if clinical suspicion.')
+              )
+            }, 'Normal ferritin but low TSAT without overt inflammation suggests functional iron deficiency — stores are present but not being mobilised effectively. Consider trial of iron therapy.'),
+
+            // Pattern: Ferritin low-normal + TSAT normal = borderline stores
+            ferritinResult === 'lowNormal' && tsatResult === 'normal' && e(DiffListItem, {
+              title: 'Borderline Iron Stores',
+              tags: ['Monitor', 'May progress']
+            }, 'Ferritin 30–100 µg/L with normal TSAT suggests early depletion of stores not yet affecting erythropoiesis. If symptomatic or high-risk (pregnancy, heavy menses), consider iron supplementation.'),
 
             // Pattern: Ferritin normal + TSAT normal (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
@@ -2729,7 +2761,7 @@
                 title: 'Iron Overload',
                 tags: ['Haemochromatosis', 'Transfusional', 'Check HFE genotype'],
                 defaultOpen: true
-              }, 'Elevated ferritin with TSAT >45% (especially >60%) strongly suggests true iron overload. Check HFE gene (C282Y homozygosity = hereditary haemochromatosis). If transfusion-dependent, consider chelation therapy.'),
+              }, 'Elevated ferritin with TSAT >45% (especially >60%) indicates true iron overload. Primary (hereditary haemochromatosis — check HFE gene) or secondary (transfusional, ineffective erythropoiesis, dietary).'),
               e(DiffListItem, {
                 title: 'Liver Disease',
                 tags: ['Hepatocyte damage', 'Ferritin leak']
@@ -2761,16 +2793,40 @@
               defaultOpen: true
             }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
 
-            // Investigation info for iron deficiency
-            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'When to Scope', color: 'var(--red)' },
-              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Mandatory GI investigation:'), ' All males, all post-menopausal females with unexplained iron deficiency.'),
-              e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Pre-menopausal females:'), ' Investigate if GI symptoms, family history of GI cancer, or iron deficiency not explained by menstrual losses.'),
-              e('p', null, e('strong', null, 'Coeliac serology'), ' should be checked in all cases of unexplained iron deficiency.')
+            // Causes of iron deficiency
+            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'Causes of Iron Deficiency', color: 'var(--red)' },
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Blood loss:'),
+              e('p', { style: { marginBottom: '10px' } }, 'GI (occult or overt) · Menstrual · Urinary (rare) · Blood donation · Surgical'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Reduced absorption:'),
+              e('p', { style: { marginBottom: '10px' } }, 'Coeliac disease · Post-gastrectomy/bariatric · IBD · H. pylori · PPI/H2-blocker use'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Increased demand:'),
+              e('p', { style: { marginBottom: '10px' } }, 'Pregnancy · Adolescent growth · ESA therapy · Chronic haemolysis'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Dietary insufficiency:'),
+              e('p', null, 'Vegetarian/vegan diet · Elderly · Eating disorders')
+            ),
+
+            // Haemochromatosis detail
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(InfoPanel, { title: 'Hereditary Haemochromatosis', color: 'var(--orange)' },
+              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'When to check HFE gene:'), ' TSAT >45% on two separate occasions warrants HFE genotyping.'),
+              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y homozygosity:'), ' Diagnostic for hereditary haemochromatosis. ~30% penetrance — not all homozygotes develop clinical iron overload.'),
+              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y/H63D compound heterozygotes:'), ' Lower risk of iron overload. Usually only significant if other liver insults present.'),
+              e('p', null, e('strong', null, 'Family screening:'), ' First-degree relatives of confirmed cases should have iron studies and HFE genotyping.')
+            ),
+
+            // When interpretation requires haematology
+            e(InfoPanel, { title: 'When Interpretation Requires Haematology Input', color: 'var(--red)' },
+              e('ul', { style: { marginLeft: '16px' } },
+                e('li', null, e('strong', null, 'Ferritin >1000 µg/L'), ' — HLH workup, malignancy screen'),
+                e('li', null, e('strong', null, 'Unexplained iron overload'), ' — haemochromatosis assessment, secondary causes'),
+                e('li', null, e('strong', null, 'Non-response to iron therapy'), ' — absorption issues, ongoing loss, incorrect diagnosis'),
+                e('li', null, e('strong', null, 'Complex inflammation + suspected deficiency'), ' — sTfR, bone marrow assessment')
+              )
             ),
 
             e('div', {
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges shown are Australian standard ranges. Verify against your laboratory.'),
             e('div', { style: { marginTop: '16px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--red)', onClick: resetModule }),
               e('button', {
