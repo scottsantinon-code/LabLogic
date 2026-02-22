@@ -1382,6 +1382,9 @@
 
           // SCREEN 0: Is the patient acutely unwell? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
+            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(255,159,10,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
+              '⚠️ Reference ranges shown are examples only. Always verify against your laboratory\'s reference ranges.'
+            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient acutely unwell?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
@@ -1495,7 +1498,7 @@
           step === 3 && tshResult === 'low' && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT3?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
-              ft4Status === 'high' ? 'Confirms degree of thyrotoxicosis' :
+              ft4Status === 'high' ? 'Assesses severity of thyrotoxicosis' :
               ft4Status === 'low' ? 'Helps distinguish central hypothyroidism from sick euthyroid' :
               'Needed to detect T3 thyrotoxicosis when fT4 is normal'
             ),
@@ -1528,7 +1531,10 @@
                 scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--orange)'
-            })
+            }),
+            e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
+            }, '💡 fT3 not available? If clinical suspicion of hyperthyroidism is high but fT4 is normal, consider requesting fT3 — about 5% of hyperthyroidism is T3-predominant.')
           ),
 
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
@@ -1556,7 +1562,7 @@
             tshResult === 'low' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Overt Hyperthyroidism',
               tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
-            }, 'Suppressed TSH with elevated fT4 confirms thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
+            }, 'Suppressed TSH with elevated fT4 indicates thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
 
             tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(DiffListItem, {
               title: 'T3 Thyrotoxicosis',
@@ -1565,8 +1571,18 @@
 
             tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3Status) && !(ft3Status === 'high') && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
-              tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk']
-            }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks. If persistent, increased risk of atrial fibrillation and osteoporosis.'),
+              tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk'],
+              infoPanel: e(InfoPanel, { title: 'Why Subclinical Hyperthyroidism Matters', color: 'var(--purple)' },
+                e('p', { style: { marginBottom: '10px' } }, 'The degree of TSH suppression affects clinical significance:'),
+                e('div', { style: { background: 'rgba(255,59,48,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
+                  e('strong', { style: { color: 'var(--red)' } }, 'TSH < 0.1 mU/L:'), ' Higher risk — associated with 3× increased risk of atrial fibrillation and accelerated bone loss, particularly in postmenopausal women and elderly.'
+                ),
+                e('div', { style: { background: 'rgba(255,159,10,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
+                  e('strong', { style: { color: 'var(--orange)' } }, 'TSH 0.1–0.4 mU/L:'), ' Lower risk — may be observed if asymptomatic and no risk factors for AF or osteoporosis.'
+                ),
+                e('p', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Collet TH et al. JAMA 2012 — meta-analysis of subclinical hyperthyroidism and cardiovascular outcomes.')
+              )
+            }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks to confirm persistence. If persistent, associated with increased risk of atrial fibrillation (especially if TSH < 0.1) and osteoporosis.'),
 
             tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
               e(DiffListItem, {
@@ -1590,7 +1606,7 @@
             tshResult === 'high' && ft4Status === 'low' && e(DiffListItem, {
               title: 'Overt Hypothyroidism',
               tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine']
-            }, 'Elevated TSH with low fT4 confirms primary hypothyroidism. Most commonly autoimmune (Hashimoto\'s — check TPO antibodies).'),
+            }, 'Elevated TSH with low fT4 indicates primary hypothyroidism. Most commonly autoimmune (Hashimoto\'s — check TPO antibodies).'),
 
             tshResult === 'high' && ft4Status === 'normal' && e(DiffListItem, {
               title: 'Subclinical Hypothyroidism',
@@ -1599,9 +1615,10 @@
                 e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
                   e('strong', { style: { color: 'var(--green)' } }, 'TREAT IF:'), ' TSH >10 (except consider observation in >70y) · TSH 4–10 with positive TPOAb and symptoms · Pregnant or planning pregnancy (target TSH <2.5)'
                 ),
-                e('div', { style: { background: 'rgba(255,159,10,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                  e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment (TRUST trial) · Recovery from acute illness'
-                )
+                e('div', { style: { background: 'rgba(255,159,10,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
+                  e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment · Recovery from acute illness'
+                ),
+                e('p', { style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px' } }, 'Stott DJ et al. NEJM 2017 (TRUST trial) — levothyroxine provided no benefit in adults ≥65 years with subclinical hypothyroidism.')
               )
             }, 'TSH elevated but fT4 still normal. Common finding. Check TPO antibodies and recheck in 6–8 weeks. Treatment threshold depends on TSH level, symptoms, and antibody status.'),
 
@@ -1617,27 +1634,75 @@
               defaultOpen: true
             }, 'TSH and fT4 both normal. Symptoms unlikely to be thyroid-related.'),
 
-            tshResult === 'normal' && ft4Status === 'low' && e(DiffListItem, {
-              title: 'Central Hypothyroidism',
-              tags: ['Pituitary failure', 'Investigate urgently'],
-              defaultOpen: true,
-              warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
-              infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
-                e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
-                e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
-              )
-            }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
+            tshResult === 'normal' && ft4Status === 'low' && e(React.Fragment, null,
+              e(DiffListItem, {
+                title: 'Central Hypothyroidism',
+                tags: ['Pituitary failure', 'Investigate urgently'],
+                defaultOpen: true,
+                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+                  e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
+                  e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
+                  e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
+                )
+              }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
+              e(DiffListItem, {
+                title: 'Also Consider',
+                tags: ['Alternative explanations']
+              }, 'Recent levothyroxine dose change (TSH lags fT4 by several weeks) · Recovery from non-thyroidal illness · Assay interference (heterophile antibodies, biotin).')
+            ),
 
             tshResult === 'normal' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference',
               tags: ['Biotin supplements', 'Heterophile antibodies', 'Recheck']
             }, 'Normal TSH with high fT4 is discordant. Most commonly caused by biotin supplement interference. Stop biotin for 48h and recheck, or request repeat on different assay platform.'),
 
+            // Urgent pattern recognition - thyroid emergencies
+            (tshResult === 'low' && ft4Status === 'high') && e('div', {
+              style: { background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--red)', marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.5' } },
+                'If the patient has ', e('strong', null, 'fever, tachycardia out of proportion to fever, and altered mental status'), ' — consider thyroid storm. This is a clinical emergency requiring immediate escalation.'
+              )
+            ),
+
+            (tshResult === 'high' && ft4Status === 'low') && e('div', {
+              style: { background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--red)', marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.5' } },
+                'If the patient has ', e('strong', null, 'hypothermia, bradycardia, and altered consciousness'), ' — consider myxoedema coma. This is a clinical emergency requiring immediate escalation.'
+              )
+            ),
+
+            // Further workup section - for hyperthyroidism
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e('div', {
+              style: { background: 'rgba(175,82,222,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--purple)', marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.6' } },
+                e('div', null, '• ', e('strong', null, 'TRAb'), ' — positive in Graves\' disease'),
+                e('div', null, '• ', e('strong', null, 'TPO antibodies'), ' — supports autoimmune aetiology'),
+                e('div', null, '• ', e('strong', null, 'Thyroid uptake scan'), ' — distinguishes high-uptake (Graves\', toxic nodule) from low-uptake (thyroiditis, exogenous) causes')
+              )
+            ),
+
+            // Further workup section - for hypothyroidism
+            (tshResult === 'high' && ft4Status === 'low') && e('div', {
+              style: { background: 'rgba(175,82,222,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--purple)', marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.6' } },
+                e('div', null, '• ', e('strong', null, 'TPO antibodies'), ' — positive in Hashimoto\'s thyroiditis (most common cause)'),
+                e('div', null, '• Recheck TFTs in 6–8 weeks if recent illness or uncertain chronicity')
+              )
+            ),
+
             e('div', {
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges shown are examples. Verify against your local laboratory reference ranges.'),
 
             e(PrimaryButton, {
               label: 'New Analysis',
@@ -1688,11 +1753,40 @@
 
             e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction', color: 'var(--purple)' },
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Amiodarone:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for treatment. TFTs should be monitored every 6 months on amiodarone.'),
+              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for interpretation. TFTs should be monitored every 6 months on amiodarone.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Lithium:'),
               e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release. Monitor TFTs at baseline, 6 months, then annually.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Other drugs:'),
               e('p', null, 'Immune checkpoint inhibitors (pembrolizumab, nivolumab) → thyroiditis then hypothyroidism. Tyrosine kinase inhibitors → hypothyroidism. Dopamine/glucocorticoids → suppress TSH.')
+            ),
+
+            // Postpartum thyroiditis - show when hyperthyroid
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Postpartum Thyroiditis', color: 'var(--purple)' },
+              e('p', { style: { marginBottom: '10px' } }, 'Affects 5–10% of women within 12 months of delivery. Autoimmune destructive process — often TPO antibody positive.'),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Typical pattern:'),
+              e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
+                e('li', null, 'Hyperthyroid phase (1–4 months postpartum) — preformed hormone release'),
+                e('li', null, 'Hypothyroid phase (4–8 months postpartum) — gland recovery'),
+                e('li', null, 'Usually self-resolves, but ~20% develop permanent hypothyroidism')
+              ),
+              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Key interpretation points:'),
+              e('ul', { style: { marginLeft: '16px' } },
+                e('li', null, 'Low uptake on thyroid scan (distinguishes from Graves\')'),
+                e('li', null, 'No eye signs (unlike Graves\')'),
+                e('li', null, 'Often painless (unlike subacute thyroiditis)')
+              )
+            ),
+
+            // When interpretation requires endocrinology
+            e(InfoPanel, { title: 'When Interpretation Requires Endocrinology Input', color: 'var(--purple)' },
+              e('p', { style: { marginBottom: '10px' } }, 'Consider endocrinology referral when interpretation is complex:'),
+              e('ul', { style: { marginLeft: '16px' } },
+                e('li', null, e('strong', null, 'Central hypothyroidism'), ' — pituitary axis evaluation required'),
+                e('li', null, e('strong', null, 'Discordant TSH and fT4'), ' (both high, or TSH normal with abnormal fT4) — assay issues vs rare pathology'),
+                e('li', null, e('strong', null, 'Pregnancy'), ' — trimester-specific interpretation and monitoring'),
+                e('li', null, e('strong', null, 'Amiodarone-induced thyroid dysfunction'), ' — Type 1 vs Type 2 distinction affects interpretation'),
+                e('li', null, e('strong', null, 'Persistent subclinical disease'), ' — risk stratification and monitoring decisions')
+              )
             )
           )
         )
