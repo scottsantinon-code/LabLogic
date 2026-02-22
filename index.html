@@ -1719,25 +1719,34 @@
               )
             ),
 
-            e('div', {
-              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges shown are examples. Verify against your local laboratory reference ranges.'),
+            // When Interpretation Requires Endocrinology Input
+            e(InfoPanel, { title: 'When Interpretation Requires Endocrinology Input', color: 'var(--purple)' },
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
+                e('li', null, 'Suspected central hypothyroidism (low TSH + low fT4)'),
+                e('li', null, 'Discordant results suggesting assay interference'),
+                e('li', null, 'TSH-secreting pituitary adenoma (high TSH + high fT4)'),
+                e('li', null, 'Thyroid storm or myxoedema coma (emergencies)'),
+                e('li', null, 'Pregnancy with abnormal TFTs'),
+                e('li', null, 'Amiodarone-induced thyroid dysfunction')
+              )
+            ),
 
-            e(PrimaryButton, {
-              label: 'New Analysis',
-              color: 'var(--purple)',
-              onClick: resetModule
-            }),
-            e('button', {
-              onClick: onBack,
-              style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-            }, '← All modules'),
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, {
+                label: 'New Analysis',
+                color: 'var(--purple)',
+                onClick: resetModule
+              }),
+              e('button', {
+                onClick: onBack,
+                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
+              }, '← All modules')
+            ),
 
             e(LearnMoreDivider),
 
             // Causes of Hyperthyroidism InfoPanel (when hyperthyroid)
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism', color: 'var(--purple)' },
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism', color: 'var(--purple)', collapsed: true },
               e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'High uptake on thyroid scan (↑ synthesis):'),
               e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
                 e('li', null, 'Graves\' disease — diffuse uptake, TRAb positive'),
@@ -1794,18 +1803,6 @@
                 e('li', null, 'Low uptake on thyroid scan (distinguishes from Graves\')'),
                 e('li', null, 'No eye signs (unlike Graves\')'),
                 e('li', null, 'Often painless (unlike subacute thyroiditis)')
-              )
-            ),
-
-            // When interpretation requires endocrinology
-            e(InfoPanel, { title: 'When Interpretation Requires Endocrinology Input', color: 'var(--purple)' },
-              e('p', { style: { marginBottom: '10px' } }, 'Consider endocrinology referral when interpretation is complex:'),
-              e('ul', { style: { marginLeft: '16px' } },
-                e('li', null, e('strong', null, 'Central hypothyroidism'), ' — pituitary axis evaluation required'),
-                e('li', null, e('strong', null, 'Discordant TSH and fT4'), ' (both high, or TSH normal with abnormal fT4) — assay issues vs rare pathology'),
-                e('li', null, e('strong', null, 'Pregnancy'), ' — trimester-specific interpretation and monitoring'),
-                e('li', null, e('strong', null, 'Amiodarone-induced thyroid dysfunction'), ' — Type 1 vs Type 2 distinction affects interpretation'),
-                e('li', null, e('strong', null, 'Persistent subclinical disease'), ' — risk stratification and monitoring decisions')
               )
             )
           )
@@ -2573,11 +2570,6 @@
               )
             ),
 
-            e('div', {
-              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
-
             // Bottom buttons (for all result paths)
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--blue)', onClick: resetModule }),
@@ -3050,11 +3042,7 @@
               )
             ),
 
-            e('div', {
-              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges shown are Australian standard ranges. Verify against your laboratory.'),
-            e('div', { style: { marginTop: '16px' } },
+            e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--red)', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
@@ -3332,10 +3320,7 @@
               )
             ),
 
-            e('div', {
-              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
-            e('div', { style: { marginTop: '16px' } },
+            e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--cyan)', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
@@ -3754,10 +3739,7 @@
               )
             ),
 
-            e('div', {
-              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
-            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests. Reference ranges vary by laboratory.'),
-            e('div', { style: { marginTop: '16px' } },
+            e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--green)', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
