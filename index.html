@@ -1280,14 +1280,13 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
               label: 'Yes — acutely unwell or in ICU',
-              sublabel: 'Sick euthyroid may confound results',
               selected: acutelyUnwell === true,
               onClick: () => {
                 clearAutoAdvance();
                 setAcutelyUnwell(true);
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--orange)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'No — outpatient or stable',
@@ -1300,7 +1299,7 @@
               color: 'var(--purple)'
             }),
             acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
-              e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause ↓fT3, ↓fT4, and ↓TSH in acute illness. Do NOT diagnose or treat thyroid disease from TFTs in acute illness unless TSH is markedly abnormal (>20 or <0.1).'
+              e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause transient TFT changes — most commonly ↓fT3, ↓fT4, and ↓TSH. Consider retesting when clinically stable before starting new thyroid treatment, unless results are markedly abnormal or clinical suspicion is high.'
             ),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
@@ -1308,17 +1307,16 @@
           // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the TSH?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'TSH moves before fT4/fT3 become abnormal'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 0.4–4.0 mU/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 0.4 mU/L',
-              sublabel: 'Suppressed — suggests excess thyroid hormone',
               selected: tshResult === 'low',
               onClick: () => {
                 clearAutoAdvance();
                 setTshResult('low');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--red)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'Normal  0.4–4.0 mU/L',
@@ -1328,18 +1326,17 @@
                 setTshResult('normal');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--green)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'High  › 4.0 mU/L',
-              sublabel: 'Elevated — suggests insufficient thyroid hormone',
               selected: tshResult === 'high',
               onClick: () => {
                 clearAutoAdvance();
                 setTshResult('high');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--purple)'
             }),
             e('div', {
               style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
@@ -1349,11 +1346,7 @@
           // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT4?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
-              tshResult === 'low' ? 'TSH is suppressed — fT4 helps classify' :
-              tshResult === 'high' ? 'TSH is elevated — fT4 distinguishes overt from subclinical' :
-              'TSH normal — fT4 checks for rare discordance'
-            ),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 12–22 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 12 pmol/L',
               selected: ft4Status === 'low',
@@ -1362,7 +1355,7 @@
                 setFt4Status('low');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--red)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'Normal  12–22 pmol/L',
@@ -1372,7 +1365,7 @@
                 setFt4Status('normal');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--green)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'High  › 22 pmol/L',
@@ -1382,18 +1375,14 @@
                 setFt4Status('high');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--purple)'
             })
           ),
 
           // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
           step === 3 && tshResult === 'low' && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT3?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
-              ft4Status === 'high' ? 'Assesses severity of thyrotoxicosis' :
-              ft4Status === 'low' ? 'Helps distinguish central hypothyroidism from sick euthyroid' :
-              'Needed to detect T3 thyrotoxicosis when fT4 is normal'
-            ),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 3.1–6.8 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 3.1 pmol/L',
               selected: ft3Status === 'low',
@@ -1402,7 +1391,7 @@
                 setFt3Status('low');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--red)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'Normal  3.1–6.8 pmol/L',
@@ -1412,7 +1401,7 @@
                 setFt3Status('normal');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--green)'
+              color: 'var(--purple)'
             }),
             e(ChoiceButton, {
               label: 'High  › 6.8 pmol/L',
@@ -1422,7 +1411,7 @@
                 setFt3Status('high');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--purple)'
             }),
             e('div', {
               style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
@@ -1843,7 +1832,7 @@
                 setChronicity('acute');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--red)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'Chronic  › 48 hours',
@@ -1854,7 +1843,7 @@
                 setChronicity('chronic');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--orange)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'Unknown',
@@ -1893,7 +1882,7 @@
                 setSerumOsmResult('normal');
                 scheduleAdvance(() => goToStep(3), false); // Go to iso-osmolar results
               },
-              color: 'var(--green)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'High  › 295 mOsm/kg',
@@ -1903,7 +1892,7 @@
                 setSerumOsmResult('high');
                 scheduleAdvance(() => goToStep(3), false); // Go to glucose input
               },
-              color: 'var(--orange)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'Not available',
@@ -1989,7 +1978,7 @@
                 setUrineOsmResult('low');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--green)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'High  › 100 mOsm/kg',
@@ -1999,7 +1988,7 @@
                 setUrineOsmResult('high');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--orange)'
+              color: 'var(--blue)'
             }),
             urineOsmResult === 'high' && e(WarningBanner, { onContinue: () => goToStep(4) }, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution.')
           ),
@@ -2060,7 +2049,7 @@
                 setUrineNaResult('low');
                 scheduleAdvance(() => goToStep(5), false);
               },
-              color: 'var(--green)'
+              color: 'var(--blue)'
             }),
             e(ChoiceButton, {
               label: 'High  › 30 mmol/L',
@@ -2070,7 +2059,7 @@
                 setUrineNaResult('high');
                 scheduleAdvance(() => goToStep(5), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--blue)'
             })
           ),
 
@@ -2228,14 +2217,8 @@
       const [clinicalContext, setClinicalContext] = useState(null);
       // Screen 2: Ferritin
       const [ferritinResult, setFerritinResult] = useState(null);
-      // Screen 3: TSAT input
-      const [serumIron, setSerumIron] = useState('');
-      const [transferrin, setTransferrin] = useState('');
-      const [tsat, setTsat] = useState('');
-      // Screen 4: TSAT interpretation
+      // Screen 3: TSAT
       const [tsatResult, setTsatResult] = useState(null);
-      // Progressive disclosure for TSAT calculation
-      const [showCalc, setShowCalc] = useState(false);
 
       const scrollToTop = () => {
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
@@ -2248,9 +2231,6 @@
         setHasInflammation(null);
         setClinicalContext(null);
         setFerritinResult(null);
-        setSerumIron('');
-        setTransferrin('');
-        setTsat('');
         setTsatResult(null);
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
@@ -2258,32 +2238,10 @@
       const handleBack = () => {
         clearAutoAdvance();
         if (step === 0) onBack();
-        else if (step === 5 && autoClassifyTsat()) goToStep(3); // Skip back over auto-classified screen 4
         else goToStep(step - 1);
       };
 
-      // Calculate TSAT from iron and transferrin
-      const calcTsat = () => {
-        const iron = parseFloat(serumIron);
-        const tf = parseFloat(transferrin);
-        if (!isNaN(iron) && !isNaN(tf) && tf > 0) {
-          return ((iron / (tf * 25)) * 100).toFixed(1);
-        }
-        return null;
-      };
-
-      const effectiveTsat = tsat || calcTsat();
-
-      const autoClassifyTsat = () => {
-        const val = parseFloat(effectiveTsat);
-        if (isNaN(val)) return null;
-        if (val < 16) return 'low';
-        if (val > 45) return 'high';
-        return 'normal';
-      };
-
-      // Dynamic screen count: skip TSAT classification if we can auto-classify
-      const getTotalScreens = () => autoClassifyTsat() ? 5 : 6;
+      const getTotalScreens = () => 5;
 
       const getInflammationDisplay = () => ({
         value: hasInflammation ? 'Present' : 'Absent',
@@ -2299,9 +2257,9 @@
       };
 
       const getTsatDisplay = () => {
-        if (tsatResult === 'low') return { value: effectiveTsat ? `${effectiveTsat}%` : '< 16%', interpretation: 'Low — iron deficient erythropoiesis', color: 'var(--red)' };
-        if (tsatResult === 'high') return { value: effectiveTsat ? `${effectiveTsat}%` : '> 45%', interpretation: 'High — iron overload', color: 'var(--orange)' };
-        return { value: effectiveTsat ? `${effectiveTsat}%` : '16–45%', interpretation: 'Normal', color: 'var(--green)' };
+        if (tsatResult === 'low') return { value: '< 16%', interpretation: 'Low — iron deficient erythropoiesis', color: 'var(--red)' };
+        if (tsatResult === 'high') return { value: '> 45%', interpretation: 'High — iron overload', color: 'var(--orange)' };
+        return { value: '16–45%', interpretation: 'Normal', color: 'var(--green)' };
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
@@ -2315,14 +2273,13 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
               label: 'Yes — CRP elevated',
-              sublabel: 'Ferritin may be falsely normal',
               selected: hasInflammation === true,
               onClick: () => {
                 clearAutoAdvance();
                 setHasInflammation(true);
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--orange)'
+              color: 'var(--red)'
             }),
             e(ChoiceButton, {
               label: 'No — stable outpatient',
@@ -2332,7 +2289,7 @@
                 setHasInflammation(false);
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--green)'
+              color: 'var(--red)'
             }),
             hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
@@ -2344,7 +2301,6 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Different iron deficiency thresholds apply'),
             e(ChoiceButton, {
               label: 'CKD or haemodialysis',
-              sublabel: 'Ferritin <200 with TSAT <20% suggests iron deficiency',
               selected: clinicalContext === 'ckd',
               onClick: () => {
                 clearAutoAdvance();
@@ -2355,7 +2311,6 @@
             }),
             e(ChoiceButton, {
               label: 'Heart failure',
-              sublabel: 'Ferritin <100, or 100–300 with TSAT <20%',
               selected: clinicalContext === 'heartFailure',
               onClick: () => {
                 clearAutoAdvance();
@@ -2366,14 +2321,13 @@
             }),
             e(ChoiceButton, {
               label: 'None of the above',
-              sublabel: 'Standard thresholds',
               selected: clinicalContext === 'none',
               onClick: () => {
                 clearAutoAdvance();
                 setClinicalContext('none');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--red)'
             })
           ),
 
@@ -2383,7 +2337,6 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'The starting point — interpret with context'),
             e(ChoiceButton, {
               label: 'Very low  ‹ 30 µg/L',
-              sublabel: 'Diagnostic for iron deficiency',
               selected: ferritinResult === 'veryLow',
               onClick: () => {
                 clearAutoAdvance();
@@ -2394,40 +2347,36 @@
             }),
             e(ChoiceButton, {
               label: 'Low-normal  30–100 µg/L',
-              sublabel: 'Iron deficiency possible, especially with inflammation',
               selected: ferritinResult === 'lowNormal',
               onClick: () => {
                 clearAutoAdvance();
                 setFerritinResult('lowNormal');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--red)'
             }),
             e(ChoiceButton, {
               label: 'Normal  100–300 µg/L',
-              sublabel: 'Stores adequate (may be masked by inflammation)',
               selected: ferritinResult === 'normal',
               onClick: () => {
                 clearAutoAdvance();
                 setFerritinResult('normal');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--green)'
+              color: 'var(--red)'
             }),
             e(ChoiceButton, {
               label: 'High  300–1000 µg/L',
-              sublabel: 'Iron overload OR acute phase response',
               selected: ferritinResult === 'high',
               onClick: () => {
                 clearAutoAdvance();
                 setFerritinResult('high');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--red)'
             }),
             e(ChoiceButton, {
               label: 'Very high  › 1000 µg/L',
-              sublabel: 'Iron overload, malignancy, liver necrosis, HLH',
               selected: ferritinResult === 'veryHigh',
               onClick: () => {
                 clearAutoAdvance();
@@ -2440,72 +2389,17 @@
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
           ),
 
-          // SCREEN 3: Transferrin saturation (ValueInput with progressive disclosure)
+          // SCREEN 3: TSAT (ChoiceButtons, auto-advance)
           step === 3 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the TSAT?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Transferrin saturation — check the lab report'),
-            e(ValueInput, { label: 'TSAT', unit: '%', value: tsat, onChange: setTsat, placeholder: '16–45', hint: 'Normal: 16–45%' }),
-
-            // Progressive disclosure: calculate from components
-            !tsat && e('div', { style: { marginTop: '8px' } },
-              e('button', {
-                onClick: () => setShowCalc(!showCalc),
-                style: {
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  padding: '10px',
-                  background: 'none',
-                  border: '1px dashed var(--sep)',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
-                  fontFamily: 'var(--font)',
-                  fontSize: '13px',
-                  color: 'var(--label3)'
-                }
-              }, showCalc ? 'Hide calculator' : 'Don\'t have TSAT? Calculate from iron + transferrin'),
-
-              showCalc && e('div', {
-                style: { background: 'rgba(142,142,147,0.06)', borderRadius: '14px', padding: '16px', marginTop: '8px' }
-              },
-                e(ValueInput, { label: 'Serum Iron', unit: 'µmol/L', value: serumIron, onChange: setSerumIron, placeholder: '10–30' }),
-                e(ValueInput, { label: 'Transferrin', unit: 'g/L', value: transferrin, onChange: setTransferrin, placeholder: '1.7–3.4' }),
-                e('div', { style: { fontSize: '11px', color: 'var(--label3)', marginTop: '4px' } }, 'If your lab reports TIBC in µmol/L instead: TSAT = (iron ÷ TIBC) × 100'),
-                calcTsat() && e('div', {
-                  style: { fontSize: '14px', color: 'var(--green)', fontWeight: 700, marginTop: '10px', textAlign: 'center' }
-                }, `Calculated TSAT: ${calcTsat()}%`)
-              )
-            ),
-
-            e(PrimaryButton, {
-              label: 'Next',
-              disabled: !effectiveTsat,
-              color: 'var(--red)',
-              onClick: () => {
-                const autoResult = autoClassifyTsat();
-                if (autoResult) {
-                  setTsatResult(autoResult);
-                  goToStep(5); // Skip classification, go to results
-                } else {
-                  goToStep(4); // No numeric value, need manual classification
-                }
-              }
-            })
-          ),
-
-          // SCREEN 4: TSAT classification (ChoiceButtons, auto-advance)
-          step === 4 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Classify the TSAT'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, effectiveTsat ? `Your TSAT: ${effectiveTsat}%` : 'Classify the TSAT result'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Transferrin saturation (normal: 16–45%)'),
             e(ChoiceButton, {
               label: 'Low  ‹ 16%',
               selected: tsatResult === 'low',
               onClick: () => {
                 clearAutoAdvance();
                 setTsatResult('low');
-                scheduleAdvance(() => goToStep(5), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--red)'
             }),
@@ -2515,9 +2409,9 @@
               onClick: () => {
                 clearAutoAdvance();
                 setTsatResult('normal');
-                scheduleAdvance(() => goToStep(5), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--green)'
+              color: 'var(--red)'
             }),
             e(ChoiceButton, {
               label: 'High  › 45%',
@@ -2525,17 +2419,14 @@
               onClick: () => {
                 clearAutoAdvance();
                 setTsatResult('high');
-                scheduleAdvance(() => goToStep(5), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--orange)'
-            }),
-            e('div', {
-              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(255,69,58,0.06)', borderRadius: '10px' }
-            }, '💡 Thresholds vary by context: In CKD on ESAs, TSAT <30% may indicate iron deficiency. Some sources use <20% as the threshold in inflammatory states.')
+              color: 'var(--red)'
+            })
           ),
 
-          // SCREEN 5: Results
-          step === 5 && e(FadeIn, null,
+          // SCREEN 4: Results
+          step === 4 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
@@ -2557,7 +2448,6 @@
             // Pattern: Ferritin low/low-normal + TSAT low
             (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
               title: 'Iron Deficiency',
-              tags: ['Classic pattern', 'Investigate cause'],
               defaultOpen: true,
               infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'In CKD, iron deficiency thresholds are higher due to impaired iron utilisation with ESA therapy.'),
@@ -2573,7 +2463,6 @@
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
               title: 'Iron Deficiency Masked by Inflammation',
-              tags: ['Ferritin falsely normal', 'TSAT is the giveaway'],
               infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies', color: 'var(--red)' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
@@ -2584,7 +2473,6 @@
             // Pattern: Ferritin normal + TSAT low (WITHOUT inflammation) = functional or early deficiency
             ferritinResult === 'normal' && tsatResult === 'low' && !hasInflammation && e(DiffListItem, {
               title: 'Functional Iron Deficiency',
-              tags: ['Stores adequate', 'Impaired mobilisation'],
               infoPanel: e(InfoPanel, { title: 'Functional Iron Deficiency', color: 'var(--orange)' },
                 e('p', { style: { marginBottom: '10px' } }, 'Iron stores are present (normal ferritin) but delivery to erythroid precursors is inadequate (low TSAT).'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Common in:'), ' CKD (especially on ESAs), chronic inflammation not reflected in CRP, high erythropoietic demand (haemolysis, bleeding).'),
@@ -2594,51 +2482,43 @@
 
             // Pattern: Ferritin low-normal + TSAT normal = borderline stores
             ferritinResult === 'lowNormal' && tsatResult === 'normal' && e(DiffListItem, {
-              title: 'Borderline Iron Stores',
-              tags: ['Monitor', 'May progress']
+              title: 'Borderline Iron Stores'
             }, 'Ferritin 30–100 µg/L with normal TSAT suggests early depletion of stores not yet affecting erythropoiesis. If symptomatic or high-risk (pregnancy, heavy menses), consider iron supplementation.'),
 
             // Pattern: Ferritin normal + TSAT normal (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
-              title: 'Anaemia of Chronic Disease',
-              tags: ['Inflammatory iron sequestration', 'Iron trapped in macrophages']
+              title: 'Anaemia of Chronic Disease'
             }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
 
             // Pattern: Ferritin high + TSAT high
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Iron Overload',
-                tags: ['Haemochromatosis', 'Transfusional', 'Check HFE genotype'],
                 defaultOpen: true
               }, 'Elevated ferritin with TSAT >45% (especially >60%) indicates true iron overload. Primary (hereditary haemochromatosis — check HFE gene) or secondary (transfusional, ineffective erythropoiesis, dietary).'),
               e(DiffListItem, {
-                title: 'Liver Disease',
-                tags: ['Hepatocyte damage', 'Ferritin leak']
+                title: 'Liver Disease'
               }, 'Damaged hepatocytes leak ferritin into serum. TSAT may be normal or elevated. Check LFTs. Liver disease + iron overload can coexist (e.g. haemochromatosis with cirrhosis).')
             ),
 
             // Pattern: Ferritin high + TSAT normal
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'normal' && e(React.Fragment, null,
               e(DiffListItem, {
-                title: 'Acute Phase Response',
-                tags: ['Inflammation', 'Liver disease', 'Recheck when stable']
+                title: 'Acute Phase Response'
               }, 'Elevated ferritin with normal TSAT most likely reflects an acute phase response rather than true iron overload. Recheck when inflammation has resolved.'),
               e(DiffListItem, {
-                title: 'Liver Disease',
-                tags: ['Ferritin leak from hepatocytes']
+                title: 'Liver Disease'
               })
             ),
 
             // Pattern: Ferritin high + TSAT low
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'low' && e(DiffListItem, {
-              title: 'Anaemia of Chronic Disease (severe)',
-              tags: ['Hepcidin-mediated', 'Iron trapped']
+              title: 'Anaemia of Chronic Disease (severe)'
             }, 'High ferritin (inflammation) + low TSAT (no iron reaching marrow). Iron is present in stores but trapped by hepcidin-mediated sequestration.'),
 
             // Ferritin very high
             ferritinResult === 'veryHigh' && e(DiffListItem, {
               title: 'Urgent Evaluation Required',
-              tags: ['HLH', 'Malignancy', 'Hepatic necrosis', 'Still\'s disease'],
               defaultOpen: true
             }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
 
@@ -2682,9 +2562,7 @@
       const [step, setStep] = useState(0);
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
 
-      // Screen 0: Clinical context
-      const [clinicalContext, setClinicalContext] = useState(null);
-      // Screen 1: Pattern
+      // Screen 0: Pattern
       const [pattern, setPattern] = useState(null);
       // Optional value entry on pattern screen
       const [ptEntry, setPtEntry] = useState('');
@@ -2698,14 +2576,13 @@
       const [dDimer, setDDimer] = useState('');
       const [platelets, setPlatelets] = useState('');
 
-      const getTotalScreens = () => 3;
+      const getTotalScreens = () => 2;
 
       const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
       const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
 
       const resetModule = () => {
         setStep(0);
-        setClinicalContext(null);
         setPattern(null);
         setPtEntry('');
         setApttEntry('');
@@ -2762,58 +2639,8 @@
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--green)' }),
 
-          // SCREEN 0: Is the patient bleeding? (ChoiceButtons, auto-advance)
+          // SCREEN 0: What pattern do you see? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e(InfoPanel, { title: 'Sample Artefacts', color: 'var(--blue)', collapsed: true },
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Common causes of spurious coag results:'),
-              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Underfilled tube:'), ' Citrate excess relative to blood prolongs PT/APTT. Reject samples <80% filled.'),
-              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Clotted sample:'), ' Activates and consumes factors. Spuriously normal or shortened times.'),
-              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Haemolysed sample:'), ' Releases phospholipids and tissue factor — may shorten clotting times.'),
-              e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Heparin contamination:'), ' From flushed lines. Strongly prolongs APTT.'),
-              e('p', null, e('strong', null, 'High haematocrit (>55%):'), ' Altered citrate:plasma ratio prolongs PT/APTT. Paediatric polycythaemia, myeloproliferative neoplasms.')
-            ),
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient bleeding?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines urgency'),
-            e(ChoiceButton, {
-              label: 'Active bleeding',
-              sublabel: 'Urgent — need to identify and correct the problem',
-              selected: clinicalContext === 'bleeding',
-              onClick: () => {
-                clearAutoAdvance();
-                setClinicalContext('bleeding');
-                // No auto-advance — warning gates progression
-              },
-              color: 'var(--red)'
-            }),
-            e(ChoiceButton, {
-              label: 'Incidental finding',
-              sublabel: 'Abnormal coag on routine tests',
-              selected: clinicalContext === 'incidental',
-              onClick: () => {
-                clearAutoAdvance();
-                setClinicalContext('incidental');
-                scheduleAdvance(() => goToStep(1), false);
-              },
-              color: 'var(--blue)'
-            }),
-            e(ChoiceButton, {
-              label: 'Pre-procedure / pre-operative',
-              sublabel: 'Abnormal coag before a planned procedure',
-              selected: clinicalContext === 'preOp',
-              onClick: () => {
-                clearAutoAdvance();
-                setClinicalContext('preOp');
-                // No auto-advance — info banner shown
-              },
-              color: 'var(--orange)'
-            }),
-            clinicalContext === 'bleeding' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.'),
-            clinicalContext === 'preOp' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Bleeding history is more predictive than coags.'), ' A structured bleeding history (prior surgery, dental extractions, trauma, menstrual history) predicts surgical bleeding risk better than routine coagulation tests.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
-          ),
-
-          // SCREEN 1: What pattern do you see? (ChoiceButtons, auto-advance)
-          step === 1 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Which values are prolonged?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '16px' } }, 'Check the PT and APTT on the coag panel'),
 
@@ -2871,7 +2698,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setPattern('A');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(1), false);
               },
               color: 'var(--green)'
             }),
@@ -2882,7 +2709,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setPattern('B');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(1), false);
               },
               color: 'var(--green)'
             }),
@@ -2893,9 +2720,9 @@
               onClick: () => {
                 clearAutoAdvance();
                 setPattern('C');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--orange)'
+              color: 'var(--green)'
             }),
             e(ChoiceButton, {
               label: 'Both normal',
@@ -2904,14 +2731,15 @@
               onClick: () => {
                 clearAutoAdvance();
                 setPattern('D');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--blue)'
-            })
+              color: 'var(--green)'
+            }),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
 
-          // SCREEN 2: Results
-          step === 2 && e(FadeIn, null,
+          // SCREEN 1: Results
+          step === 1 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
@@ -2919,7 +2747,6 @@
               )
             ),
             e(InputSummaryStrip, { items: [
-              { label: 'Context', value: clinicalContext === 'bleeding' ? 'Active bleeding' : clinicalContext === 'preOp' ? 'Pre-procedure' : 'Incidental', color: clinicalContext === 'bleeding' ? 'var(--red)' : 'var(--blue)' },
               { label: 'Pattern', value: pattern === 'A' ? 'PT ↑' : pattern === 'B' ? 'APTT ↑' : pattern === 'C' ? 'Both ↑' : 'Both normal', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }
             ] }),
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
