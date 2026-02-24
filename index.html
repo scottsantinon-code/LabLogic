@@ -870,60 +870,35 @@
     }
 
     // Na Correction Rate Calculator (collapsible, used on Hypona results screens)
-    function NaCorrectionCalculator({ naEntries, setNaEntries, targetRate, setTargetRate }) {
+    function NaCorrectionCalculator() {
       const [isOpen, setIsOpen] = useState(false);
+      const [startNa, setStartNa] = useState('');
+      const [latestNa, setLatestNa] = useState('');
+      const [hoursElapsed, setHoursElapsed] = useState('');
+      const [targetRate, setTargetRate] = useState(10);
 
-      const getCurrentDateTime = () => {
-        const now = new Date();
-        const date = now.toISOString().split('T')[0];
-        const time = now.toTimeString().slice(0, 5);
-        return { date, time };
-      };
+      const calculateCorrection = () => {
+        const start = parseFloat(startNa);
+        const latest = parseFloat(latestNa);
+        const hours = parseFloat(hoursElapsed);
+        if (isNaN(start) || isNaN(latest) || isNaN(hours) || hours <= 0) return null;
 
-      const updateEntry = (index, field, value) => {
-        setNaEntries(prev => prev.map((entry, i) => i === index ? { ...entry, [field]: value } : entry));
-      };
-
-      const addEntry = () => {
-        const { date, time } = getCurrentDateTime();
-        setNaEntries(prev => [...prev, { na: '', date, time }]);
-      };
-
-      const removeEntry = (index) => {
-        if (naEntries.length > 1) {
-          setNaEntries(prev => prev.filter((_, i) => i !== index));
-        }
-      };
-
-      const calculateCorrectionRate = () => {
-        const validEntries = naEntries
-          .filter(entry => entry.na && entry.date && entry.time)
-          .map(entry => ({
-            na: parseFloat(entry.na),
-            timestamp: new Date(`${entry.date}T${entry.time}`).getTime()
-          }))
-          .filter(entry => !isNaN(entry.na) && !isNaN(entry.timestamp))
-          .sort((a, b) => a.timestamp - b.timestamp);
-
-        if (validEntries.length < 2) return null;
-
-        const first = validEntries[0];
-        const last = validEntries[validEntries.length - 1];
-        const hoursElapsed = (last.timestamp - first.timestamp) / (1000 * 60 * 60);
-        if (hoursElapsed <= 0) return null;
-
-        const naChange = last.na - first.na;
-        const ratePerHour = naChange / hoursElapsed;
-        const ratePer24h = ratePerHour * 24;
+        const naChange = latest - start;
+        const ratePerHour = naChange / hours;
+        const remainingHours = Math.max(0, 24 - hours);
+        const remainingBudget = targetRate - naChange;
 
         return {
           naChange: naChange.toFixed(1),
-          hoursElapsed: hoursElapsed.toFixed(1),
           ratePerHour: ratePerHour.toFixed(2),
-          ratePer24h: ratePer24h.toFixed(1),
-          exceeds: Math.abs(ratePer24h) > targetRate
+          remainingHours: remainingHours.toFixed(1),
+          remainingBudget: remainingBudget.toFixed(1),
+          exceeds: naChange > targetRate,
+          beyondWindow: hours > 24
         };
       };
+
+      const result = calculateCorrection();
 
       return e('div', { style: { marginBottom: '16px' } },
         // Collapsible header
@@ -956,7 +931,7 @@
             }, e('span', { style: { fontSize: '11px', fontWeight: 800, color: 'white' } }, 'Na')),
             e('div', null,
               e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Na Correction Rate'),
-              e('div', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Track serial measurements')
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Calculate remaining safe correction')
             )
           ),
           e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, isOpen ? '▲' : '▼')
@@ -966,95 +941,66 @@
         isOpen && e('div', {
           style: { background: 'rgba(142,142,147,0.06)', borderRadius: '0 0 14px 14px', padding: '16px', marginTop: '-14px', paddingTop: '28px', border: '1px solid var(--sep)', borderTop: 'none' }
         },
-          // Target rate selector
-          e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' } },
-            e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Target limit:'),
+          // Three ValueInputs
+          e(ValueInput, { label: 'Starting Na', unit: 'mmol/L', value: startNa, onChange: setStartNa, placeholder: 'e.g. 118' }),
+          e(ValueInput, { label: 'Latest Na', unit: 'mmol/L', value: latestNa, onChange: setLatestNa, placeholder: 'e.g. 122' }),
+          e(ValueInput, { label: 'Hours since first Na', unit: 'hours', value: hoursElapsed, onChange: setHoursElapsed, placeholder: 'e.g. 8' }),
+
+          // Alert threshold selector
+          e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', marginBottom: '12px' } },
+            e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Alert threshold:'),
             e('select', {
               value: targetRate,
               onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
               style: { padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '12px', fontFamily: 'var(--font)' }
             },
-              e('option', { value: 8 }, '8 mmol/24h (severe/chronic)'),
-              e('option', { value: 10 }, '10 mmol/24h (standard)'),
-              e('option', { value: 12 }, '12 mmol/24h (acute)')
+              e('option', { value: 6 }, '6 mmol/24h'),
+              e('option', { value: 8 }, '8 mmol/24h'),
+              e('option', { value: 10 }, '10 mmol/24h'),
+              e('option', { value: 12 }, '12 mmol/24h')
             )
           ),
 
-          // Na entries
-          naEntries.map((entry, index) => e('div', {
-            key: index,
-            style: { display: 'flex', gap: '6px', alignItems: 'flex-end', marginBottom: '8px' }
-          },
-            e('div', { style: { flex: '1' } },
-              e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Na'),
-              e('input', {
-                type: 'number', inputMode: 'decimal', value: entry.na,
-                onChange: (ev) => updateEntry(index, 'na', ev.target.value),
-                placeholder: 'mmol/L',
-                style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-              })
-            ),
-            e('div', { style: { flex: '0.8' } },
-              e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Date'),
-              e('input', {
-                type: 'date', value: entry.date,
-                onChange: (ev) => updateEntry(index, 'date', ev.target.value),
-                style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-              })
-            ),
-            e('div', { style: { flex: '0.8' } },
-              e('label', { style: { fontSize: '10px', color: 'var(--label3)', display: 'block', marginBottom: '2px' } }, 'Time'),
-              e('input', {
-                type: 'time', value: entry.time,
-                onChange: (ev) => updateEntry(index, 'time', ev.target.value),
-                style: { width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-              })
-            ),
-            naEntries.length > 1 && e('button', {
-              onClick: () => removeEntry(index),
-              style: { padding: '8px 10px', background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '16px', minWidth: '36px', minHeight: '36px' }
-            }, '×')
-          )),
-
-          e('button', {
-            onClick: addEntry,
-            style: { padding: '8px 12px', background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '8px', color: 'var(--blue)', fontSize: '12px', cursor: 'pointer', fontFamily: 'var(--font)', marginBottom: '12px' }
-          }, '+ Add measurement'),
-
           // Results display
-          calculateCorrectionRate() && e('div', {
-            style: {
-              background: calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.08)' : 'rgba(52,199,89,0.08)',
-              border: `1px solid ${calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.2)' : 'rgba(52,199,89,0.2)'}`,
-              borderRadius: '10px',
-              padding: '12px',
-              marginTop: '8px'
-            }
-          },
-            e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
-              e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Na change:'),
-              e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol/L`)
+          result && e('div', null,
+            // Na change and rate summary
+            e('div', { style: { fontSize: '13px', color: 'var(--label)', marginBottom: '8px' } },
+              `Na change: ${result.naChange > 0 ? '+' : ''}${result.naChange} mmol/L in ${hoursElapsed} hours`
             ),
-            e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
-              e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Time elapsed:'),
-              e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().hoursElapsed} hours`)
+            e('div', { style: { fontSize: '13px', color: 'var(--label)', marginBottom: '12px' } },
+              `Rate: ${result.ratePerHour} mmol/L/hr`
             ),
-            e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '6px' } },
-              e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Rate:'),
-              e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/L/hr`)
+
+            // Remaining budget or warning
+            !result.beyondWindow && !result.exceeds && e('div', {
+              style: { background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.2)', borderRadius: '10px', padding: '12px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--green)' } },
+                `Remaining safe correction: ${result.remainingBudget} mmol/L over the next ${result.remainingHours} hours`
+              )
             ),
-            e('div', { style: { display: 'flex', justifyContent: 'space-between' } },
-              e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)' } }, 'Projected 24h:'),
-              e('span', {
-                style: { fontSize: '14px', fontWeight: 700, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
-              }, `${calculateCorrectionRate().ratePer24h} mmol/L/24h`)
-            ),
-            e('div', {
-              style: { fontSize: '10px', color: 'var(--label3)', marginTop: '6px', fontStyle: 'italic' }
-            }, 'Projection based on current rate — correction often slows as Na rises. Recheck frequently.'),
-            calculateCorrectionRate().exceeds && e('div', {
-              style: { marginTop: '8px', padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', fontSize: '11px', color: 'var(--red)', fontWeight: 500 }
-            }, `⚠ Exceeds target of ${targetRate} mmol/24h — risk of ODS`)
+
+            !result.beyondWindow && result.exceeds && e('div', {
+              style: { background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', borderRadius: '10px', padding: '12px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--red)' } },
+                `⚠️ Correction rate exceeds safe limit of ${targetRate} mmol/24h`
+              )
+            )
+          ),
+
+          // ODS InfoPanel
+          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)', collapsed: true },
+            e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
+            e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+            e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
+            e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+              e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
+              e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+              e('li', null, 'Hypokalaemia'),
+              e('li', null, 'Malnutrition or alcoholism'),
+              e('li', null, 'Advanced liver disease')
+            )
           )
         )
       );
@@ -2564,9 +2510,6 @@
 
       // Screen 0: Pattern
       const [pattern, setPattern] = useState(null);
-      // Optional value entry on pattern screen
-      const [ptEntry, setPtEntry] = useState('');
-      const [apttEntry, setApttEntry] = useState('');
       // Optional lab inputs (collapsed on results)
       const [showLabs, setShowLabs] = useState(false);
       const [pt, setPt] = useState('');
@@ -2584,8 +2527,6 @@
       const resetModule = () => {
         setStep(0);
         setPattern(null);
-        setPtEntry('');
-        setApttEntry('');
         setShowLabs(false);
         setPt('');
         setInr('');
@@ -2642,55 +2583,7 @@
           // SCREEN 0: What pattern do you see? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Which values are prolonged?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '16px' } }, 'Check the PT and APTT on the coag panel'),
-
-            // Optional value entry
-            e('div', {
-              style: { display: 'flex', gap: '10px', marginBottom: '8px' }
-            },
-              e('div', { style: { flex: 1 } },
-                e(ValueInput, { label: 'PT', unit: 'sec', value: ptEntry, onChange: (v) => {
-                  setPtEntry(v);
-                  if (!pt) setPt(v); // Pre-fill DIC calculator
-                }, placeholder: '11–13.5', hint: 'Optional' })
-              ),
-              e('div', { style: { flex: 1 } },
-                e(ValueInput, { label: 'APTT', unit: 'sec', value: apttEntry, onChange: setApttEntry, placeholder: '25–38', hint: 'Optional' })
-              )
-            ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label3)', marginBottom: '16px', textAlign: 'center' } },
-              'For warfarin monitoring, use INR (reagent-standardised) rather than PT in seconds.'
-            ),
-
-            // Individual value feedback
-            ptEntry && !apttEntry && e('div', {
-              style: { fontSize: '12px', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', borderRadius: '10px',
-                color: parseFloat(ptEntry) > 13.5 ? 'var(--orange)' : 'var(--green)',
-                background: parseFloat(ptEntry) > 13.5 ? 'rgba(245,158,11,0.06)' : 'rgba(48,209,88,0.06)' }
-            }, parseFloat(ptEntry) > 13.5 ? `PT ${ptEntry}s — prolonged (>13.5)` : `PT ${ptEntry}s — normal`),
-
-            apttEntry && !ptEntry && e('div', {
-              style: { fontSize: '12px', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', borderRadius: '10px',
-                color: parseFloat(apttEntry) > 38 ? 'var(--orange)' : 'var(--green)',
-                background: parseFloat(apttEntry) > 38 ? 'rgba(245,158,11,0.06)' : 'rgba(48,209,88,0.06)' }
-            }, parseFloat(apttEntry) > 38 ? `APTT ${apttEntry}s — prolonged (>38)` : `APTT ${apttEntry}s — normal`),
-
-            // Combined pattern suggestion
-            ptEntry && apttEntry && e('div', {
-              style: { fontSize: '12px', color: 'var(--blue)', fontWeight: 600, marginBottom: '12px', padding: '8px 12px', background: 'rgba(139,92,246,0.06)', borderRadius: '10px' }
-            },
-              (() => {
-                const ptVal = parseFloat(ptEntry);
-                const apttVal = parseFloat(apttEntry);
-                const ptHigh = ptVal > 13.5;
-                const apttHigh = apttVal > 38;
-                if (ptHigh && !apttHigh) return '→ Isolated prolonged PT';
-                if (!ptHigh && apttHigh) return '→ Isolated prolonged APTT';
-                if (ptHigh && apttHigh) return '→ Both prolonged';
-                return '→ Both normal';
-              })()
-            ),
-
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check the PT and APTT on the coag panel'),
             e(ChoiceButton, {
               label: 'Isolated prolonged PT',
               sublabel: 'Extrinsic pathway',
