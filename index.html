@@ -474,26 +474,16 @@
       );
     }
 
-    // 8b. InputSummaryStrip (compact summary of user inputs on results screens)
+    // 8b. InputSummaryStrip (quiet breadcrumb summary of user inputs on results screens)
     function InputSummaryStrip({ items }) {
       return e('div', {
-        style: {
-          background: 'var(--card)',
-          borderRadius: '14px',
-          border: '1px solid var(--sep)',
-          padding: '14px 16px',
-          marginBottom: '20px'
-        }
+        style: { fontSize: '12px', color: 'var(--label3)', lineHeight: 1.5, marginBottom: '16px' }
       },
-        e('div', {
-          style: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 0' }
-        },
-          items.map((item, i) => e(React.Fragment, { key: i },
-            i > 0 && e('span', { style: { color: 'var(--label3)', margin: '0 8px', fontSize: '12px' } }, '·'),
-            e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginRight: '4px' } }, item.label),
-            e('span', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label2)' } }, item.value)
-          ))
-        )
+        items.map((item, i) => e(React.Fragment, { key: i },
+          i > 0 && ' · ',
+          e('span', null, item.label, ' '),
+          e('span', { style: { fontWeight: 500, color: 'var(--label2)' } }, item.value)
+        ))
       );
     }
 
@@ -2068,11 +2058,13 @@
             urineOsmResult === 'high' && urineNaResult === 'high' && e(React.Fragment, null,
               e(DiagnosisHeader, {
                 title: 'Water Retention with Sodium Wasting',
-                description: 'ADH is active (water retention) AND kidneys are wasting sodium. This is the broadest differential — clinical context is critical.',
-                warning: 'Must exclude adrenal insufficiency before diagnosing SIADH. Check morning cortisol ± short synacthen test.'
+                description: 'ADH is active (water retention) AND kidneys are wasting sodium. This is the broadest differential — clinical context is critical.'
               }),
 
-              e(DiffCard, { title: 'SIADH', description: 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine). Tip: Low serum uric acid (<4 mg/dL) is a useful supportive clue.' }),
+              e(DiffListItem, {
+                title: 'SIADH',
+                warning: 'Exclude adrenal insufficiency before diagnosing SIADH — check morning cortisol ± short synacthen test.'
+              }, 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine). Tip: Low serum uric acid (<4 mg/dL) is a useful supportive clue.'),
 
               e(DiffCard, { title: 'Adrenal insufficiency (Addison\'s, pan-hypopit)', description: 'Aldosterone deficiency → Na wasting. Cortisol deficiency → impaired free water excretion.' }),
 
@@ -2085,24 +2077,6 @@
               e(DiffCard, { title: 'AKI (GFR <15)', description: 'Impaired dilution and sodium handling.' }),
 
               e(DiffCard, { title: 'Post-obstructive diuresis / Polyuric ATN', description: 'Recovery phase — kidneys wasting everything.' }),
-
-              e(InfoPanel, { title: 'Physiology of Key Diagnoses', color: 'var(--blue)' },
-                e('div', { style: { background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                  e('strong', null, 'Renal salt wasting:'), ' Failure of ATP-dependent Na+/K+ ATPase. Renal ADH responsiveness variable, thus urine osmolality variable.'
-                ),
-                e('div', { style: { background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                  e('strong', null, 'Hypoaldosteronism:'), ' ENaC + uninhibited ADH release → Na wasting + water retention. Giveaway is hyperkalaemia.'
-                ),
-                e('div', { style: { background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                  e('strong', null, 'Hypothyroidism:'), ' Mechanism unclear.'
-                ),
-                e('div', { style: { background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '8px' } },
-                  e('strong', null, 'Oedematous disorders:'), ' Hypotension/intravascular hypovolaemia → ADH release + overactivation of RAAS → Na and water retention. Baroreceptor reflex is a stronger stimulus for ADH release than the osmoreceptor reflex. IE: body will defend volume over tonicity.'
-                ),
-                e('div', { style: { background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                  e('strong', null, 'Cerebral salt wasting:'), ' Poorly understood. Related to ↑BNP/ANP → natriuresis → polyuria and hypovolaemia. Appropriate secretion of ADH to compensate.'
-                )
-              ),
 
               e(InfoPanel, { title: 'SIADH vs Cerebral Salt Wasting — the Key Distinction', color: 'var(--blue)' },
                 e('p', { style: { marginBottom: '12px' } }, 'Both cause hyponatraemia with high urine osm and high urine Na. The critical difference is volume status:'),
@@ -2119,8 +2093,6 @@
                 e('p', { style: { fontWeight: 600, color: 'var(--red)' } }, 'Distinguishing these matters: management differs significantly and misdiagnosis can worsen outcomes.')
               )
             ),
-
-            e(WarningBanner, null, e('strong', null, 'Always exclude adrenal insufficiency.'), ' Check morning cortisol (or short synacthen test) in any unexplained hyponatraemia — it is one of the most dangerous missed diagnoses.'),
 
             e(LearnMoreDivider),
 
