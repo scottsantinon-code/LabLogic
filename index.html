@@ -9,6 +9,10 @@
   <meta name="author" content="Critical Condition">
   <meta name="description" content="Laboratory investigation interpreter for healthcare professionals">
   <title>LabLogic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@500,700,800,900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f5f5f7;
@@ -18,21 +22,20 @@
       --label3: #86868b;
       --label4: #d2d2d7;
       --sep: rgba(0,0,0,0.08);
-      --blue: #0071e3;
-      --green: #30D158;
-      --orange: #ff9f0a;
+      --accent: #8B5CF6;
+      --accent-light: rgba(139,92,246,0.08);
+      --accent-border: rgba(139,92,246,0.2);
       --red: #FF453A;
-      --purple: #AF52DE;
-      --cyan: #06B6D4;
-      --yellow: #FFD60A;
-      --indigo: #5E5CE6;
+      --orange: #ff9f0a;
+      --green: #30D158;
       --radius: 16px;
       --radius-sm: 14px;
       --radius-xs: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03);
       --nav-bg: rgba(245,245,247,0.92);
-      --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-heading: 'Satoshi', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -44,6 +47,8 @@
         --label3: #86868b;
         --label4: #424245;
         --sep: rgba(255,255,255,0.08);
+        --accent-light: rgba(139,92,246,0.15);
+        --accent-border: rgba(139,92,246,0.3);
         --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.3);
         --shadow-sm: 0 1px 2px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.15);
         --nav-bg: rgba(29,29,31,0.92);
@@ -112,19 +117,23 @@
 
     // Module data
     const modules = [
-      { id: "hypona", name: "Hyponatraemia", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6 0%, #6D3BD4 100%)", tag: "Na⁺", icon: "sodium" },
-      { id: "tft", name: "Thyroid Function", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", tag: "TFT", icon: "thyroid" },
-      { id: "iron", name: "Iron Studies", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", tag: "Fe", icon: "iron" },
-      { id: "coag", name: "Coagulation", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", tag: "Coag", icon: "coag" }
+      { id: "hypona", name: "Hyponatraemia", icon: "sodium" },
+      { id: "tft", name: "Thyroid Function", icon: "thyroid" },
+      { id: "iron", name: "Iron Studies", icon: "iron" },
+      { id: "coag", name: "Coagulation", icon: "coag" }
     ];
 
     // Module icons (simplified SVG paths)
     const moduleIcons = {
       sodium: e('svg', { width: 24, height: 24, viewBox: '0 0 512 512', fill: 'white' },
-        e('path', { d: 'M511.558 400.802l-23.054-223.239c-1.31-12.69-8.309-23.466-18.313-29.905v-33.813h5.58c5.522 0 10-4.478 10-10v-9.238c0-40.776-33.175-73.951-73.952-73.951h-99.07c-40.777 0-73.952 33.175-73.952 73.951v9.238c0 5.522 4.478 10 10 10h5.58v33.813c-10.004 6.438-17.003 17.214-18.313 29.904l-19.604 189.822c-15.149-11.449-31.719-21.125-49.409-28.707l-14.058-6.025c-2.516-1.078-5.363-1.078-7.879 0l-14.058 6.025c-60.791 26.055-108.351 76.836-130.482 139.32-1.085 3.062-.615 6.458 1.259 9.11 1.874 2.651 4.92 4.229 8.167 4.229h420.141c23.089 0 45.214-9.848 60.702-27.018 15.553-17.241 23.102-40.392 20.715-63.516zM276.22 161.262h172.127c10.471 0 19.183 7.891 20.263 18.355l7.791 75.447h-125.792c-18.207-18.975-43.365-29.769-69.738-29.769-10.467 0-20.44 1.659-30.151 5.039l5.238-50.717c1.079-10.464 9.791-18.355 20.262-18.355z' })
+        e('path', { d: 'm136.969 378.554c.373.055.743.082 1.11.082 3.654 0 6.856-2.676 7.409-6.4l24.638-166.031c1.151-.314 2.294-.613 3.411-.877 21.552-5.088 45.835-4.384 70.225 2.04 6.13 1.614 12.182 3.484 18.589 5.464 17.195 5.314 34.934 10.796 53.62 10.796 1.434 0 2.874-.032 4.319-.1 8.062-.374 15.894-2.093 23.393-5.119l3.081 20.761c.607 4.097 4.423 6.921 8.52 6.318 4.098-.608 6.926-4.422 6.318-8.52l-12.299-82.884c5.305-3.338 8.848-9.229 8.848-15.945v-69.005c0-10.391-8.454-18.844-18.845-18.844h-1.846c-3.69-28.333-27.964-50.29-57.287-50.29h-48.347c-29.322 0-53.597 21.957-57.287 50.29h-1.846c-10.391 0-18.845 8.454-18.845 18.844v69.005c0 6.717 3.543 12.607 8.848 15.945l-32.046 215.949c-.607 4.098 2.222 7.912 6.319 8.521zm182.626-170.009c-17.67.821-35.532-4.703-52.815-10.044-6.273-1.939-12.762-3.943-19.197-5.639-25.867-6.812-51.761-7.709-75.081-2.658l4.93-33.22h157.138l6.83 46.026c-6.946 3.309-14.256 5.184-21.805 5.535zm-87.768-193.545h48.347c21.037 0 38.576 15.258 42.132 35.29h-132.61c3.554-20.032 21.094-35.29 42.131-35.29zm-62.978 54.134c0-2.12 1.725-3.844 3.845-3.844h8.843 148.927 8.843c2.12 0 3.845 1.725 3.845 3.844v69.005c0 2.12-1.725 3.844-3.845 3.844h-166.613c-2.12 0-3.845-1.725-3.845-3.844z' }),
+        e('path', { d: 'm395.699 466.735-28.486-191.955c-.607-4.097-4.423-6.924-8.52-6.318-4.098.608-6.926 4.422-6.318 8.52l28.485 191.955c1.046 7.046-1.022 14.181-5.676 19.575-4.652 5.394-11.406 8.488-18.53 8.488h-201.31c-7.123 0-13.877-3.094-18.529-8.487-4.653-5.395-6.722-12.529-5.676-19.576l8.902-59.994c.607-4.098-2.221-7.912-6.318-8.52-4.09-.604-7.911 2.22-8.52 6.318l-8.902 59.994c-1.687 11.366 1.65 22.875 9.155 31.575 7.504 8.701 18.398 13.69 29.888 13.69h201.311c11.49 0 22.385-4.99 29.889-13.69 7.504-8.701 10.841-20.209 9.155-31.575z' }),
+        e('path', { d: 'm200.884 267.889-22.133 169.253c-.537 4.107 2.356 7.872 6.464 8.409.33.043.658.064.982.064 3.709 0 6.933-2.751 7.427-6.528l22.133-169.253c.537-4.107-2.356-7.872-6.464-8.409-4.109-.541-7.872 2.357-8.409 6.464z' }),
+        e('path', { d: 'm256 261.362c-4.143 0-7.5 3.358-7.5 7.5v169.253c0 4.142 3.357 7.5 7.5 7.5s7.5-3.358 7.5-7.5v-169.253c0-4.142-3.358-7.5-7.5-7.5z' }),
+        e('path', { d: 'm302.707 261.425c-4.107.537-7.001 4.302-6.464 8.409l22.132 169.253c.494 3.777 3.718 6.528 7.427 6.528.324 0 .652-.021.982-.064 4.107-.537 7.001-4.302 6.464-8.409l-22.132-169.253c-.537-4.107-4.3-7.005-8.409-6.464z' })
       ),
-      thyroid: e('svg', { width: 24, height: 24, viewBox: '0 0 48 48', fill: 'white' },
-        e('path', { d: 'm41.85 20.55c1.44-7.17-6.85-11.41-10.5-8.81.29-1 .21-.74 3.27-7.49a3 3 0 0 0 -2.73-4.25h-3.2a3 3 0 0 0 -3 2.51l-.39 2.36a1.36 1.36 0 0 1 -2.68 0l-.39-2.36a3 3 0 0 0 -3-2.51h-3.2a3 3 0 0 0 -2.73 4.24c3.08 6.8 3 6.55 3.28 7.5-3.58-2.6-11.88 1.59-10.43 8.81a8 8 0 0 0 0 10.89c-1.3 6.42 5.21 11.34 11.21 9a2.87 2.87 0 0 0 .42.61c-1 1.09-.78 2.13-.78 4a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3c0-1.91.19-2.93-.78-4a2.55 2.55 0 0 0 .42-.61c6 2.39 12.5-2.55 11.21-8.94a8 8 0 0 0 0-10.95z' })
+      thyroid: e('svg', { width: 24, height: 24, viewBox: '0 0 128 128', fill: 'white' },
+        e('path', { d: 'm90.048 116.284c-3.564 0-6.317-1.572-8.88-4.857-2.517-1.206-4.137-4.567-4.6-7.318-.437-2.619.087-4.812 1.44-6.078.839-1.538.3-3.87-1.319-5.634a7.136 7.136 0 0 0 -8.24-1.474c-1.664.752-7.24.752-8.9 0a7.136 7.136 0 0 0 -8.24 1.473c-1.623 1.765-2.159 4.1-1.32 5.635 1.353 1.266 1.877 3.459 1.44 6.078-.459 2.751-2.079 6.112-4.6 7.318-3.986 5.107-8.429 6.074-15.667 3.43-2.646-.165-7.87-1.68-10.316-6.458a8.247 8.247 0 0 0 -2.148-2.644c-6.198-5.055-9.773-11.017-10.325-17.24a7.705 7.705 0 0 0 -.729-2.7c-3.914-8.043-5.044-14.944-3.798-23.08a8.311 8.311 0 0 0 .031-2.566c-.552-3.569-1.477-12.659 1.842-20.069a9.3 9.3 0 0 0 .742-3c.685-7.439 7.272-14.951 14.1-16.078 8.947-1.482 12.083 3.334 13.967 8.237a5.745 5.745 0 0 0 1.606 2.282 14.659 14.659 0 0 1 5.129 8.031 5.513 5.513 0 0 0 1.423 2.6 44.406 44.406 0 0 1 6.506 8.585c.61.96 1.265 1.989 2.01 3.119 2.519 3.815 6.467 5.517 12.8 5.517s10.281-1.7 12.8-5.517c.745-1.13 1.4-2.159 2.01-3.119a44.406 44.406 0 0 1 6.506-8.585 5.515 5.515 0 0 0 1.423-2.6 14.652 14.652 0 0 1 5.129-8.031 5.755 5.755 0 0 0 1.606-2.283c1.884-4.9 5.016-9.721 13.967-8.237 6.826 1.127 13.413 8.639 14.1 16.078a9.284 9.284 0 0 0 .742 3c3.321 7.416 2.394 16.509 1.842 20.074a8.317 8.317 0 0 0 .031 2.567c1.251 8.136.116 15.037-3.8 23.076a7.705 7.705 0 0 0 -.729 2.7c-.552 6.223-4.124 12.185-10.328 17.24a8.24 8.24 0 0 0 -2.148 2.645c-2.446 4.777-7.67 6.292-10.316 6.457a20.07 20.07 0 0 1 -6.789 1.426zm-18.423-29.055a9.823 9.823 0 0 1 7.275 3.138c2.628 2.857 3.263 6.739 1.544 9.441a1.541 1.541 0 0 1 -.323.361c-.624.5-.856 1.857-.591 3.446.4 2.377 1.788 4.7 3.1 5.178a1.492 1.492 0 0 1 .687.508c3.283 4.37 6.367 5.015 12.69 2.664a1.471 1.471 0 0 1 .477-.094c1.939-.06 6.1-1.149 7.995-4.839a11.237 11.237 0 0 1 2.923-3.6c3.879-3.16 8.63-8.359 9.235-15.18a10.693 10.693 0 0 1 1.02-3.751c3.674-7.547 4.7-13.72 3.53-21.308a11.411 11.411 0 0 1 -.031-3.481c1.066-6.877.462-13.751-1.615-18.388a12.448 12.448 0 0 1 -.992-3.95c-.561-6.1-6.089-12.484-11.6-13.394-6.479-1.069-8.821 1.52-10.68 6.354a8.749 8.749 0 0 1 -2.447 3.48 11.573 11.573 0 0 0 -4.175 6.478 8.509 8.509 0 0 1 -2.219 4.01 41.48 41.48 0 0 0 -6.09 8.066c-.619.974-1.282 2.019-2.038 3.163-3.092 4.684-7.955 6.865-15.3 6.865s-12.212-2.181-15.3-6.865c-.756-1.144-1.419-2.189-2.038-3.163a41.48 41.48 0 0 0 -6.09-8.066 8.508 8.508 0 0 1 -2.219-4.011 11.576 11.576 0 0 0 -4.176-6.478 8.746 8.746 0 0 1 -2.446-3.479c-1.859-4.835-4.2-7.423-10.679-6.354-5.51.91-11.038 7.294-11.6 13.394a12.461 12.461 0 0 1 -.992 3.951c-2.08 4.633-2.684 11.507-1.618 18.384a11.411 11.411 0 0 1 -.031 3.481c-1.166 7.588-.144 13.761 3.53 21.308a10.693 10.693 0 0 1 1.02 3.751c.6 6.821 5.356 12.02 9.235 15.18a11.244 11.244 0 0 1 2.923 3.6c1.89 3.691 6.056 4.78 8 4.84a1.471 1.471 0 0 1 .477.094c6.322 2.351 9.406 1.7 12.69-2.664a1.492 1.492 0 0 1 .687-.508c1.313-.479 2.7-2.8 3.1-5.178.265-1.589.033-2.942-.591-3.446a1.541 1.541 0 0 1 -.323-.361c-1.719-2.7-1.084-6.584 1.544-9.442a10.132 10.132 0 0 1 11.684-2.178 16.866 16.866 0 0 0 6.435 0 10.711 10.711 0 0 1 4.403-.957z' })
       ),
       iron: e('svg', { width: 24, height: 24, viewBox: '0 0 512 512', fill: 'white' },
         e('path', { d: 'M400,8A104,104,0,1,0,504,112,104.121,104.121,0,0,0,400,8Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,400,200Z' }),
@@ -132,8 +141,10 @@
         e('path', { d: 'M352,72v88h16V112h32V96H368V80h32V64H360A8,8,0,0,0,352,72Z' }),
         e('path', { d: 'M456,128a8,8,0,0,0,8-8v-4a28,28,0,0,0-56,0v20a24.026,24.026,0,0,0,24,24h8a24.026,24.026,0,0,0,24-24H448a8.005,8.005,0,0,1-8,8h-8a8.005,8.005,0,0,1-8-8v-8Zm-20-24a12.011,12.011,0,0,1,11.312,8H424.688A12.011,12.011,0,0,1,436,104Z' })
       ),
-      coag: e('svg', { width: 24, height: 24, viewBox: '0 0 64 64', fill: 'white' },
-        e('path', { d: 'm46.764 2c-.35716-.0079841-.69144.17516-.87695.48046-4.327 7.1324-11.81 15.141-24.453 17.572-7.9975 1.5379-14.256 5.0338-19.088 9.2166-.4173.36143-.46276.99263-.10156 1.4101.36143.41729.99265.46275 1.4102.10156 4.6037-3.9853 10.521-7.2948 18.158-8.7634 13.302-2.5579 21.27-11.054 25.785-18.498.28744-.47237.13694-1.0883-.33594-1.375-.15042-.091133-.32221-.14098-.49805-.14453zm3.6562.51952c-4.5446 8.3079-13.022 18.537-28.232 21.462-8.7712 1.6867-15.242 5.9636-19.908 10.808-.38298.398-.37073 1.0311.027344 1.414.39802.38297 1.0311.37072 1.4141-.027339 4.4347-4.6047 10.509-8.627 18.846-10.23 15.926-3.0627 24.89-13.842 29.607-22.466.26532-.48432.08782-1.092-.39648-1.3574-.62566-.26528-1.0958-.02989-1.3574.39647zm5.5801 4.4803c-1.645 0-3 1.355-3 2.9999 0 1.645 1.355 2.9999 3 2.9999s3-1.355 3-2.9999c0-1.645-1.355-2.9999-3-2.9999zm-6 3.9999c-1.645 0-3 1.355-3 2.9999 0 1.645 1.355 2.9999 3 2.9999s3-1.355 3-2.9999c0-1.645-1.355-2.9999-3-2.9999zm9 0c-1.645 0-3 1.355-3 2.9999 0 1.645 1.355 2.9999 3 2.9999s3-1.355 3-2.9999c0-1.645-1.355-2.9999-3-2.9999zm-13 3.9999c-7.7201 0-14 6.2797-14 14 0 1.9687.41314 3.8403 1.1504 5.5409-10.872 4.5616-17.496 12.98-21.324 19.978-.26532.48432-.08782 1.092.39648 1.3574.48433.26532 1.092.08782 1.3574-.39647 4.5446-8.3079 13.022-18.537 28.232-21.462 8.7712-1.6867 15.242-5.9636 19.908-10.808.38298-.39801.37073-1.0311-.02734-1.414-.39802-.38296-1.0311-.37072-1.4141.02734-.47918.49754-.98175.98513-1.5 1.4668-2.1894-4.88-7.093-8.2888-12.779-8.2888zm0 1.9999c5.114 0 9.4663 3.182 11.197 7.6775-4.0599 3.3577-9.2104 6.1146-15.764 7.3748-2.2832.43906-4.4189 1.0404-6.4238 1.7675-.64633-1.475-1.0098-3.1034-1.0098-4.8202 0-6.6391 5.3607-12 12-12z' })
+      coag: e('svg', { width: 24, height: 24, viewBox: '0 0 512 512', fill: 'white' },
+        e('path', { d: 'm181.06 40.094c-41.331-53.354-109.181-53.344-150.504 0-65.194 84.156-18.374 228.14 75.252 228.14 93.582-.001 140.491-143.926 75.252-228.14zm-75.252 213.155c-49.932 0-90.554-53.416-90.554-119.072s40.622-119.073 90.554-119.073 90.554 53.416 90.554 119.072-40.622 119.073-90.554 119.073z' }),
+        e('path', { d: 'm257.844 271.391c-105.609 13.41-174.312 148.326-108.108 214.531 66.316 66.312 201.138-2.63 214.531-108.109 8.499-66.942-39.48-114.929-106.423-106.422zm50.715 183.77c-74.45 74.45-180.64 43.598-168.904-48.829 8.12-63.956 70.977-120.941 133.24-120.941 84.536.001 104.634 100.8 35.664 169.77z' }),
+        e('path', { d: 'm510.774 134.14c-4.017-31.637-20.038-62.87-45.111-87.943-47.492-47.491-124.391-65.193-169.419-20.166-20.194 20.194-29.053 49.13-24.946 81.477 4.017 31.637 20.038 62.87 45.111 87.943 47.618 47.616 124.48 65.103 169.42 20.166 20.194-20.193 29.053-49.129 24.945-81.477zm-35.54 70.881c-36.527 36.528-103.486 24.578-148.229-20.166-46.426-46.426-55.473-112.922-20.165-148.228 36.746-36.747 103.774-24.289 148.228 20.166 46.426 46.426 55.472 112.922 20.166 148.228z' })
       )
     };
 
@@ -163,7 +174,7 @@
     }
 
     // 1b. ProgressBar (step dots - current step is elongated pill)
-    function ProgressBar({ current, total, color = 'var(--blue)' }) {
+    function ProgressBar({ current, total, color = 'var(--accent)' }) {
       return e('div', {
         style: {
           display: 'flex',
@@ -189,17 +200,15 @@
       );
     }
 
-    // Helper: Render tag with action detection
+    // Helper: Render tag (neutral grey)
     function renderTag(tag, index) {
-      const actionVerbs = ['Check', 'Order', 'Send', 'Exclude', 'Consider', 'Confirm', 'Measure', 'Request', 'Evaluate', 'Assess', 'Verify'];
-      const isAction = actionVerbs.some(v => tag.startsWith(v));
       return e('span', {
         key: index,
         style: {
           fontSize: '11px',
           fontWeight: 600,
-          color: isAction ? 'var(--blue)' : 'var(--label3)',
-          background: isAction ? 'rgba(0,122,255,0.1)' : 'rgba(142,142,147,0.12)',
+          color: 'var(--label3)',
+          background: 'rgba(142,142,147,0.12)',
           padding: '3px 8px',
           borderRadius: '6px'
         }
@@ -231,7 +240,7 @@
             style: {
               background: 'none',
               border: 'none',
-              color: 'var(--blue)',
+              color: 'var(--accent)',
               fontSize: '16px',
               fontWeight: 500,
               fontFamily: 'var(--font)',
@@ -256,7 +265,7 @@
     }
 
     // 3. ChoiceButton
-    function ChoiceButton({ label, sublabel, selected, onClick, color = 'var(--blue)' }) {
+    function ChoiceButton({ label, sublabel, selected, onClick, color = 'var(--accent)' }) {
       return e('button', {
         onClick: onClick,
         style: {
@@ -317,7 +326,7 @@
           style: {
             display: 'flex',
             background: 'var(--card)',
-            border: `1.5px solid ${hasValue ? 'var(--blue)' : 'var(--sep)'}`,
+            border: `1.5px solid ${hasValue ? 'var(--accent)' : 'var(--sep)'}`,
             borderRadius: '12px',
             overflow: 'hidden'
           }
@@ -357,12 +366,12 @@
     }
 
     // 6. InfoPanel
-    function InfoPanel({ title, color = 'var(--blue)', children }) {
+    function InfoPanel({ title, children }) {
       const [isOpen, setIsOpen] = useState(false);
       return e('div', {
         style: {
-          background: isOpen ? `${color}08` : 'var(--card)',
-          border: `1px solid ${isOpen ? `${color}25` : 'var(--sep)'}`,
+          background: isOpen ? 'rgba(139,92,246,0.06)' : 'var(--card)',
+          border: isOpen ? '1px solid rgba(139,92,246,0.15)' : '1px solid var(--sep)',
           borderRadius: '14px',
           marginBottom: '12px',
           overflow: 'hidden'
@@ -388,8 +397,8 @@
               width: '26px',
               height: '26px',
               borderRadius: '50%',
-              background: `${color}15`,
-              color: color,
+              background: 'rgba(142,142,147,0.12)',
+              color: 'var(--label3)',
               fontWeight: 700,
               fontSize: '14px',
               display: 'flex',
@@ -412,7 +421,7 @@
         ),
         isOpen && e('div', {
           style: {
-            borderTop: `1px solid ${color}15`,
+            borderTop: '1px solid rgba(139,92,246,0.15)',
             padding: '16px',
             fontSize: '13px',
             lineHeight: 1.65,
@@ -467,26 +476,28 @@
     }
 
     // 8. BranchCard
-    function BranchCard({ label, value, interpretation, color = 'var(--blue)' }) {
+    function BranchCard({ label, value, interpretation, color, useColor = false }) {
+      const barColor = useColor && color ? color : 'var(--label4)';
+      const valueColor = useColor && color ? color : 'var(--label)';
       return e('div', {
         style: {
           display: 'flex',
           borderRadius: '14px',
           overflow: 'hidden',
-          border: `1px solid ${color}25`,
+          border: '1px solid var(--sep)',
           background: 'var(--card)',
           marginBottom: '16px'
         }
       },
         e('div', {
-          style: { width: '5px', background: color, flexShrink: 0 }
+          style: { width: '5px', background: barColor, flexShrink: 0 }
         }),
         e('div', { style: { flex: 1, padding: '14px 16px' } },
           e('div', {
             style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' }
           },
             e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label3)' } }, label),
-            e('span', { style: { fontSize: '17px', fontWeight: 700, color: color } }, value)
+            e('span', { style: { fontSize: '17px', fontWeight: 700, color: valueColor } }, value)
           ),
           e('div', {
             style: { fontSize: '14px', fontWeight: 600, color: 'var(--label)', marginTop: '4px' }
@@ -569,7 +580,7 @@
         },
           e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
           e('div', {
-            style: { fontSize: '12px', lineHeight: 1.5, color: 'var(--red)', fontWeight: 500 }
+            style: { fontSize: '12px', lineHeight: 1.5, fontWeight: 500 }
           }, warning)
         ),
         tags.length > 0 && e('div', {
@@ -592,7 +603,7 @@
           style: {
             background: 'none',
             border: 'none',
-            color: 'var(--blue)',
+            color: 'var(--accent)',
             fontSize: '13px',
             fontWeight: 600,
             marginTop: '12px',
@@ -605,7 +616,7 @@
     }
 
     // 10. PrimaryButton
-    function PrimaryButton({ label, onClick, disabled, color = 'var(--blue)' }) {
+    function PrimaryButton({ label, onClick, disabled, color = 'var(--accent)' }) {
       return e('button', {
         onClick: disabled ? undefined : onClick,
         disabled: disabled,
@@ -629,7 +640,7 @@
     }
 
     // 11. DiffCard (Collapsible)
-    function DiffCard({ title, description, color = 'var(--blue)' }) {
+    function DiffCard({ title, description, color = 'var(--accent)' }) {
       const [isOpen, setIsOpen] = useState(false);
       return e('div', {
         style: {
@@ -766,7 +777,7 @@
             },
               e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
               e('div', {
-                style: { fontSize: '12px', lineHeight: 1.5, color: 'var(--red)', fontWeight: 500 }
+                style: { fontSize: '12px', lineHeight: 1.5, fontWeight: 500 }
               }, warning)
             ),
 
@@ -811,7 +822,7 @@
             }
           },
             e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
-            e('div', { style: { fontSize: '12px', lineHeight: 1.5, color: 'var(--red)', fontWeight: 500 } }, warning)
+            e('div', { style: { fontSize: '12px', lineHeight: 1.5, fontWeight: 500 } }, warning)
           ),
           infoPanel && e('div', { style: { marginTop: '10px' } }, infoPanel)
         )
@@ -986,7 +997,7 @@
             !result.beyondWindow && !result.exceeds && e('div', {
               style: { background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.2)', borderRadius: '10px', padding: '12px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--green)' } },
+              e('div', { style: { fontSize: '13px', fontWeight: 600 } },
                 `Remaining safe correction: ${result.remainingBudget} mmol/L over the next ${result.remainingHours} hours`
               )
             ),
@@ -994,14 +1005,14 @@
             !result.beyondWindow && result.exceeds && e('div', {
               style: { background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', borderRadius: '10px', padding: '12px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--red)' } },
+              e('div', { style: { fontSize: '13px', fontWeight: 600 } },
                 `⚠️ Correction rate exceeds safe limit of ${targetRate} mmol/24h`
               )
             )
           ),
 
           // ODS InfoPanel
-          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)', collapsed: true },
+          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', collapsed: true },
             e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
             e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
             e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
@@ -1035,16 +1046,16 @@
                 width: '52px',
                 height: '52px',
                 borderRadius: '14px',
-                background: 'linear-gradient(135deg, var(--blue) 0%, #0077ed 100%)',
+                background: 'linear-gradient(135deg, var(--accent) 0%, #7C3AED 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(0,113,227,0.25)'
+                boxShadow: '0 4px 12px rgba(139,92,246,0.25)'
               }
             }, e('span', { style: { fontSize: '16px', fontWeight: 800, color: 'white' } }, 'Lab')),
             e('div', null,
               e('div', {
-                style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--label)' }
+                style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--label)', fontFamily: 'var(--font-heading)' }
               }, 'LabLogic')
             )
           )
@@ -1074,31 +1085,17 @@
                   position: 'relative'
                 }
               },
-                // BETA badge (if beta module)
-                mod.beta && e('span', {
-                  style: {
-                    position: 'absolute',
-                    top: '8px',
-                    right: '8px',
-                    background: 'rgba(6,182,212,0.15)',
-                    color: 'var(--cyan)',
-                    fontSize: '10px',
-                    fontWeight: 700,
-                    padding: '2px 8px',
-                    borderRadius: '6px'
-                  }
-                }, 'BETA'),
                 // Icon square
                 e('div', {
                   style: {
                     width: '48px',
                     height: '48px',
                     borderRadius: '14px',
-                    background: mod.gradient,
+                    background: 'linear-gradient(135deg, var(--accent) 0%, #7C3AED 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: `0 3px 10px ${mod.color}30`,
+                    boxShadow: '0 3px 10px rgba(139,92,246,0.2)',
                     flexShrink: 0
                   }
                 }, moduleIcons[mod.icon]),
@@ -1108,20 +1105,8 @@
                     style: { fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--label)' }
                   }, mod.name)
                 ),
-                // Tag + chevron
-                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 } },
-                  e('span', {
-                    style: {
-                      fontSize: '11px',
-                      fontWeight: 700,
-                      color: mod.color,
-                      background: `${mod.color}12`,
-                      padding: '3px 8px',
-                      borderRadius: '6px'
-                    }
-                  }, mod.tag),
-                  e('span', { style: { color: 'var(--label4)', fontSize: '18px' } }, '›')
-                )
+                // Chevron
+                e('span', { style: { color: 'var(--label4)', fontSize: '18px', flexShrink: 0 } }, '›')
               )
             )
           )
@@ -1139,7 +1124,7 @@
             style: {
               background: 'none',
               border: 'none',
-              color: 'var(--blue)',
+              color: 'var(--accent)',
               fontSize: '11px',
               fontWeight: 500,
               marginTop: '12px',
@@ -1222,32 +1207,32 @@
 
       // Get TSH display values
       const getTSHDisplay = () => {
-        if (tshResult === 'low') return { value: 'Low (< 0.4)', interpretation: 'Suppressed', color: 'var(--red)' };
-        if (tshResult === 'high') return { value: 'High (> 4.0)', interpretation: 'Elevated', color: 'var(--orange)' };
-        return { value: 'Normal (0.4–4.0)', interpretation: 'Within range', color: 'var(--green)' };
+        if (tshResult === 'low') return { value: 'Low (< 0.4)', interpretation: 'Suppressed' };
+        if (tshResult === 'high') return { value: 'High (> 4.0)', interpretation: 'Elevated' };
+        return { value: 'Normal (0.4–4.0)', interpretation: 'Within range' };
       };
 
       const getFT4Display = () => {
-        if (ft4Status === 'low') return { value: 'Low (< 12)', interp: 'Below range', color: 'var(--red)' };
-        if (ft4Status === 'high') return { value: 'High (> 22)', interp: 'Above range', color: 'var(--orange)' };
-        return { value: 'Normal (12–22)', interp: 'Within range', color: 'var(--green)' };
+        if (ft4Status === 'low') return { value: 'Low (< 12)', interp: 'Below range' };
+        if (ft4Status === 'high') return { value: 'High (> 22)', interp: 'Above range' };
+        return { value: 'Normal (12–22)', interp: 'Within range' };
       };
 
       const getFT3Display = () => {
-        if (ft3Status === 'low') return { value: 'Low (< 3.1)', interp: 'Below range', color: 'var(--red)' };
-        if (ft3Status === 'high') return { value: 'High (> 6.8)', interp: 'Above range', color: 'var(--orange)' };
-        return { value: 'Normal (3.1–6.8)', interp: 'Within range', color: 'var(--green)' };
+        if (ft3Status === 'low') return { value: 'Low (< 3.1)', interp: 'Below range' };
+        if (ft3Status === 'high') return { value: 'High (> 6.8)', interp: 'Above range' };
+        return { value: 'Normal (3.1–6.8)', interp: 'Within range' };
       };
 
       // Main TFT flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Thyroid Function', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
         e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--purple)' }),
+          e(ProgressBar, { current: step, total: getTotalScreens() }),
 
           // SCREEN 0: Is the patient acutely unwell? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient acutely unwell?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Is the patient acutely unwell?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
               label: 'Yes — acutely unwell or in ICU',
@@ -1257,7 +1242,7 @@
                 setAcutelyUnwell(true);
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'No — outpatient or stable',
@@ -1267,7 +1252,7 @@
                 setAcutelyUnwell(false);
                 scheduleAdvance(() => goToStep(1), false); // 300ms delay
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
               e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause transient TFT changes — most commonly ↓fT3, ↓fT4, and ↓TSH. Consider retesting when clinically stable before starting new thyroid treatment, unless results are markedly abnormal or clinical suspicion is high.'
@@ -1277,7 +1262,7 @@
 
           // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the TSH?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the TSH?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 0.4–4.0 mU/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 0.4 mU/L',
@@ -1287,7 +1272,7 @@
                 setTshResult('low');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  0.4–4.0 mU/L',
@@ -1297,7 +1282,7 @@
                 setTshResult('normal');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 4.0 mU/L',
@@ -1307,16 +1292,16 @@
                 setTshResult('high');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e('div', {
-              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px' }
             }, '💡 In first trimester pregnancy, TSH as low as 0.1 can be physiological due to hCG cross-reactivity. Use trimester-specific reference ranges.')
           ),
 
           // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT4?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the fT4?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 12–22 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 12 pmol/L',
@@ -1326,7 +1311,7 @@
                 setFt4Status('low');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  12–22 pmol/L',
@@ -1336,7 +1321,7 @@
                 setFt4Status('normal');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 22 pmol/L',
@@ -1346,13 +1331,13 @@
                 setFt4Status('high');
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             })
           ),
 
           // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
           step === 3 && tshResult === 'low' && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the fT3?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the fT3?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 3.1–6.8 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 3.1 pmol/L',
@@ -1362,7 +1347,7 @@
                 setFt3Status('low');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  3.1–6.8 pmol/L',
@@ -1372,7 +1357,7 @@
                 setFt3Status('normal');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 6.8 pmol/L',
@@ -1382,24 +1367,16 @@
                 setFt3Status('high');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--purple)'
+              color: 'var(--accent)'
             }),
             e('div', {
-              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(175,82,222,0.06)', borderRadius: '10px' }
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px' }
             }, '💡 fT3 not available? If clinical suspicion of hyperthyroidism is high but fT4 is normal, consider requesting fT3 — about 5% of hyperthyroidism is T3-predominant.')
           ),
 
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
           step === getResultsScreen() && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } },
-              (() => {
-                const tsh = tshResult === 'low' ? 'TSH ↓' : tshResult === 'high' ? 'TSH ↑' : 'TSH normal';
-                const ft4 = ft4Status === 'low' ? ' · fT4 ↓' : ft4Status === 'high' ? ' · fT4 ↑' : ' · fT4 normal';
-                const ft3 = tshResult === 'low' && ft3Status ? (ft3Status === 'high' ? ' · fT3 ↑' : ft3Status === 'low' ? ' · fT3 ↓' : ' · fT3 normal') : '';
-                return tsh + ft4 + ft3;
-              })()
-            ),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px' } }, 'Interpretation'),
 
             // Compact input summary
             e(InputSummaryStrip, { items: [
@@ -1414,70 +1391,69 @@
             tshResult === 'low' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Overt Hyperthyroidism',
               tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
-            }, 'Suppressed TSH with elevated fT4 indicates thyrotoxicosis. Most commonly Graves\' disease, toxic multinodular goitre, or toxic adenoma.'),
+            }, 'Thyrotoxicosis. Most commonly Graves\', toxic MNG, or toxic adenoma.'),
 
             tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(DiffListItem, {
               title: 'T3 Thyrotoxicosis',
               tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
-            }, 'fT4 normal but fT3 elevated — about 5% of hyperthyroidism presents this way. Common in early Graves\' disease or autonomous thyroid adenoma.'),
+            }, 'About 5% of hyperthyroidism is T3-predominant. Consider early Graves\' or autonomous adenoma.'),
 
             tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3Status) && !(ft3Status === 'high') && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
               tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk'],
-              infoPanel: e(InfoPanel, { title: 'Why Subclinical Hyperthyroidism Matters', color: 'var(--purple)' },
+              infoPanel: e(InfoPanel, { title: 'Why Subclinical Hyperthyroidism Matters' },
                 e('p', { style: { marginBottom: '10px' } }, 'The degree of TSH suppression affects clinical significance:'),
-                e('div', { style: { background: 'rgba(255,59,48,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
-                  e('strong', { style: { color: 'var(--red)' } }, 'TSH < 0.1 mU/L:'), ' Higher risk — associated with 3× increased risk of atrial fibrillation and accelerated bone loss, particularly in postmenopausal women and elderly.'
+                e('p', { style: { marginBottom: '10px' } },
+                  e('strong', null, 'TSH < 0.1 mU/L:'), ' Higher risk — associated with 3× increased risk of atrial fibrillation and accelerated bone loss, particularly in postmenopausal women and elderly.'
                 ),
-                e('div', { style: { background: 'rgba(245,158,11,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
-                  e('strong', { style: { color: 'var(--orange)' } }, 'TSH 0.1–0.4 mU/L:'), ' Lower risk — may be observed if asymptomatic and no risk factors for AF or osteoporosis.'
+                e('p', { style: { marginBottom: '10px' } },
+                  e('strong', null, 'TSH 0.1–0.4 mU/L:'), ' Lower risk — may be observed if asymptomatic and no risk factors for AF or osteoporosis.'
                 ),
                 e('p', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Collet TH et al. JAMA 2012 — meta-analysis of subclinical hyperthyroidism and cardiovascular outcomes.')
               )
-            }, 'TSH suppressed but hormones normal. May be transient. Recheck in 6–8 weeks to confirm persistence. If persistent, associated with increased risk of atrial fibrillation (especially if TSH < 0.1) and osteoporosis.'),
+            }, 'May be transient — recheck in 6–8 weeks. If persistent, risk of AF and osteoporosis.'),
 
             tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Central Hypothyroidism',
-                tags: ['Pituitary failure', 'Check cortisol FIRST'],
+                tags: ['Pituitary failure'],
                 defaultOpen: true,
                 warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
-                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                   e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                  e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
-                  e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
+                  e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
                 )
-              }, 'Low TSH with low fT4 means the pituitary is failing — this is NOT primary thyroid disease. Investigate for pituitary pathology urgently.'),
+              }, 'Pituitary failure — not primary thyroid disease. Investigate urgently.'),
               e(DiffListItem, {
                 title: 'Non-Thyroidal Illness (Recovery Phase)',
                 tags: ['Sick euthyroid', 'Transient', 'Recheck when well']
-              }, 'TSH can transiently suppress during recovery from acute illness while fT4 is still low. If the patient was recently unwell, recheck TFTs in 4–6 weeks before investigating for pituitary pathology.')
+              }, 'Transient TSH suppression during recovery from acute illness. Recheck TFTs in 4–6 weeks when stable.')
             ),
 
             // TSH HIGH pathways
             tshResult === 'high' && ft4Status === 'low' && e(DiffListItem, {
               title: 'Overt Hypothyroidism',
               tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine']
-            }, 'Elevated TSH with low fT4 indicates primary hypothyroidism. Most commonly autoimmune (Hashimoto\'s — check TPO antibodies).'),
+            }, 'Primary hypothyroidism. Most commonly Hashimoto\'s — check TPO antibodies.'),
 
             tshResult === 'high' && ft4Status === 'normal' && e(DiffListItem, {
               title: 'Subclinical Hypothyroidism',
               tags: ['Recheck 6–8 weeks', 'Check TPO antibodies', 'Treat if TSH >10'],
-              infoPanel: e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism', color: 'var(--purple)' },
-                e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
-                  e('strong', { style: { color: 'var(--green)' } }, 'TREAT IF:'), ' TSH >10 (except consider observation in >70y) · TSH 4–10 with positive TPOAb and symptoms · Pregnant or planning pregnancy (target TSH <2.5)'
+              infoPanel: e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism' },
+                e('p', { style: { marginBottom: '10px' } },
+                  e('strong', null, 'TREAT IF:'), ' TSH >10 (except consider observation in >70y) · TSH 4–10 with positive TPOAb and symptoms · Pregnant or planning pregnancy (target TSH <2.5)'
                 ),
-                e('div', { style: { background: 'rgba(245,158,11,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '10px' } },
-                  e('strong', { style: { color: 'var(--orange)' } }, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment · Recovery from acute illness'
+                e('p', { style: { marginBottom: '10px' } },
+                  e('strong', null, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment · Recovery from acute illness'
                 ),
                 e('p', { style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px' } }, 'Stott DJ et al. NEJM 2017 (TRUST trial) — levothyroxine provided no benefit in adults ≥65 years with subclinical hypothyroidism.')
               )
-            }, 'TSH elevated but fT4 still normal. Common finding. Check TPO antibodies and recheck in 6–8 weeks. Treatment threshold depends on TSH level, symptoms, and antibody status.'),
+            }, 'Common finding. Check TPO antibodies and recheck in 6–8 weeks.'),
 
             tshResult === 'high' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference or TSH-oma',
               tags: ['Biotin interference', 'Heterophile antibodies', 'Refer endocrinology']
-            }, 'TSH elevated with high fT4 is discordant — TSH should be suppressed. Consider biotin supplement interference, heterophile antibodies, or rare TSH-secreting pituitary adenoma.'),
+            }, 'Discordant result — TSH should be suppressed. Consider biotin interference, heterophile antibodies, or TSH-oma.'),
 
             // TSH NORMAL pathways
             tshResult === 'normal' && ft4Status === 'normal' && e(DiffListItem, {
@@ -1489,15 +1465,14 @@
             tshResult === 'normal' && ft4Status === 'low' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Central Hypothyroidism',
-                tags: ['Pituitary failure', 'Investigate urgently'],
+                tags: ['Pituitary failure'],
                 defaultOpen: true,
                 warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
-                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters', color: 'var(--red)' },
+                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                   e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
-                  e('p', { style: { marginBottom: '10px' } }, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)'),
-                  e('p', { style: { fontWeight: 700 } }, 'If pituitary failure suspected, check cortisol BEFORE starting thyroxine.')
+                  e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
                 )
-              }, 'Normal TSH is \'inappropriately normal\' in the context of low fT4. The pituitary should be driving TSH up. Investigate for pituitary pathology.'),
+              }, 'TSH is \'inappropriately normal\' for a low fT4. Investigate for pituitary pathology.'),
               e(DiffListItem, {
                 title: 'Also Consider',
                 tags: ['Alternative explanations']
@@ -1513,7 +1488,7 @@
             (tshResult === 'low' && ft4Status === 'high') && e('div', {
               style: { background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--red)', marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
+              e('div', { style: { fontSize: '13px', fontWeight: 700, marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
               e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.5' } },
                 'If the patient has ', e('strong', null, 'fever, tachycardia out of proportion to fever, and altered mental status'), ' — consider thyroid storm. This is a clinical emergency requiring immediate escalation.'
               )
@@ -1522,7 +1497,7 @@
             (tshResult === 'high' && ft4Status === 'low') && e('div', {
               style: { background: 'rgba(255,59,48,0.1)', border: '1px solid rgba(255,59,48,0.3)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--red)', marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
+              e('div', { style: { fontSize: '13px', fontWeight: 700, marginBottom: '6px' } }, '🚨 Urgent Pattern Recognition'),
               e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.5' } },
                 'If the patient has ', e('strong', null, 'hypothermia, bradycardia, and altered consciousness'), ' — consider myxoedema coma. This is a clinical emergency requiring immediate escalation.'
               )
@@ -1530,9 +1505,9 @@
 
             // Further workup section - for hyperthyroidism
             (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e('div', {
-              style: { background: 'rgba(175,82,222,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+              style: { background: 'rgba(142,142,147,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--purple)', marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
+              e('div', { style: { fontSize: '13px', fontWeight: 700, marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
               e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.6' } },
                 e('div', null, '• ', e('strong', null, 'TRAb'), ' — positive in Graves\' disease'),
                 e('div', null, '• ', e('strong', null, 'TPO antibodies'), ' — supports autoimmune aetiology'),
@@ -1542,9 +1517,9 @@
 
             // Further workup section - for hypothyroidism
             (tshResult === 'high' && ft4Status === 'low') && e('div', {
-              style: { background: 'rgba(175,82,222,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
+              style: { background: 'rgba(142,142,147,0.06)', borderRadius: '12px', padding: '12px', marginTop: '16px' }
             },
-              e('div', { style: { fontSize: '13px', fontWeight: 700, color: 'var(--purple)', marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
+              e('div', { style: { fontSize: '13px', fontWeight: 700, marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
               e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.6' } },
                 e('div', null, '• ', e('strong', null, 'TPO antibodies'), ' — positive in Hashimoto\'s thyroiditis (most common cause)'),
                 e('div', null, '• Recheck TFTs in 6–8 weeks if recent illness or uncertain chronicity')
@@ -1554,7 +1529,7 @@
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, {
                 label: 'New Analysis',
-                color: 'var(--purple)',
+                color: 'var(--accent)',
                 onClick: resetModule
               }),
               e('button', {
@@ -1566,7 +1541,7 @@
             e(LearnMoreDivider),
 
             // Causes of Hyperthyroidism InfoPanel (when hyperthyroid)
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism', color: 'var(--purple)', collapsed: true },
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism', collapsed: true },
               e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'High uptake on thyroid scan (↑ synthesis):'),
               e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
                 e('li', null, 'Graves\' disease — diffuse uptake, TRAb positive'),
@@ -1588,7 +1563,7 @@
             ),
 
             // Assay interference panel - only show when relevant
-            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoPanel, { title: 'Assay Interference — the Hidden Trap', color: 'var(--purple)' },
+            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoPanel, { title: 'Assay Interference — the Hidden Trap' },
               e('p', { style: { marginBottom: '10px' } },
                 e('strong', null, 'Biotin (Vitamin B7):'), ' High-dose biotin supplements (common in "hair and nails" products, also MS treatment) interfere with streptavidin-biotin immunoassays. Can cause falsely ↑fT4, ↑fT3, ↓TSH — mimicking hyperthyroidism.'
               ),
@@ -1600,7 +1575,7 @@
               )
             ),
 
-            e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction', color: 'var(--purple)' },
+            e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction' },
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Amiodarone:'),
               e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for interpretation. TFTs should be monitored every 6 months on amiodarone.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Lithium:'),
@@ -1610,7 +1585,7 @@
             ),
 
             // Postpartum thyroiditis - show when hyperthyroid
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Postpartum Thyroiditis', color: 'var(--purple)' },
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Postpartum Thyroiditis' },
               e('p', { style: { marginBottom: '10px' } }, 'Affects 5–10% of women within 12 months of delivery. Autoimmune destructive process — often TPO antibody positive.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Typical pattern:'),
               e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
@@ -1738,39 +1713,39 @@
         return {
           value: naValue ? `${naValue} mmol/L` : '',
           interpretation: severity?.interp || '',
-          color: severity?.color || 'var(--blue)'
+          color: severity?.color || 'var(--accent)'
         };
       };
 
       const getSerumOsmDisplay = () => {
-        if (serumOsmResult === 'low') return { value: 'Low (< 275)', interpretation: 'Hypotonic', color: 'var(--blue)' };
-        if (serumOsmResult === 'normal') return { value: 'Normal (275–295)', interpretation: 'Iso-osmolar', color: 'var(--green)' };
-        if (serumOsmResult === 'high') return { value: 'High (> 295)', interpretation: 'Hyper-osmolar', color: 'var(--orange)' };
+        if (serumOsmResult === 'low') return { value: 'Low (< 275)', interpretation: 'Hypotonic' };
+        if (serumOsmResult === 'normal') return { value: 'Normal (275–295)', interpretation: 'Iso-osmolar' };
+        if (serumOsmResult === 'high') return { value: 'High (> 295)', interpretation: 'Hyper-osmolar' };
         if (serumOsmResult === 'skip') return { value: 'Not available', interpretation: 'Assumed hypotonic', color: 'var(--label3)' };
-        return { value: '', interpretation: '', color: 'var(--blue)' };
+        return { value: '', interpretation: '' };
       };
 
       const getUrineOsmDisplay = () => {
-        if (urineOsmResult === 'low') return { value: 'Low (< 100)', interpretation: 'Dilute — kidneys working', color: 'var(--green)' };
-        if (urineOsmResult === 'high') return { value: 'High (> 100)', interpretation: 'Concentrated — ADH active', color: 'var(--orange)' };
-        return { value: '', interpretation: '', color: 'var(--blue)' };
+        if (urineOsmResult === 'low') return { value: 'Low (< 100)', interpretation: 'Dilute — kidneys working' };
+        if (urineOsmResult === 'high') return { value: 'High (> 100)', interpretation: 'Concentrated — ADH active' };
+        return { value: '', interpretation: '' };
       };
 
       const getUrineNaDisplay = () => {
-        if (urineNaResult === 'low') return { value: 'Low (< 30)', interpretation: 'Retained — kidneys conserving', color: 'var(--green)' };
-        if (urineNaResult === 'high') return { value: 'High (> 30)', interpretation: 'Wasted — sodium loss', color: 'var(--orange)' };
-        return { value: '', interpretation: '', color: 'var(--blue)' };
+        if (urineNaResult === 'low') return { value: 'Low (< 30)', interpretation: 'Retained — kidneys conserving' };
+        if (urineNaResult === 'high') return { value: 'High (> 30)', interpretation: 'Wasted — sodium loss' };
+        return { value: '', interpretation: '' };
       };
 
       // Main flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Hyponatraemia', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
         e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--blue)' }),
+          e(ProgressBar, { current: step, total: getTotalScreens() }),
 
           // SCREEN 0: Serum sodium (ValueInput, Next button)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the serum sodium?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the serum sodium?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines the severity'),
             e(ValueInput, {
               label: 'Serum Sodium',
@@ -1784,7 +1759,7 @@
             e(PrimaryButton, {
               label: 'Next',
               disabled: !naValue,
-              color: 'var(--blue)',
+              color: 'var(--accent)',
               onClick: () => goToStep(1)
             }),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
@@ -1792,7 +1767,7 @@
 
           // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'How quickly did this develop?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'How quickly did this develop?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'If last known normal Na was >48h ago or unknown, treat as chronic'),
             e(ChoiceButton, {
               label: 'Acute  ‹ 48 hours',
@@ -1801,9 +1776,9 @@
               onClick: () => {
                 clearAutoAdvance();
                 setChronicity('acute');
-                // No auto-advance — warning gates progression
+                scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Chronic  › 48 hours',
@@ -1814,7 +1789,7 @@
                 setChronicity('chronic');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Unknown',
@@ -1825,15 +1800,14 @@
                 setChronicity('unknown');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
-            chronicity === 'acute' && e(WarningBanner, { onContinue: () => goToStep(2) }, 'Higher risk of cerebral oedema. But safer to correct faster than in chronic hyponatraemia.'),
             chronicity === 'chronic' && e(WarningBanner, { onContinue: () => goToStep(2) }, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
           ),
 
           // SCREEN 2: Serum osmolality (ChoiceButtons, auto-advance, branches)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Check serum osmolality'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Check serum osmolality'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Determines whether this is true hyponatraemia'),
             e(ChoiceButton, {
               label: 'Low  ‹ 275 mOsm/kg',
@@ -1843,7 +1817,7 @@
                 setSerumOsmResult('low');
                 scheduleAdvance(() => goToStep(3), false); // Continue to urine osm
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  275–295 mOsm/kg',
@@ -1853,7 +1827,7 @@
                 setSerumOsmResult('normal');
                 scheduleAdvance(() => goToStep(3), false); // Go to iso-osmolar results
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 295 mOsm/kg',
@@ -1863,7 +1837,7 @@
                 setSerumOsmResult('high');
                 scheduleAdvance(() => goToStep(3), false); // Go to glucose input
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Not available',
@@ -1883,20 +1857,20 @@
           // SCREEN 3: Path-dependent
           // If iso-osmolar → Results
           step === 3 && isIsoOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Iso-osmolar hyponatraemia'),
             e(InputSummaryStrip, { items: [
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() }
             ] }),
             e('div', {
-              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', marginBottom: '12px', padding: '10px 12px', background: 'rgba(139,92,246,0.06)', borderRadius: '10px' }
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', marginBottom: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px' }
             }, '💡 If iso-osmolar but clinical picture doesn\'t fit pseudohyponatraemia, check cortisol to exclude adrenal insufficiency.'),
             e(DiffListItem, {
               title: 'Pseudohyponatraemia',
               tags: ['Measurement artefact', 'Check Na on VBG'],
               defaultOpen: true,
-              infoPanel: e(InfoPanel, { title: 'Tonicity vs Osmolality', color: 'var(--blue)' },
+              infoPanel: e(InfoPanel, { title: 'Tonicity vs Osmolality' },
                 e('p', { style: { marginBottom: '10px' } }, 'Urea and ethanol contribute to measured osmolality but are ineffective osmoles (cross cell membranes freely).'),
                 e('p', null, 'Tonicity = Osmolality − Urea. If in doubt, calculate tonicity or check Na on VBG.')
               )
@@ -1905,7 +1879,7 @@
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--blue)', onClick: resetModule }),
+            e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
             e('button', {
               onClick: onBack,
               style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
@@ -1914,7 +1888,7 @@
 
           // If hyper-osmolar → Glucose input screen
           step === 3 && isHyperOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter glucose'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Enter glucose'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'To calculate corrected sodium'),
             e(ValueInput, {
               label: 'Glucose',
@@ -1928,18 +1902,18 @@
               label: 'Corrected Na',
               value: `${getCorrectedNa()} mmol/L`,
               interpretation: 'Predicted Na once glucose normalises',
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(PrimaryButton, {
               label: 'See Results',
-              color: 'var(--blue)',
+              color: 'var(--accent)',
               onClick: () => goToStep(4)
             })
           ),
 
           // If hypotonic → Urine Osmolality
           step === 3 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the urine osmolality?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the urine osmolality?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Is the kidney diluting appropriately?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 100 mOsm/kg',
@@ -1949,7 +1923,7 @@
                 setUrineOsmResult('low');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 100 mOsm/kg',
@@ -1959,7 +1933,7 @@
                 setUrineOsmResult('high');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             urineOsmResult === 'high' && e(WarningBanner, { onContinue: () => goToStep(4) }, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution.')
           ),
@@ -1967,12 +1941,12 @@
           // SCREEN 4: Path-dependent
           // If hyper-osmolar → Results
           step === 4 && isHyperOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hyper-osmolar hyponatraemia'),
             e(InputSummaryStrip, { items: [
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() },
-              getCorrectedNa() && { label: 'Corrected Na', value: `${getCorrectedNa()} mmol/L`, color: 'var(--blue)' }
+              getCorrectedNa() && { label: 'Corrected Na', value: `${getCorrectedNa()} mmol/L` }
             ].filter(Boolean) }),
             e(DiffListItem, {
               title: 'Hyper-osmolar Hyponatraemia',
@@ -1981,27 +1955,12 @@
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
 
-            e(LearnMoreDivider),
-
-            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
-              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
-              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
-                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
-                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
-                e('li', null, 'Hypokalaemia'),
-                e('li', null, 'Malnutrition or alcoholism'),
-                e('li', null, 'Advanced liver disease')
-              )
-            ),
-
             e('div', {
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
-            e(PrimaryButton, { label: 'New Analysis', color: 'var(--blue)', onClick: resetModule }),
+            e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
             e('button', {
               onClick: onBack,
               style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
@@ -2010,7 +1969,7 @@
 
           // If hypotonic → Urine Sodium
           step === 4 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the urine sodium?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the urine sodium?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Is the kidney conserving sodium?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 30 mmol/L',
@@ -2020,7 +1979,7 @@
                 setUrineNaResult('low');
                 scheduleAdvance(() => goToStep(5), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 30 mmol/L',
@@ -2030,13 +1989,13 @@
                 setUrineNaResult('high');
                 scheduleAdvance(() => goToStep(5), false);
               },
-              color: 'var(--blue)'
+              color: 'var(--accent)'
             })
           ),
 
           // SCREEN 5: Hypotonic Results (full differential)
           step === 5 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Interpretation'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hypotonic hyponatraemia'),
 
             // Compact input summary
@@ -2079,7 +2038,7 @@
               e(DiagnosisHeader, {
                 title: 'Hypovolaemia or Effective Hypovolaemia',
                 description: 'Actual or effective volume depletion → RAAS overactivation. The body is defending volume over tonicity — retaining water even at the expense of worsening hyponatraemia.',
-                infoPanel: e(InfoPanel, { title: 'Volume over Tonicity', color: 'var(--blue)' },
+                infoPanel: e(InfoPanel, { title: 'Volume over Tonicity' },
                   e('p', null, 'The baroreceptor reflex is a stronger stimulus for ADH release than the osmoreceptor reflex. When intravascular volume is low (or perceived as low — heart failure, liver failure), the body will retain water even at the expense of worsening hyponatraemia. This is because volume depletion kills faster than low sodium.')
                 )
               }),
@@ -2097,9 +2056,8 @@
               }),
 
               e(DiffListItem, {
-                title: 'SIADH',
-                warning: 'Exclude adrenal insufficiency before diagnosing SIADH — check morning cortisol ± short synacthen test.'
-              }, 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion: euvolaemic, no adrenal insufficiency, no hypothyroidism, no renal failure, no diuretics. Oliguric (concentrated urine). Tip: Low serum uric acid (<4 mg/dL) is a useful supportive clue.'),
+                title: 'SIADH'
+              }, e(React.Fragment, null, 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion — ensure no adrenal insufficiency, hypothyroidism, or renal failure. ', e('strong', null, 'Important:'), ' exclude adrenal insufficiency (check cortisol) before diagnosing SIADH.')),
 
               e(DiffCard, { title: 'Adrenal insufficiency (Addison\'s, pan-hypopit)', description: 'Aldosterone deficiency → Na wasting. Cortisol deficiency → impaired free water excretion.' }),
 
@@ -2113,25 +2071,25 @@
 
               e(DiffCard, { title: 'Post-obstructive diuresis / Polyuric ATN', description: 'Recovery phase — kidneys wasting everything.' }),
 
-              e(InfoPanel, { title: 'SIADH vs Cerebral Salt Wasting — the Key Distinction', color: 'var(--blue)' },
+              e(InfoPanel, { title: 'SIADH vs Cerebral Salt Wasting — the Key Distinction' },
                 e('p', { style: { marginBottom: '12px' } }, 'Both cause hyponatraemia with high urine osm and high urine Na. The critical difference is volume status:'),
                 e('div', { style: { display: 'flex', gap: '8px', marginBottom: '12px' } },
-                  e('div', { style: { flex: 1, background: 'rgba(139,92,246,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                    e('strong', { style: { color: 'var(--blue)' } }, 'SIADH:'),
+                  e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
+                    e('strong', null, 'SIADH:'),
                     e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic or mildly hypervolaemic. Oliguric (low urine output). Urine osm typically >300.')
                   ),
-                  e('div', { style: { flex: 1, background: 'rgba(245,158,11,0.08)', borderRadius: '10px', padding: '10px 12px' } },
-                    e('strong', { style: { color: 'var(--orange)' } }, 'CSW:'),
+                  e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
+                    e('strong', null, 'CSW:'),
                     e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric (high urine output). Signs of volume depletion (tachycardia, orthostatic hypotension).')
                   )
                 ),
-                e('p', { style: { fontWeight: 600, color: 'var(--red)' } }, 'Distinguishing these matters: management differs significantly and misdiagnosis can worsen outcomes.')
+                e('p', null, e('strong', null, 'Distinguishing these matters:'), ' management differs significantly and misdiagnosis can worsen outcomes.')
               )
             ),
 
             e(LearnMoreDivider),
 
-            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
+            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)' },
               e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
               e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
               e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
@@ -2146,7 +2104,7 @@
 
             // Bottom buttons (for all result paths)
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--blue)', onClick: resetModule }),
+              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
                 style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
@@ -2198,31 +2156,29 @@
 
       const getInflammationDisplay = () => ({
         value: hasInflammation ? 'Present' : 'Absent',
-        interpretation: hasInflammation ? 'Adjusted thresholds apply' : 'Standard thresholds',
-        color: hasInflammation ? 'var(--orange)' : 'var(--green)'
+        interpretation: hasInflammation ? 'Adjusted thresholds apply' : 'Standard thresholds'
       });
 
       const getFerritinDisplay = () => {
         const labels = { veryLow: '< 30 µg/L', lowNormal: '30–100 µg/L', normal: '100–300 µg/L', high: '300–1000 µg/L', veryHigh: '> 1000 µg/L' };
         const interps = { veryLow: 'Iron deficiency', lowNormal: 'Possible deficiency', normal: 'Stores adequate', high: 'Elevated', veryHigh: 'Urgent evaluation' };
-        const colors = { veryLow: 'var(--red)', lowNormal: 'var(--orange)', normal: 'var(--green)', high: 'var(--orange)', veryHigh: 'var(--red)' };
-        return { value: labels[ferritinResult] || '', interpretation: interps[ferritinResult] || '', color: colors[ferritinResult] || 'var(--blue)' };
+        return { value: labels[ferritinResult] || '', interpretation: interps[ferritinResult] || '' };
       };
 
       const getTsatDisplay = () => {
-        if (tsatResult === 'low') return { value: '< 16%', interpretation: 'Low — iron deficient erythropoiesis', color: 'var(--red)' };
-        if (tsatResult === 'high') return { value: '> 45%', interpretation: 'High — iron overload', color: 'var(--orange)' };
-        return { value: '16–45%', interpretation: 'Normal', color: 'var(--green)' };
+        if (tsatResult === 'low') return { value: '< 16%', interpretation: 'Low — iron deficient erythropoiesis' };
+        if (tsatResult === 'high') return { value: '> 45%', interpretation: 'High — iron overload' };
+        return { value: '16–45%', interpretation: 'Normal' };
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Iron Studies', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
         e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--red)' }),
+          e(ProgressBar, { current: step, total: getTotalScreens() }),
 
           // SCREEN 0: Is the patient inflamed? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient inflamed?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Is the patient inflamed?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
               label: 'Yes — CRP elevated',
@@ -2250,7 +2206,7 @@
 
           // SCREEN 1: CKD or heart failure? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Does the patient have CKD or heart failure?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Does the patient have CKD or heart failure?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Different iron deficiency thresholds apply'),
             e(ChoiceButton, {
               label: 'CKD or haemodialysis',
@@ -2286,7 +2242,7 @@
 
           // SCREEN 2: Ferritin (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the ferritin (µg/L)?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the ferritin (µg/L)?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'The starting point — interpret with context'),
             e(ChoiceButton, {
               label: 'Very low  ‹ 30 µg/L',
@@ -2344,7 +2300,7 @@
 
           // SCREEN 3: TSAT (ChoiceButtons, auto-advance)
           step === 3 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the TSAT?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the TSAT?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Transferrin saturation (normal: 16–45%)'),
             e(ChoiceButton, {
               label: 'Low  ‹ 16%',
@@ -2381,7 +2337,7 @@
           // SCREEN 4: Results
           step === 4 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
                 (() => {
                   const ferr = { veryLow: 'Ferritin ↓↓', lowNormal: 'Ferritin low-normal', normal: 'Ferritin normal', high: 'Ferritin ↑', veryHigh: 'Ferritin ↑↑' }[ferritinResult] || '';
@@ -2402,36 +2358,36 @@
             (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
               title: 'Iron Deficiency',
               defaultOpen: true,
-              infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD', color: 'var(--red)' },
+              infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD' },
                 e('p', { style: { marginBottom: '10px' } }, 'In CKD, iron deficiency thresholds are higher due to impaired iron utilisation with ESA therapy.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'KDIGO thresholds:'), ' TSAT <30% and ferritin <500 µg/L may benefit from IV iron in CKD patients on ESAs.'),
                 e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Kidney Disease: Improving Global Outcomes (KDIGO) Anemia Guideline 2012.')
-              ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure', color: 'var(--red)' },
+              ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure' },
                 e('p', { style: { marginBottom: '10px' } }, 'Iron deficiency in HF is defined as ferritin <100 µg/L, OR ferritin 100–300 µg/L with TSAT <20%.'),
                 e('p', { style: { marginBottom: '10px' } }, 'FAIR-HF and AFFIRM-AHF trials demonstrated improved symptoms, functional capacity, and reduced HF hospitalisations with IV iron.'),
                 e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Ponikowski P et al. Eur Heart J 2016; ESC Heart Failure Guidelines 2021.')
               ) : null
-            }, 'Low ferritin + low TSAT indicates iron deficiency. Transferrin/TIBC will typically be elevated (body upregulating iron transport). Investigate the underlying cause.'),
+            }, 'Low ferritin + low TSAT confirms iron deficiency. Investigate the underlying cause.'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
               title: 'Iron Deficiency Masked by Inflammation',
-              infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies', color: 'var(--red)' },
+              infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
                 e('p', null, e('strong', null, 'Pragmatic approach:'), ' If in doubt and the patient is symptomatic, a trial of IV iron is both diagnostic and therapeutic. If Hb rises, they were iron deficient.')
               )
-            }, 'This is the most common diagnostic trap in hospital medicine. Ferritin appears \'normal\' because inflammation has raised it, but low TSAT reveals inadequate iron delivery to the marrow.'),
+            }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
 
             // Pattern: Ferritin normal + TSAT low (WITHOUT inflammation) = functional or early deficiency
             ferritinResult === 'normal' && tsatResult === 'low' && !hasInflammation && e(DiffListItem, {
               title: 'Functional Iron Deficiency',
-              infoPanel: e(InfoPanel, { title: 'Functional Iron Deficiency', color: 'var(--orange)' },
+              infoPanel: e(InfoPanel, { title: 'Functional Iron Deficiency' },
                 e('p', { style: { marginBottom: '10px' } }, 'Iron stores are present (normal ferritin) but delivery to erythroid precursors is inadequate (low TSAT).'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Common in:'), ' CKD (especially on ESAs), chronic inflammation not reflected in CRP, high erythropoietic demand (haemolysis, bleeding).'),
                 e('p', null, e('strong', null, 'Also consider:'), ' Early true iron deficiency — stores depleting but ferritin not yet fallen. Repeat testing in 4–6 weeks if clinical suspicion.')
               )
-            }, 'Normal ferritin but low TSAT without overt inflammation suggests functional iron deficiency — stores are present but not being mobilised effectively. Consider trial of iron therapy.'),
+            }, 'Stores present but not mobilised effectively. Consider trial of iron therapy.'),
 
             // Pattern: Ferritin low-normal + TSAT normal = borderline stores
             ferritinResult === 'lowNormal' && tsatResult === 'normal' && e(DiffListItem, {
@@ -2448,7 +2404,7 @@
               e(DiffListItem, {
                 title: 'Iron Overload',
                 defaultOpen: true
-              }, 'Elevated ferritin with TSAT >45% (especially >60%) indicates true iron overload. Primary (hereditary haemochromatosis — check HFE gene) or secondary (transfusional, ineffective erythropoiesis, dietary).'),
+              }, 'True iron overload. Check HFE gene for hereditary haemochromatosis.'),
               e(DiffListItem, {
                 title: 'Liver Disease'
               }, 'Damaged hepatocytes leak ferritin into serum. TSAT may be normal or elevated. Check LFTs. Liver disease + iron overload can coexist (e.g. haemochromatosis with cirrhosis).')
@@ -2473,10 +2429,10 @@
             ferritinResult === 'veryHigh' && e(DiffListItem, {
               title: 'Urgent Evaluation Required',
               defaultOpen: true
-            }, 'Ferritin >1000 µg/L narrows the differential significantly. Consider haemophagocytic lymphohistiocytosis (HLH — check triglycerides, fibrinogen, LDH, soluble IL-2R), adult-onset Still\'s disease (quotidian fevers, rash, arthritis), hepatic necrosis, or massive iron overload.'),
+            }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, or massive iron overload. Check triglycerides, fibrinogen, LDH.'),
 
             // Causes of iron deficiency
-            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'Causes of Iron Deficiency', color: 'var(--red)' },
+            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'Causes of Iron Deficiency' },
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Blood loss:'),
               e('p', { style: { marginBottom: '10px' } }, 'GI (occult or overt) · Menstrual · Urinary (rare) · Blood donation · Surgical'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Reduced absorption:'),
@@ -2488,7 +2444,7 @@
             ),
 
             // Haemochromatosis detail
-            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(InfoPanel, { title: 'Hereditary Haemochromatosis', color: 'var(--orange)' },
+            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(InfoPanel, { title: 'Hereditary Haemochromatosis' },
               e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'When to check HFE gene:'), ' TSAT >45% on two separate occasions warrants HFE genotyping.'),
               e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y homozygosity:'), ' Diagnostic for hereditary haemochromatosis. ~30% penetrance — not all homozygotes develop clinical iron overload.'),
               e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y/H63D compound heterozygotes:'), ' Lower risk of iron overload. Usually only significant if other liver insults present.'),
@@ -2496,7 +2452,7 @@
             ),
 
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--red)', onClick: resetModule }),
+              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
                 style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
@@ -2573,23 +2529,22 @@
         if (!value) return null;
         const v = parseFloat(value);
         let interp = 'Normal';
-        let color = 'var(--green)';
-        if (name === 'PT' && v > 13.5) { interp = 'Prolonged'; color = 'var(--orange)'; }
-        if (name === 'APTT' && v > 38) { interp = 'Prolonged'; color = 'var(--orange)'; }
-        if (name === 'Fibrinogen' && v < 2.0) { interp = 'Low'; color = 'var(--red)'; }
-        if (name === 'Platelets' && v < 150) { interp = 'Low'; color = 'var(--red)'; }
-        if (name === 'D-dimer' && v > 0.5) { interp = 'Elevated'; color = 'var(--orange)'; }
-        return { value: `${value} ${unit}`, interpretation: interp, color };
+        if (name === 'PT' && v > 13.5) { interp = 'Prolonged'; }
+        if (name === 'APTT' && v > 38) { interp = 'Prolonged'; }
+        if (name === 'Fibrinogen' && v < 2.0) { interp = 'Low'; }
+        if (name === 'Platelets' && v < 150) { interp = 'Low'; }
+        if (name === 'D-dimer' && v > 0.5) { interp = 'Elevated'; }
+        return { value: `${value} ${unit}`, interpretation: interp };
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Coagulation', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
         e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--green)' }),
+          e(ProgressBar, { current: step, total: getTotalScreens() }),
 
           // SCREEN 0: What pattern do you see? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Which values are prolonged?'),
+            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Which values are prolonged?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check the PT and APTT on the coag panel'),
             e(ChoiceButton, {
               label: 'Isolated prolonged PT',
@@ -2641,7 +2596,7 @@
           // SCREEN 1: Results
           step === 1 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
+              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
                 pattern === 'A' ? 'Isolated prolonged PT' : pattern === 'B' ? 'Isolated prolonged APTT' : pattern === 'C' ? 'Both PT and APTT prolonged' : 'Both normal'
               )
@@ -2670,20 +2625,20 @@
               e(DiffListItem, {
                 title: 'Heparin',
                 tags: ['Most common in hospital', 'UFH vs LMWH'],
-                infoPanel: e(InfoPanel, { title: 'UFH vs LMWH', color: 'var(--green)' },
+                infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
                   e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Unfractionated heparin (UFH):'), ' Strongly prolongs APTT. Monitor with APTT ratio or anti-Xa level. Reversed with protamine.'),
                   e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'LMWH (enoxaparin, dalteparin):'), ' Minimal effect on APTT — may be normal even at therapeutic doses. Monitor with anti-Xa level (peak 4h post-dose). Protamine partially reverses (~60%).'),
                   e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
                 )
-              }, 'Most common cause of isolated prolonged APTT in hospital. Check whether the patient is on a heparin infusion, prophylactic LMWH, or has a heparin-coated line.'),
+              }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
               e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
-                'X-linked recessive. Severity correlates with factor level: severe <1% (spontaneous bleeds), moderate 1–5%, mild 5–40%. Treat with Factor VIII concentrate or desmopressin (mild). Target levels depend on bleed severity and location.'),
+                'X-linked. Severity correlates with factor level: severe <1%, moderate 1–5%, mild 5–40%.'),
               e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
-                'Clinically identical to Haemophilia A — can only distinguish by factor levels. Treat with Factor IX concentrate (not desmopressin, which has no effect on Factor IX).'),
+                'Clinically identical to Haemophilia A — distinguish by factor levels only.'),
               e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
-                'Most common inherited bleeding disorder (~1% prevalence). vWF stabilises Factor VIII in circulation — low vWF causes secondary Factor VIII deficiency. Check vWF antigen, vWF activity (ristocetin cofactor), and Factor VIII level. Type 1 (most common) responds to desmopressin.'),
+                'Most common inherited bleeding disorder. vWF stabilises Factor VIII — low vWF causes secondary VIII deficiency. Check vWF antigen, activity, and Factor VIII.'),
               e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
-                'Common in Ashkenazi Jewish populations (up to 8% carrier rate). Bleeding risk does not correlate well with factor level — some patients with very low levels bleed minimally. Unpredictable post-surgical bleeding is the main concern.'),
+                'Common in Ashkenazi Jewish populations. Bleeding risk poorly correlates with factor level.'),
               e(DiffListItem, {
                 title: 'Factor XII Deficiency',
                 tags: ['NO bleeding risk', 'Do NOT delay surgery'],
@@ -2692,16 +2647,16 @@
               e(DiffListItem, {
                 title: 'Lupus Anticoagulant',
                 tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
-              }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo. Paradoxical — the lab looks like a bleeding risk but the clinical risk is clotting.'),
+              }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo — the clinical risk is clotting, not bleeding.'),
               e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
-                'Direct thrombin inhibitor. Prolongs APTT and strongly prolongs thrombin time (TT). Normal TT effectively excludes clinically significant dabigatran effect. Specific reversal: idarucizumab (Praxbind).'),
+                'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.'),
               e(DiffListItem, {
                 title: 'Acquired Factor VIII Inhibitor',
                 tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
                 defaultOpen: true,
                 warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
-              }, 'Autoantibody against Factor VIII. Characteristically presents in elderly patients or postpartum. APTT does not correct with mixing study (time-dependent inhibitor — Bethesda assay at 2 hours). Factor VIII level very low. Distinct from congenital haemophilia. Requires immunosuppression + bypassing agents.'),
-              e(InfoPanel, { title: 'The Mixing Study', color: 'var(--green)' },
+              }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. APTT does not correct on mixing study. Contact haematology immediately.'),
+              e(InfoPanel, { title: 'The Mixing Study' },
                 e('p', { style: { marginBottom: '8px' } }, 'When APTT is prolonged, mix 1:1 patient plasma with normal plasma:'),
                 e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
                 e('p', null, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate: lupus anticoagulant, heparin. Time-dependent (2h): acquired Factor VIII inhibitor (serious).', e('br'), 'If patient is on heparin, the mixing study is useless.')
@@ -2731,34 +2686,34 @@
                 ),
                 e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
                 e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
-                calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)' })
+                calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
               ),
               e(DiffListItem, {
                 title: 'Severe Liver Disease',
                 tags: ['Impaired synthesis', 'Factor VIII normal/↑ (distinguishes from DIC)'],
-                infoPanel: e(InfoPanel, { title: 'Liver vs DIC', color: 'var(--green)' },
+                infoPanel: e(InfoPanel, { title: 'Liver vs DIC' },
                   e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
                   e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Factor VIII is the key.'), ' Normal/high in liver disease (Factor VIII made by endothelium). Low in DIC (consumed).'),
                   e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
                 )
               }),
               e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] },
-                'Occurs after large-volume resuscitation with crystalloid, colloid, or packed red cells without adequate FFP and platelets. Follow massive transfusion protocol — aim for FFP:RBC ratio of at least 1:2.'),
+                'Dilution of factors and platelets after large-volume resuscitation. Follow massive transfusion protocol.'),
               e(DiffListItem, {
                 title: 'TTP / HUS',
                 tags: ['ADAMTS13', 'Schistocytes', 'Fibrinogen NORMAL', 'Haematology emergency'],
                 warning: 'If schistocytes on blood film + thrombocytopenia + AKI or neurological features → suspect TTP until proven otherwise. Do NOT delay plasma exchange for ADAMTS13 result.'
-              }, 'Thrombotic thrombocytopenic purpura and haemolytic uraemic syndrome cause microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen is typically NORMAL in TTP (minimal consumption coagulopathy). Check blood film for schistocytes, LDH, haptoglobin, ADAMTS13 activity.'),
+              }, 'Microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen typically NORMAL.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] },
-                'Severe deficiency affects Factors II, VII, IX, and X — prolonging both PT (extrinsic) and APTT (intrinsic). Common causes: prolonged malnutrition, warfarin (iatrogenic). IV vitamin K produces measurable improvement in 6–8 hours.'),
+                'Affects Factors II, VII, IX, X — prolonging both pathways. IV vitamin K improves within 6–8 hours.'),
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] },
-                'Very high INR with both PT and APTT prolonged. If no active bleeding: hold warfarin, oral vitamin K 1–2 mg. If active bleeding: IV vitamin K + prothrombin complex concentrate (PCC) for immediate reversal. FFP is second-line.'),
+                'Very high INR. If bleeding: IV vitamin K + PCC. If not bleeding: hold warfarin, oral vitamin K 1–2 mg.'),
               e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
-                'At high levels, direct thrombin inhibitors prolong both APTT and PT. For dabigatran: check Hemoclot assay, reverse with idarucizumab. For argatroban (IV, used in HIT): reduce infusion rate, no specific reversal.'),
+                'At high levels, prolongs both APTT and PT. Dabigatran: reverse with idarucizumab. Argatroban: reduce infusion.'),
               e(DiffListItem, {
                 title: 'Isolated Hypofibrinogenaemia',
                 tags: ['Congenital', 'Acquired', 'L-asparaginase', 'Liver failure']
-              }, 'Fibrinogen <1.5 g/L with relatively preserved PT/APTT suggests isolated hypofibrinogenaemia. Congenital: afibrinogenaemia, hypofibrinogenaemia, dysfibrinogenaemia. Acquired: L-asparaginase therapy, severe liver disease, massive transfusion. Check thrombin time (prolonged) and reptilase time (distinguishes heparin effect).')
+              }, 'Fibrinogen <1.5 g/L with preserved PT/APTT. Congenital or acquired (L-asparaginase, liver disease, massive transfusion).')
             ),
 
             // Pattern D: Both normal
@@ -2767,34 +2722,34 @@
                 title: 'Antiplatelet Drug Effect',
                 tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor', 'Most common cause'],
                 defaultOpen: true
-              }, 'Antiplatelet agents cause clinically significant bleeding with completely normal PT and APTT. This is the most common cause of "normal coags but bleeding" — always take a thorough medication history including over-the-counter aspirin and NSAIDs.'),
+              }, 'Most common cause of \'normal coags but bleeding\'. Always check medication history including OTC aspirin and NSAIDs.'),
               e(DiffListItem, {
                 title: 'Thrombocytopenia or Platelet Dysfunction',
                 tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
-              }, 'Low platelet count or dysfunctional platelets (uraemia, myelodysplasia, inherited platelet disorders). PT and APTT are normal because they only test the coagulation cascade, not primary haemostasis.'),
+              }, 'PT and APTT only test the coagulation cascade, not primary haemostasis. Check platelet count and function.'),
               e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
-                'Mild Type 1 vWD may have a normal APTT because Factor VIII remains above the threshold for APTT prolongation (~30%). Always check vWF antigen, vWF activity, and Factor VIII level if vWD is suspected clinically.'),
+                'Mild vWD may not prolong APTT. Always check vWF antigen, activity, and Factor VIII if suspected.'),
               e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] },
-                'Factor XIII cross-links fibrin after clot formation. Deficiency means the clot forms normally (PT/APTT normal) but is unstable and breaks down. Classic presentation: delayed bleeding 24–48h post-surgery, umbilical stump bleeding in neonates. Diagnose with urea clot lysis test or Factor XIII level.'),
+                'Factor XIII cross-links fibrin after clot formation. Classic: delayed bleeding 24–48h post-surgery. Diagnose with urea clot lysis test.'),
               e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
-                'Vascular fragility from connective tissue disorders (Ehlers-Danlos, Marfan), vasculitis (Henoch-Schönlein purpura, other small-vessel vasculitides), or scurvy (vitamin C deficiency — perifollicular haemorrhage, corkscrew hairs). All have normal coagulation studies.')
+                'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.')
             ),
 
-            e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?', color: 'var(--green)' },
+            e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?' },
               e('p', { style: { marginBottom: '10px' } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem:'),
-              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } },
+              e('p', { style: { marginBottom: '10px' } },
                 e('strong', null, 'Dabigatran (direct thrombin inhibitor):'), ' Prolongs APTT and thrombin time. Thrombin time is very sensitive — if normal, dabigatran effect is excluded. For quantification: dilute thrombin time (Hemoclot).'
               ),
-              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } },
+              e('p', { style: { marginBottom: '10px' } },
                 e('strong', null, 'Rivaroxaban / Apixaban (anti-Xa):'), ' May prolong PT (rivaroxaban > apixaban). Standard PT/APTT are unreliable for measuring effect. Use calibrated anti-Xa level.'
               ),
-              e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px' } },
+              e('p', null,
                 e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
               )
             ),
 
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--green)', onClick: resetModule }),
+              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
               e('button', {
                 onClick: onBack,
                 style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
@@ -2854,7 +2809,7 @@
               gap: '10px',
               padding: '12px',
               background: hasChecked ? 'rgba(0,113,227,0.1)' : 'var(--sep)',
-              border: hasChecked ? '1px solid var(--blue)' : '1px solid var(--sep)',
+              border: hasChecked ? '1px solid var(--accent)' : '1px solid var(--sep)',
               borderRadius: '10px',
               cursor: 'pointer',
               marginBottom: '16px'
@@ -2866,7 +2821,7 @@
                 height: '20px',
                 borderRadius: '4px',
                 border: hasChecked ? 'none' : '2px solid var(--label4)',
-                background: hasChecked ? 'var(--blue)' : 'var(--card)',
+                background: hasChecked ? 'var(--accent)' : 'var(--card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -2886,7 +2841,7 @@
               padding: '14px',
               fontSize: '15px',
               fontWeight: '600',
-              background: hasChecked ? 'var(--blue)' : 'var(--label4)',
+              background: hasChecked ? 'var(--accent)' : 'var(--label4)',
               color: hasChecked ? 'white' : 'var(--label3)',
               border: 'none',
               borderRadius: '10px',
@@ -2940,7 +2895,7 @@
           e('p', { style: paraStyle }, 'You agree to indemnify and hold harmless Critical Condition from all claims arising from your use of this application.'),
 
           e('h3', { style: sectionStyle }, '10. EMERGENCY WARNING'),
-          e('p', { style: { ...paraStyle, padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', color: 'var(--red)' } },
+          e('p', { style: { ...paraStyle, padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px' } },
             e('strong', null, 'DO NOT USE IN EMERGENCIES.'), ' Call emergency services (000/911/999/112) immediately.'
           ),
 
