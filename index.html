@@ -110,10 +110,10 @@
 
     // Module data
     const modules = [
-      { id: "hypona", name: "Hyponatraemia", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6 0%, #6D3BD4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
-      { id: "tft", name: "Thyroid Function", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
-      { id: "iron", name: "Iron Studies", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Ferritin, TSAT & the inflammation trap", tag: "Fe" },
-      { id: "coag", name: "Coagulation", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT & APTT — from pattern to diagnosis", tag: "Coag" }
+      { id: "hypona", name: "Hyponatraemia", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6 0%, #6D3BD4 100%)", tag: "Na⁺" },
+      { id: "tft", name: "Thyroid Function", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", tag: "TFT" },
+      { id: "iron", name: "Iron Studies", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", tag: "Fe" },
+      { id: "coag", name: "Coagulation", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", tag: "Coag" }
     ];
 
     // Reference ranges
@@ -491,7 +491,7 @@
           items.map((item, i) => e(React.Fragment, { key: i },
             i > 0 && e('span', { style: { color: 'var(--label3)', margin: '0 8px', fontSize: '12px' } }, '·'),
             e('span', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', marginRight: '4px' } }, item.label),
-            e('span', { style: { fontSize: '14px', fontWeight: 700, color: item.color || 'var(--label)' } }, item.value)
+            e('span', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label2)' } }, item.value)
           ))
         )
       );
@@ -1088,10 +1088,7 @@
             e('div', null,
               e('div', {
                 style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--label)' }
-              }, 'LabLogic'),
-              e('div', {
-                style: { fontSize: '14px', fontWeight: 500, color: 'var(--label3)' }
-              }, 'Lab interpretation, step by step')
+              }, 'LabLogic')
             )
           )
         ),
@@ -1152,10 +1149,7 @@
                 e('div', { style: { flex: 1 } },
                   e('div', {
                     style: { fontSize: '16px', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--label)' }
-                  }, mod.name),
-                  e('div', {
-                    style: { fontSize: '13px', color: 'var(--label3)', marginTop: '2px' }
-                  }, mod.desc)
+                  }, mod.name)
                 ),
                 // Tag + chevron
                 e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 } },
@@ -1282,9 +1276,6 @@
 
           // SCREEN 0: Is the patient acutely unwell? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
-              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
-            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient acutely unwell?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
@@ -1310,7 +1301,8 @@
             }),
             acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
               e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause ↓fT3, ↓fT4, and ↓TSH in acute illness. Do NOT diagnose or treat thyroid disease from TFTs in acute illness unless TSH is markedly abnormal (>20 or <0.1).'
-            )
+            ),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
 
           // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
@@ -1599,18 +1591,6 @@
               )
             ),
 
-            // When Interpretation Requires Endocrinology Input
-            e(InfoPanel, { title: 'When Interpretation Requires Endocrinology Input', color: 'var(--purple)' },
-              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
-                e('li', null, 'Suspected central hypothyroidism (low TSH + low fT4)'),
-                e('li', null, 'Discordant results suggesting assay interference'),
-                e('li', null, 'TSH-secreting pituitary adenoma (high TSH + high fT4)'),
-                e('li', null, 'Thyroid storm or myxoedema coma (emergencies)'),
-                e('li', null, 'Pregnancy with abnormal TFTs'),
-                e('li', null, 'Amiodarone-induced thyroid dysfunction')
-              )
-            ),
-
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, {
                 label: 'New Analysis',
@@ -1830,9 +1810,6 @@
 
           // SCREEN 0: Serum sodium (ValueInput, Next button)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
-              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
-            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'What is the serum sodium?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines the severity'),
             e(ValueInput, {
@@ -1849,7 +1826,8 @@
               disabled: !naValue,
               color: 'var(--blue)',
               onClick: () => goToStep(1)
-            })
+            }),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
 
           // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
@@ -1899,7 +1877,6 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Determines whether this is true hyponatraemia'),
             e(ChoiceButton, {
               label: 'Low  ‹ 275 mOsm/kg',
-              sublabel: 'True hyponatraemia — continue workup',
               selected: serumOsmResult === 'low',
               onClick: () => {
                 clearAutoAdvance();
@@ -1910,7 +1887,6 @@
             }),
             e(ChoiceButton, {
               label: 'Normal  275–295 mOsm/kg',
-              sublabel: 'Pseudohyponatraemia',
               selected: serumOsmResult === 'normal',
               onClick: () => {
                 clearAutoAdvance();
@@ -1921,7 +1897,6 @@
             }),
             e(ChoiceButton, {
               label: 'High  › 295 mOsm/kg',
-              sublabel: 'Dilutional — check glucose',
               selected: serumOsmResult === 'high',
               onClick: () => {
                 clearAutoAdvance();
@@ -1932,7 +1907,6 @@
             }),
             e(ChoiceButton, {
               label: 'Not available',
-              sublabel: 'Will assume hypotonic',
               selected: serumOsmResult === 'skip',
               onClick: () => {
                 clearAutoAdvance();
@@ -2009,7 +1983,6 @@
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Is the kidney diluting appropriately?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 100 mOsm/kg',
-              sublabel: 'Kidneys diluting — problem is excess water',
               selected: urineOsmResult === 'low',
               onClick: () => {
                 clearAutoAdvance();
@@ -2020,7 +1993,6 @@
             }),
             e(ChoiceButton, {
               label: 'High  › 100 mOsm/kg',
-              sublabel: 'ADH is active — kidneys can\'t dilute',
               selected: urineOsmResult === 'high',
               onClick: () => {
                 clearAutoAdvance();
@@ -2114,8 +2086,6 @@
               { label: 'Urine Osm', ...getUrineOsmDisplay() },
               { label: 'Urine Na', ...getUrineNaDisplay() }
             ] }),
-
-            e(WarningBanner, null, e('strong', null, 'Always exclude adrenal insufficiency.'), ' Check morning cortisol (or short synacthen test) in any unexplained hyponatraemia — it is one of the most dangerous missed diagnoses.'),
 
             e('div', {
               style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
@@ -2215,6 +2185,8 @@
               )
             ),
 
+            e(WarningBanner, null, e('strong', null, 'Always exclude adrenal insufficiency.'), ' Check morning cortisol (or short synacthen test) in any unexplained hyponatraemia — it is one of the most dangerous missed diagnoses.'),
+
             e(LearnMoreDivider),
 
             e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
@@ -2227,19 +2199,6 @@
                 e('li', null, 'Hypokalaemia'),
                 e('li', null, 'Malnutrition or alcoholism'),
                 e('li', null, 'Advanced liver disease')
-              )
-            ),
-
-            e(InfoPanel, { title: 'When Interpretation Requires Nephrology/Endocrinology Input', color: 'var(--purple)' },
-              e('p', { style: { marginBottom: '8px' } }, 'Consider specialist consultation for:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
-                e('li', null, 'Severe hyponatraemia (<120 mmol/L) or symptomatic hyponatraemia'),
-                e('li', null, 'Uncertain aetiology after initial workup'),
-                e('li', null, 'Suspected SIADH — to confirm diagnosis and identify underlying cause'),
-                e('li', null, 'Suspected adrenal insufficiency — for endocrine workup'),
-                e('li', null, 'Cerebral salt wasting vs SIADH distinction — volume status assessment'),
-                e('li', null, 'Chronic hyponatraemia with risk factors for ODS'),
-                e('li', null, 'Recurrent or refractory hyponatraemia')
               )
             ),
 
@@ -2352,9 +2311,6 @@
 
           // SCREEN 0: Is the patient inflamed? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
-              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
-            ),
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient inflamed?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
@@ -2378,7 +2334,8 @@
               },
               color: 'var(--green)'
             }),
-            hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.')
+            hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
 
           // SCREEN 1: CKD or heart failure? (ChoiceButtons, auto-advance)
@@ -2705,16 +2662,6 @@
               e('p', null, e('strong', null, 'Family screening:'), ' First-degree relatives of confirmed cases should have iron studies and HFE genotyping.')
             ),
 
-            // When interpretation requires haematology
-            e(InfoPanel, { title: 'When Interpretation Requires Haematology Input', color: 'var(--red)' },
-              e('ul', { style: { marginLeft: '16px' } },
-                e('li', null, e('strong', null, 'Ferritin >1000 µg/L'), ' — HLH workup, malignancy screen'),
-                e('li', null, e('strong', null, 'Unexplained iron overload'), ' — haemochromatosis assessment, secondary causes'),
-                e('li', null, e('strong', null, 'Non-response to iron therapy'), ' — absorption issues, ongoing loss, incorrect diagnosis'),
-                e('li', null, e('strong', null, 'Complex inflammation + suspected deficiency'), ' — sTfR, bone marrow assessment')
-              )
-            ),
-
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', color: 'var(--red)', onClick: resetModule }),
               e('button', {
@@ -2817,9 +2764,6 @@
 
           // SCREEN 0: Is the patient bleeding? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '12px', textAlign: 'center' } },
-              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
-            ),
             e(InfoPanel, { title: 'Sample Artefacts', color: 'var(--blue)', collapsed: true },
               e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Common causes of spurious coag results:'),
               e('p', { style: { marginBottom: '6px' } }, e('strong', null, 'Underfilled tube:'), ' Citrate excess relative to blood prolongs PT/APTT. Reject samples <80% filled.'),
@@ -2864,7 +2808,8 @@
               color: 'var(--orange)'
             }),
             clinicalContext === 'bleeding' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Active bleeding.'), ' Prioritise haemostasis — identify and treat the cause.'),
-            clinicalContext === 'preOp' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Bleeding history is more predictive than coags.'), ' A structured bleeding history (prior surgery, dental extractions, trauma, menstrual history) predicts surgical bleeding risk better than routine coagulation tests.')
+            clinicalContext === 'preOp' && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Bleeding history is more predictive than coags.'), ' A structured bleeding history (prior surgery, dental extractions, trauma, menstrual history) predicts surgical bleeding risk better than routine coagulation tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
           ),
 
           // SCREEN 1: What pattern do you see? (ChoiceButtons, auto-advance)
@@ -3118,20 +3063,6 @@
               ),
               e('div', { style: { background: 'rgba(48,209,88,0.08)', borderRadius: '10px', padding: '10px 12px' } },
                 e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
-              )
-            ),
-
-            e(InfoPanel, { title: 'When Interpretation Requires Haematology Input', color: 'var(--purple)' },
-              e('p', { style: { marginBottom: '8px' } }, 'Consider haematology consultation for:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
-                e('li', null, 'Suspected acquired Factor VIII inhibitor (elderly with new bleeding + very prolonged APTT that doesn\'t correct)'),
-                e('li', null, 'Unexplained prolonged APTT with bleeding — mixing study interpretation'),
-                e('li', null, 'Congenital factor deficiency suspected (young patient, family history)'),
-                e('li', null, 'ISTH DIC score ≥5 in a patient with unclear underlying cause'),
-                e('li', null, 'Thrombocytopenia + schistocytes (TTP/HUS must be excluded urgently)'),
-                e('li', null, 'Coagulopathy with normal PT/APTT — Factor XIII deficiency, platelet function disorders'),
-                e('li', null, 'Isolated low fibrinogen (<1.5 g/L) without explanation'),
-                e('li', null, 'Pre-operative patient with bleeding history but normal coags')
               )
             ),
 
