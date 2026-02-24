@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#F2F2F7">
+  <meta name="theme-color" content="#f5f5f7">
   <title>LabLogic</title>
   <style>
     :root {
-      --bg: #F2F2F7;
+      --bg: #f5f5f7;
       --card: #FFFFFF;
-      --label: #1C1C1E;
-      --label2: #3A3A3C;
-      --label3: #8E8E93;
-      --label4: #C7C7CC;
-      --sep: rgba(60,60,67,0.08);
-      --blue: #8B5CF6;
+      --label: #1d1d1f;
+      --label2: #424245;
+      --label3: #86868b;
+      --label4: #d2d2d7;
+      --sep: rgba(0,0,0,0.08);
+      --blue: #0071e3;
       --green: #30D158;
-      --orange: #F59E0B;
+      --orange: #ff9f0a;
       --red: #FF453A;
       --purple: #AF52DE;
       --cyan: #06B6D4;
@@ -29,29 +29,29 @@
       --radius-xs: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 8px 24px rgba(0,0,0,0.06);
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03);
-      --nav-bg: rgba(242,242,247,0.92);
+      --nav-bg: rgba(245,245,247,0.92);
       --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
     }
 
     @media (prefers-color-scheme: dark) {
       :root {
-        --bg: #1C1C1E;
-        --card: #2C2C2E;
-        --label: #FFFFFF;
-        --label2: #EBEBF5;
-        --label3: #8E8E93;
-        --label4: #48484A;
-        --sep: rgba(84,84,88,0.65);
+        --bg: #1d1d1f;
+        --card: #2c2c2e;
+        --label: #f5f5f7;
+        --label2: #e8e8ed;
+        --label3: #86868b;
+        --label4: #424245;
+        --sep: rgba(255,255,255,0.08);
         --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.3);
         --shadow-sm: 0 1px 2px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.15);
-        --nav-bg: rgba(28,28,30,0.92);
+        --nav-bg: rgba(29,29,31,0.92);
       }
       body { background: #000000; }
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; -webkit-tap-highlight-color: transparent; }
-    body { font-family: var(--font); background: #E5E5EA; color: var(--label); }
+    body { font-family: var(--font); background: var(--bg); color: var(--label); }
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
@@ -110,12 +110,10 @@
 
     // Module data
     const modules = [
-      { id: "hypona", name: "Hyponatraemia", icon: "💧", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6 0%, #6D3BD4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
-      { id: "tft", name: "Thyroid Function", icon: "🦋", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
-      { id: "iron", name: "Iron Studies", icon: "🩸", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Ferritin, TSAT & the inflammation trap", tag: "Fe" },
-      { id: "coag", name: "Coagulation", icon: "🔬", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT & APTT — from pattern to diagnosis", tag: "Coag" },
-      { id: "aki", name: "Urine Biochem", icon: "⚗️", color: "#06B6D4", gradient: "linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)", desc: "Pre-renal vs intrinsic — FENa calculator", tag: "AKI", beta: true },
-      { id: "nacorr", name: "Na Correction Rate", icon: "📈", color: "#5E5CE6", gradient: "linear-gradient(135deg, #5E5CE6 0%, #4B48B8 100%)", desc: "Track serial sodium measurements", tag: "Tool" }
+      { id: "hypona", name: "Hyponatraemia", color: "#8B5CF6", gradient: "linear-gradient(135deg, #8B5CF6 0%, #6D3BD4 100%)", desc: "Sodium workup algorithm", tag: "Na⁺" },
+      { id: "tft", name: "Thyroid Function", color: "#AF52DE", gradient: "linear-gradient(135deg, #AF52DE 0%, #8B3FC1 100%)", desc: "TSH-first interpretation", tag: "TFT" },
+      { id: "iron", name: "Iron Studies", color: "#FF453A", gradient: "linear-gradient(135deg, #FF453A 0%, #D42020 100%)", desc: "Ferritin, TSAT & the inflammation trap", tag: "Fe" },
+      { id: "coag", name: "Coagulation", color: "#30D158", gradient: "linear-gradient(135deg, #30D158 0%, #1FA840 100%)", desc: "PT & APTT — from pattern to diagnosis", tag: "Coag" }
     ];
 
     // Reference ranges
@@ -871,134 +869,6 @@
       );
     }
 
-    // 16. BetaGate (password gate for beta modules)
-    function BetaGate({ moduleName, moduleColor, onSuccess, onBack }) {
-      const [pin, setPin] = useState('');
-      const [shake, setShake] = useState(false);
-      const CORRECT_PIN = '0000';
-
-      const handleDigit = (digit) => {
-        if (pin.length >= 4) return;
-        const newPin = pin + digit;
-        setPin(newPin);
-        if (newPin.length === 4) {
-          if (newPin === CORRECT_PIN) {
-            setTimeout(() => onSuccess(), 200);
-          } else {
-            setShake(true);
-            setTimeout(() => {
-              setShake(false);
-              setPin('');
-            }, 500);
-          }
-        }
-      };
-
-      const handleDelete = () => {
-        setPin(pin.slice(0, -1));
-      };
-
-      const PinDot = ({ filled }) => e('div', {
-        style: {
-          width: '16px',
-          height: '16px',
-          borderRadius: '50%',
-          border: filled ? 'none' : '2px solid var(--label3)',
-          background: filled ? moduleColor : 'transparent',
-          transition: 'all 0.15s ease'
-        }
-      });
-
-      const NumKey = ({ digit, letters }) => e('button', {
-        onClick: () => handleDigit(digit),
-        style: {
-          width: '75px',
-          height: '75px',
-          borderRadius: '50%',
-          background: 'var(--card)',
-          border: '1px solid var(--sep)',
-          cursor: 'pointer',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: 'var(--font)',
-          transition: 'transform 0.1s ease, background 0.1s ease'
-        }
-      },
-        e('span', { style: { fontSize: '28px', fontWeight: 300, color: 'var(--label)' } }, digit),
-        letters && e('span', { style: { fontSize: '10px', fontWeight: 500, color: 'var(--label3)', letterSpacing: '2px', marginTop: '-2px' } }, letters)
-      );
-
-      return e('div', { className: 'app-container', style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: moduleName, onBack: onBack }),
-        e('div', { className: 'screen-content', style: { display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '40px' } },
-          e('div', { style: { fontSize: '60px', marginBottom: '16px' } }, '🔒'),
-          e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '6px' } }, 'Beta Module'),
-          e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '32px' } }, 'Enter access code'),
-
-          // PIN dots
-          e('div', {
-            style: {
-              display: 'flex',
-              gap: '20px',
-              marginBottom: '40px',
-              animation: shake ? 'shake 0.5s ease' : 'none'
-            }
-          },
-            e(PinDot, { filled: pin.length >= 1 }),
-            e(PinDot, { filled: pin.length >= 2 }),
-            e(PinDot, { filled: pin.length >= 3 }),
-            e(PinDot, { filled: pin.length >= 4 })
-          ),
-
-          // Numeric keypad
-          e('div', { style: { display: 'flex', flexDirection: 'column', gap: '12px' } },
-            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
-              e(NumKey, { digit: '1', letters: '' }),
-              e(NumKey, { digit: '2', letters: 'ABC' }),
-              e(NumKey, { digit: '3', letters: 'DEF' })
-            ),
-            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
-              e(NumKey, { digit: '4', letters: 'GHI' }),
-              e(NumKey, { digit: '5', letters: 'JKL' }),
-              e(NumKey, { digit: '6', letters: 'MNO' })
-            ),
-            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
-              e(NumKey, { digit: '7', letters: 'PQRS' }),
-              e(NumKey, { digit: '8', letters: 'TUV' }),
-              e(NumKey, { digit: '9', letters: 'WXYZ' })
-            ),
-            e('div', { style: { display: 'flex', gap: '20px', justifyContent: 'center' } },
-              e('div', { style: { width: '75px', height: '75px' } }), // empty spacer
-              e(NumKey, { digit: '0', letters: '' }),
-              e('button', {
-                onClick: handleDelete,
-                style: {
-                  width: '75px',
-                  height: '75px',
-                  borderRadius: '50%',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontFamily: 'var(--font)'
-                }
-              },
-                e('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
-                  e('path', { d: 'M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z' }),
-                  e('line', { x1: '18', y1: '9', x2: '12', y2: '15' }),
-                  e('line', { x1: '12', y1: '9', x2: '18', y2: '15' })
-                )
-              )
-            )
-          )
-        )
-      );
-    }
-
     // Na Correction Rate Calculator (collapsible, used on Hypona results screens)
     function NaCorrectionCalculator({ naEntries, setNaEntries, targetRate, setTargetRate }) {
       const [isOpen, setIsOpen] = useState(false);
@@ -1073,7 +943,17 @@
           }
         },
           e('div', { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
-            e('span', { style: { fontSize: '16px' } }, '📈'),
+            e('div', {
+              style: {
+                width: '32px',
+                height: '32px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #5E5CE6 0%, #4B48B8 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }
+            }, e('span', { style: { fontSize: '11px', fontWeight: 800, color: 'white' } }, 'Na')),
             e('div', null,
               e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Na Correction Rate'),
               e('div', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Track serial measurements')
@@ -1198,16 +1078,16 @@
                 width: '52px',
                 height: '52px',
                 borderRadius: '14px',
-                background: 'linear-gradient(145deg, #1C1C1E, #3A3A3C)',
+                background: 'linear-gradient(135deg, var(--blue) 0%, #0077ed 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)'
+                boxShadow: '0 4px 12px rgba(0,113,227,0.25)'
               }
-            }, e('span', { style: { fontSize: '26px' } }, '🧬')),
+            }, e('span', { style: { fontSize: '16px', fontWeight: 800, color: 'white' } }, 'Lab')),
             e('div', null,
               e('div', {
-                style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', background: 'linear-gradient(135deg, #8B5CF6, #06B6D4)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
+                style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--label)' }
               }, 'LabLogic'),
               e('div', {
                 style: { fontSize: '14px', fontWeight: 500, color: 'var(--label3)' }
@@ -1267,7 +1147,7 @@
                     boxShadow: `0 3px 10px ${mod.color}30`,
                     flexShrink: 0
                   }
-                }, e('span', { style: { fontSize: '22px' } }, mod.icon)),
+                }, e('span', { style: { fontSize: '14px', fontWeight: 800, color: 'white' } }, mod.tag)),
                 // Text
                 e('div', { style: { flex: 1 } },
                   e('div', {
@@ -1804,213 +1684,6 @@
                 e('li', null, 'No eye signs (unlike Graves\')'),
                 e('li', null, 'Often painless (unlike subacute thyroiditis)')
               )
-            )
-          )
-        )
-      );
-    }
-
-    // ========== NA CORRECTION RATE MODULE ==========
-
-    function NaCorrectionModule({ onBack }) {
-      const containerRef = useRef(null);
-      const [targetRate, setTargetRate] = useState(10);
-
-      const getCurrentDateTime = () => {
-        const now = new Date();
-        const date = now.toISOString().split('T')[0];
-        const time = now.toTimeString().slice(0, 5);
-        return { date, time };
-      };
-
-      const [naEntries, setNaEntries] = useState(() => {
-        const { date, time } = getCurrentDateTime();
-        return [{ na: '', date, time }, { na: '', date, time }];
-      });
-
-      const updateEntry = (index, field, value) => {
-        setNaEntries(prev => prev.map((entry, i) => i === index ? { ...entry, [field]: value } : entry));
-      };
-
-      const addEntry = () => {
-        const { date, time } = getCurrentDateTime();
-        setNaEntries(prev => [...prev, { na: '', date, time }]);
-      };
-
-      const removeEntry = (index) => {
-        if (naEntries.length > 2) {
-          setNaEntries(prev => prev.filter((_, i) => i !== index));
-        }
-      };
-
-      const resetModule = () => {
-        const { date, time } = getCurrentDateTime();
-        setNaEntries([{ na: '', date, time }, { na: '', date, time }]);
-        setTargetRate(10);
-        if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
-      };
-
-      const calculateCorrectionRate = () => {
-        const validEntries = naEntries
-          .filter(entry => entry.na && entry.date && entry.time)
-          .map(entry => ({
-            na: parseFloat(entry.na),
-            timestamp: new Date(`${entry.date}T${entry.time}`).getTime()
-          }))
-          .filter(entry => !isNaN(entry.na) && !isNaN(entry.timestamp))
-          .sort((a, b) => a.timestamp - b.timestamp);
-
-        if (validEntries.length < 2) return null;
-
-        const first = validEntries[0];
-        const last = validEntries[validEntries.length - 1];
-        const hoursElapsed = (last.timestamp - first.timestamp) / (1000 * 60 * 60);
-        if (hoursElapsed <= 0) return null;
-
-        const naChange = last.na - first.na;
-        const ratePerHour = naChange / hoursElapsed;
-        const ratePer24h = ratePerHour * 24;
-
-        return {
-          naChange: naChange.toFixed(1),
-          hoursElapsed: hoursElapsed.toFixed(1),
-          ratePerHour: ratePerHour.toFixed(2),
-          ratePer24h: ratePer24h.toFixed(1),
-          exceeds: Math.abs(ratePer24h) > targetRate
-        };
-      };
-
-      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Na Correction Rate', onBack: onBack, rightAction: e(HomeButton, { onClick: onBack }) }),
-        e('div', { className: 'screen-content' },
-          e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Track sodium correction'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '16px' } }, 'Enter serial sodium measurements to monitor correction rate'),
-
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '10px 12px', borderRadius: '8px', marginBottom: '16px', lineHeight: '1.5' } },
-              'This tool monitors sodium correction rate. Correction targets should be determined by the treating team based on chronicity, symptoms, and risk factors.'
-            ),
-
-            // Target rate selector
-            e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' } },
-              e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Alert threshold:'),
-              e('select', {
-                value: targetRate,
-                onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
-                style: { padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-              },
-                e('option', { value: 6 }, '6 mmol/24h'),
-                e('option', { value: 8 }, '8 mmol/24h'),
-                e('option', { value: 10 }, '10 mmol/24h'),
-                e('option', { value: 12 }, '12 mmol/24h')
-              )
-            ),
-
-            // Na entries
-            e('div', { style: { marginBottom: '12px' } },
-              naEntries.map((entry, index) => e('div', {
-                key: index,
-                style: { display: 'flex', gap: '6px', alignItems: 'flex-end', marginBottom: '10px', background: 'var(--card)', padding: '12px', borderRadius: '12px', border: '1px solid var(--sep)' }
-              },
-                e('div', { style: { flex: '1' } },
-                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, `Na #${index + 1}`),
-                  e('input', {
-                    type: 'number', inputMode: 'decimal', value: entry.na,
-                    onChange: (ev) => updateEntry(index, 'na', ev.target.value),
-                    placeholder: 'mmol/L',
-                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '16px', fontFamily: 'var(--font)' }
-                  })
-                ),
-                e('div', { style: { flex: '1' } },
-                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, 'Date'),
-                  e('input', {
-                    type: 'date', value: entry.date,
-                    onChange: (ev) => updateEntry(index, 'date', ev.target.value),
-                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-                  })
-                ),
-                e('div', { style: { flex: '0.7' } },
-                  e('label', { style: { fontSize: '11px', color: 'var(--label3)', display: 'block', marginBottom: '4px' } }, 'Time'),
-                  e('input', {
-                    type: 'time', value: entry.time,
-                    onChange: (ev) => updateEntry(index, 'time', ev.target.value),
-                    style: { width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--bg)', color: 'var(--label)', fontSize: '14px', fontFamily: 'var(--font)' }
-                  })
-                ),
-                naEntries.length > 2 && e('button', {
-                  onClick: () => removeEntry(index),
-                  style: { padding: '10px 12px', background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '18px', minWidth: '40px' }
-                }, '×')
-              ))
-            ),
-
-            e('button', {
-              onClick: addEntry,
-              style: { width: '100%', padding: '12px', background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '10px', color: 'var(--blue)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font)', marginBottom: '16px' }
-            }, '+ Add measurement'),
-
-            // Results display
-            calculateCorrectionRate() && e('div', {
-              style: {
-                background: calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.08)' : 'rgba(52,199,89,0.08)',
-                border: `1px solid ${calculateCorrectionRate().exceeds ? 'rgba(255,69,58,0.3)' : 'rgba(52,199,89,0.3)'}`,
-                borderRadius: '14px',
-                padding: '16px',
-                marginBottom: '16px'
-              }
-            },
-              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)', marginBottom: '12px' } }, 'Correction Rate'),
-              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
-                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Na change:'),
-                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().naChange} mmol/L`)
-              ),
-              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
-                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Time elapsed:'),
-                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().hoursElapsed} hours`)
-              ),
-              e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: '8px' } },
-                e('span', { style: { fontSize: '13px', color: 'var(--label3)' } }, 'Rate:'),
-                e('span', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)' } }, `${calculateCorrectionRate().ratePerHour} mmol/L/hr`)
-              ),
-              e('div', { style: { display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid var(--sep)', marginTop: '8px' } },
-                e('span', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Projected 24h rate:'),
-                e('span', {
-                  style: { fontSize: '18px', fontWeight: 800, color: calculateCorrectionRate().exceeds ? 'var(--red)' : 'var(--green)' }
-                }, `${calculateCorrectionRate().ratePer24h} mmol/L`)
-              ),
-              e('div', {
-                style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px', fontStyle: 'italic' }
-              }, 'Projection assumes linear rate — actual correction often slows as Na rises.'),
-              calculateCorrectionRate().exceeds && e('div', {
-                style: { marginTop: '10px', padding: '10px 12px', background: 'rgba(255,69,58,0.12)', borderRadius: '8px', fontSize: '12px', color: 'var(--red)', fontWeight: 600 }
-              }, `Exceeds alert threshold of ${targetRate} mmol/24h`)
-            ),
-
-            !calculateCorrectionRate() && e('div', {
-              style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '20px', textAlign: 'center', marginBottom: '16px' }
-            },
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)' } }, 'Enter at least 2 measurements to calculate correction rate')
-            ),
-
-            e(InfoPanel, { title: 'About Osmotic Demyelination Syndrome (ODS)', color: 'var(--orange)' },
-              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
-              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
-                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
-                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
-                e('li', null, 'Hypokalaemia'),
-                e('li', null, 'Malnutrition or alcoholism'),
-                e('li', null, 'Advanced liver disease')
-              )
-            ),
-
-            e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'Reset', color: 'var(--indigo)', onClick: resetModule }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
             )
           )
         )
@@ -3054,283 +2727,6 @@
       );
     }
 
-    // ========== AKI / URINE BIOCHEM MODULE ==========
-
-    function AKIModule({ onBack }) {
-      const containerRef = useRef(null);
-      const [step, setStep] = useState(0);
-      const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
-
-      // Screen 0: Diuretics?
-      const [onDiuretics, setOnDiuretics] = useState(null);
-      // Screen 1: FENa inputs
-      const [urineNa, setUrineNa] = useState('');
-      const [urineCr, setUrineCr] = useState('');
-      const [serumNa, setSerumNa] = useState('');
-      const [serumCr, setSerumCr] = useState('');
-      const [urineUrea, setUrineUrea] = useState('');
-      const [serumUrea, setSerumUrea] = useState('');
-      const [urineOsm, setUrineOsm] = useState('');
-      // Screen 2: Calculated + interpretation
-      const [fenaResult, setFenaResult] = useState(null);
-
-      const getTotalScreens = () => 5;
-
-      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
-      const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
-
-      const resetModule = () => {
-        setStep(0);
-        setOnDiuretics(null);
-        setUrineNa('');
-        setUrineCr('');
-        setSerumNa('');
-        setSerumCr('');
-        setUrineUrea('');
-        setSerumUrea('');
-        setUrineOsm('');
-        setFenaResult(null);
-        if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
-      };
-
-      const handleBack = () => {
-        clearAutoAdvance();
-        if (step === 0) onBack();
-        else goToStep(step - 1);
-      };
-
-      // FENa calculation: (UNa × SCr) / (SNa × UCr) × 100
-      // Note: SCr needs to be converted from µmol/L to mmol/L (÷1000)
-      const calcFENa = () => {
-        const una = parseFloat(urineNa);
-        const ucr = parseFloat(urineCr);
-        const sna = parseFloat(serumNa);
-        const scr = parseFloat(serumCr) / 1000; // Convert to mmol/L
-        if (!isNaN(una) && !isNaN(ucr) && !isNaN(sna) && !isNaN(scr) && ucr > 0 && sna > 0) {
-          return ((una * scr) / (sna * ucr) * 100).toFixed(2);
-        }
-        return null;
-      };
-
-      // FEUrea calculation
-      const calcFEUrea = () => {
-        const uurea = parseFloat(urineUrea);
-        const surea = parseFloat(serumUrea);
-        const ucr = parseFloat(urineCr);
-        const scr = parseFloat(serumCr) / 1000;
-        if (!isNaN(uurea) && !isNaN(surea) && !isNaN(ucr) && !isNaN(scr) && ucr > 0 && surea > 0) {
-          return ((uurea * scr) / (surea * ucr) * 100).toFixed(1);
-        }
-        return null;
-      };
-
-      const getFENaDisplay = () => {
-        const fena = calcFENa();
-        if (!fena) return null;
-        const v = parseFloat(fena);
-        if (v < 1) return { value: `${fena}%`, interpretation: 'Suggests pre-renal', color: 'var(--green)' };
-        if (v <= 2) return { value: `${fena}%`, interpretation: 'Indeterminate', color: 'var(--orange)' };
-        return { value: `${fena}%`, interpretation: 'Suggests intrinsic (ATN)', color: 'var(--red)' };
-      };
-
-      const getFEUreaDisplay = () => {
-        const feurea = calcFEUrea();
-        if (!feurea) return null;
-        const v = parseFloat(feurea);
-        if (v < 35) return { value: `${feurea}%`, interpretation: 'Suggests pre-renal', color: 'var(--green)' };
-        if (v <= 50) return { value: `${feurea}%`, interpretation: 'Indeterminate', color: 'var(--orange)' };
-        return { value: `${feurea}%`, interpretation: 'Suggests intrinsic (ATN)', color: 'var(--red)' };
-      };
-
-      const getUrineOsmDisplay = () => {
-        if (!urineOsm) return null;
-        const v = parseFloat(urineOsm);
-        if (v > 500) return { value: `${urineOsm} mOsm/kg`, interpretation: 'Concentrated — consistent with pre-renal', color: 'var(--green)' };
-        if (v >= 350) return { value: `${urineOsm} mOsm/kg`, interpretation: 'Intermediate', color: 'var(--orange)' };
-        return { value: `${urineOsm} mOsm/kg`, interpretation: 'Dilute — consistent with ATN', color: 'var(--red)' };
-      };
-
-      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Urine Biochem', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
-        e('div', { className: 'screen-content' },
-          e(ProgressBar, { current: step, total: getTotalScreens(), color: 'var(--cyan)' }),
-
-          // SCREEN 0: Is the patient on diuretics? (ChoiceButtons, auto-advance)
-          step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', background: 'rgba(245,158,11,0.1)', padding: '8px 12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' } },
-              '⚠️ Reference ranges shown are Australian standard ranges. Verify against your laboratory\'s reference ranges.'
-            ),
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Is the patient on diuretics?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes which index is reliable'),
-            e(ChoiceButton, {
-              label: 'Yes — loop or thiazide',
-              sublabel: 'Will use FEUrea instead',
-              selected: onDiuretics === true,
-              onClick: () => {
-                clearAutoAdvance();
-                setOnDiuretics(true);
-                // No auto-advance — warning gates progression
-              },
-              color: 'var(--orange)'
-            }),
-            e(ChoiceButton, {
-              label: 'No diuretics',
-              selected: onDiuretics === false,
-              onClick: () => {
-                clearAutoAdvance();
-                setOnDiuretics(false);
-                scheduleAdvance(() => goToStep(1), false);
-              },
-              color: 'var(--green)'
-            }),
-            onDiuretics === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'FENa unreliable.'), ' Diuretics force sodium excretion, making FENa falsely elevated. Use FEUrea instead.')
-          ),
-
-          // SCREEN 1: Urine biochemistry
-          step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter the urine biochemistry'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'From the spot urine sample'),
-            e(ValueInput, { label: 'Urine Sodium', unit: 'mmol/L', value: urineNa, onChange: setUrineNa, placeholder: 'Enter' }),
-            e(ValueInput, { label: 'Urine Creatinine', unit: 'mmol/L', value: urineCr, onChange: setUrineCr, placeholder: 'Enter', hint: 'Most labs report in mmol/L' }),
-            onDiuretics && e(ValueInput, { label: 'Urine Urea', unit: 'mmol/L', value: urineUrea, onChange: setUrineUrea, placeholder: 'Enter' }),
-            e(PrimaryButton, {
-              label: 'Next',
-              disabled: !urineNa || !urineCr || (onDiuretics && !urineUrea),
-              color: 'var(--cyan)',
-              onClick: () => goToStep(2)
-            })
-          ),
-
-          // SCREEN 2: Serum biochemistry
-          step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Enter the serum biochemistry'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'From the blood panel'),
-            e(ValueInput, { label: 'Serum Sodium', unit: 'mmol/L', value: serumNa, onChange: setSerumNa, placeholder: '135–145' }),
-            e('div', { style: { fontSize: '11px', color: 'var(--orange)', fontWeight: 600, marginBottom: '4px', marginTop: '-8px' } }, '⚠ Note: Serum creatinine is in µmol/L — not mmol/L'),
-            e(ValueInput, { label: 'Serum Creatinine', unit: 'µmol/L', value: serumCr, onChange: setSerumCr, placeholder: '50–120' }),
-            onDiuretics && e(ValueInput, { label: 'Serum Urea', unit: 'mmol/L', value: serumUrea, onChange: setSerumUrea, placeholder: 'Enter' }),
-            e(ValueInput, { label: 'Urine Osmolality (optional)', unit: 'mOsm/kg', value: urineOsm, onChange: setUrineOsm, placeholder: 'Optional' }),
-            e(PrimaryButton, {
-              label: 'Next',
-              disabled: !serumNa || !serumCr || (onDiuretics && !serumUrea),
-              color: 'var(--cyan)',
-              onClick: () => goToStep(3)
-            })
-          ),
-
-          // SCREEN 3: Calculated results + interpretation (ChoiceButtons, auto-advance)
-          step === 3 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', marginBottom: '8px' } }, 'Classify the AKI'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Use the calculated indices to decide'),
-            calcFENa() && !onDiuretics && e(BranchCard, { label: 'FENa', value: `${calcFENa()}%`, interpretation: 'Pre-renal <1% · Indeterminate 1–2% · Intrinsic >2%', color: 'var(--label)' }),
-            calcFENa() && onDiuretics && e('div', { style: { opacity: 0.5, marginBottom: '8px' } },
-              e(BranchCard, { label: 'FENa', value: `${calcFENa()}%`, interpretation: '⚠️ Unreliable on diuretics', color: 'var(--label3)' })
-            ),
-            onDiuretics && calcFEUrea() && e(BranchCard, { label: 'FEUrea', value: `${calcFEUrea()}%`, interpretation: 'Pre-renal <35% · Indeterminate 35–50% · Intrinsic >50%', color: 'var(--label)' }),
-            urineOsm && e(BranchCard, { label: 'Urine Osmolality', value: `${urineOsm} mOsm/kg`, interpretation: 'Pre-renal >500 · Intermediate 350–500 · ATN <350', color: 'var(--label)' }),
-            e(ChoiceButton, {
-              label: 'Pre-renal',
-              sublabel: onDiuretics ? 'FEUrea <35%' : 'FENa <1%',
-              selected: fenaResult === 'preRenal',
-              onClick: () => {
-                clearAutoAdvance();
-                setFenaResult('preRenal');
-                scheduleAdvance(() => goToStep(4), false);
-              },
-              color: 'var(--green)'
-            }),
-            e(ChoiceButton, {
-              label: 'Intrinsic (ATN)',
-              sublabel: onDiuretics ? 'FEUrea >50%' : 'FENa >2%',
-              selected: fenaResult === 'intrinsic',
-              onClick: () => {
-                clearAutoAdvance();
-                setFenaResult('intrinsic');
-                scheduleAdvance(() => goToStep(4), false);
-              },
-              color: 'var(--red)'
-            }),
-            e(ChoiceButton, {
-              label: 'Indeterminate',
-              sublabel: 'Borderline values — may be transitioning',
-              selected: fenaResult === 'indeterminate',
-              onClick: () => {
-                clearAutoAdvance();
-                setFenaResult('indeterminate');
-                scheduleAdvance(() => goToStep(4), false);
-              },
-              color: 'var(--orange)'
-            })
-          ),
-
-          // SCREEN 4: Results
-          step === 4 && e(FadeIn, null,
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)' } }, 'Interpretation'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
-                fenaResult === 'preRenal' ? 'Pre-renal pattern' : fenaResult === 'intrinsic' ? 'Intrinsic (ATN) pattern' : 'Indeterminate'
-              )
-            ),
-            e(InputSummaryStrip, { items: [
-              !onDiuretics && calcFENa() && { label: 'FENa', ...getFENaDisplay() },
-              onDiuretics && calcFEUrea() && { label: 'FEUrea', ...getFEUreaDisplay() },
-              urineOsm && { label: 'Urine Osm', ...getUrineOsmDisplay() }
-            ].filter(Boolean) }),
-
-            e(WarningBanner, null, e('strong', null, 'Always exclude obstruction.'), ' Perform renal tract ultrasound before attributing AKI to pre-renal or intrinsic causes. Post-renal obstruction is the most treatable cause of AKI.'),
-
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
-
-            fenaResult === 'preRenal' && e(DiffListItem, {
-              title: 'Pre-renal AKI',
-              tags: ['Underperfusion', 'Structurally intact', 'Reversible'],
-              warning: e(React.Fragment, null, e('strong', null, 'FENa <1% does NOT always mean pre-renal.'), ' Several intrinsic diseases preserve tubular sodium handling: contrast nephropathy, rhabdomyolysis, pigment nephropathy, early sepsis, acute glomerulonephritis, early interstitial nephritis, acute urinary obstruction, calcineurin inhibitor toxicity (cyclosporin, tacrolimus).')
-            }, 'Kidneys responding appropriately to hypovolaemia or poor perfusion. Avid sodium and water retention.'),
-
-            fenaResult === 'intrinsic' && e(DiffListItem, {
-              title: 'Intrinsic AKI (ATN)',
-              tags: ['Tubular damage', 'Muddy brown casts', 'Supportive care'],
-              warning: e(React.Fragment, null, e('strong', null, 'FENa >1% does NOT always mean intrinsic.'), ' Can be caused by: diuretic use, CKD baseline, adrenal insufficiency, cerebral salt wasting, IV saline administration, glycosuria.')
-            }, 'Tubular damage — cannot reabsorb sodium efficiently or concentrate urine.'),
-
-            fenaResult === 'indeterminate' && e(DiffListItem, {
-              title: 'Evolving AKI',
-              tags: ['May be transitioning', 'Serial measurements', 'Trend']
-            }, 'Borderline values — may be evolving from pre-renal to intrinsic. Serial measurement over 6–12 hours is more useful than a single value.'),
-
-            e(InfoPanel, { title: 'Urine Microscopy — the Forgotten Tool', color: 'var(--cyan)' },
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Muddy brown granular casts:'), ' ATN — pathognomonic'),
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Red cell casts:'), ' Glomerulonephritis'),
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'White cell casts:'), ' Interstitial nephritis or pyelonephritis'),
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Eosinophiluria:'), ' Allergic interstitial nephritis (low sensitivity)'),
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px', marginBottom: '6px' } }, e('strong', null, 'Bland sediment:'), ' Pre-renal, obstruction, or HRS'),
-              e('div', { style: { background: 'rgba(6,182,212,0.08)', borderRadius: '10px', padding: '10px 12px' } }, e('strong', null, 'Crystals:'), ' Crystal nephropathy (tumour lysis, ethylene glycol)')
-            ),
-
-            e(InfoPanel, { title: 'When Interpretation Requires Nephrology Input', color: 'var(--purple)' },
-              e('p', { style: { marginBottom: '8px' } }, 'Consider nephrology consultation for:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.6' } },
-                e('li', null, 'AKI with active urinary sediment (casts, dysmorphic RBCs) — suggests glomerulonephritis'),
-                e('li', null, 'AKI with proteinuria >1g/day — glomerular pathology likely'),
-                e('li', null, 'AKI not responding to volume resuscitation — may need further workup'),
-                e('li', null, 'Suspected interstitial nephritis (eosinophiluria, white cell casts, drug exposure)'),
-                e('li', null, 'AKI requiring renal replacement therapy consideration'),
-                e('li', null, 'Unexplained AKI — particularly if serology or biopsy may be indicated'),
-                e('li', null, 'AKI in transplant patients or immunosuppressed patients')
-              )
-            ),
-
-            e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', color: 'var(--cyan)', onClick: resetModule }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
-            )
-          )
-        )
-      );
-    }
 
     // ========== COAGULATION MODULE ==========
 
@@ -3770,29 +3166,12 @@
         return e(HyponatraemiaModule, { onBack: () => setScreen('home') });
       }
 
-      if (screen === 'nacorr') {
-        return e(NaCorrectionModule, { onBack: () => setScreen('home') });
-      }
-
       if (screen === 'iron') {
         return e(IronModule, { onBack: () => setScreen('home') });
       }
 
       if (screen === 'coag') {
         return e(CoagModule, { onBack: () => setScreen('home') });
-      }
-
-      if (screen === 'aki-gate') {
-        return e(BetaGate, {
-          moduleName: 'Urine Biochem',
-          moduleColor: 'var(--cyan)',
-          onSuccess: () => setScreen('aki'),
-          onBack: () => setScreen('home')
-        });
-      }
-
-      if (screen === 'aki') {
-        return e(AKIModule, { onBack: () => setScreen('home') });
       }
 
       // Placeholder for other modules
