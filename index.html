@@ -611,7 +611,7 @@
             cursor: 'pointer',
             fontFamily: 'var(--font)'
           }
-        }, 'View management →')
+        }, 'View details →')
       );
     }
 
@@ -952,8 +952,8 @@
               }
             }, e('span', { style: { fontSize: '11px', fontWeight: 800, color: 'white' } }, 'Na')),
             e('div', null,
-              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Na Correction Rate'),
-              e('div', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Calculate remaining safe correction')
+              e('div', { style: { fontSize: '14px', fontWeight: 700, color: 'var(--label)' } }, 'Na Change and Rate'),
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Calculate sodium change and rate over time')
             )
           ),
           e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, isOpen ? '▲' : '▼')
@@ -968,21 +968,6 @@
           e(ValueInput, { label: 'Latest Na', unit: 'mmol/L', value: latestNa, onChange: setLatestNa, placeholder: 'e.g. 122' }),
           e(ValueInput, { label: 'Hours since first Na', unit: 'hours', value: hoursElapsed, onChange: setHoursElapsed, placeholder: 'e.g. 8' }),
 
-          // Alert threshold selector
-          e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', marginBottom: '12px' } },
-            e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Alert threshold:'),
-            e('select', {
-              value: targetRate,
-              onChange: (ev) => setTargetRate(parseInt(ev.target.value)),
-              style: { padding: '6px 10px', borderRadius: '8px', border: '1px solid var(--sep)', background: 'var(--card)', color: 'var(--label)', fontSize: '12px', fontFamily: 'var(--font)' }
-            },
-              e('option', { value: 6 }, '6 mmol/24h'),
-              e('option', { value: 8 }, '8 mmol/24h'),
-              e('option', { value: 10 }, '10 mmol/24h'),
-              e('option', { value: 12 }, '12 mmol/24h')
-            )
-          ),
-
           // Results display
           result && e('div', null,
             // Na change and rate summary
@@ -992,22 +977,8 @@
             e('div', { style: { fontSize: '13px', color: 'var(--label)', marginBottom: '12px' } },
               `Rate: ${result.ratePerHour} mmol/L/hr`
             ),
-
-            // Remaining budget or warning
-            !result.beyondWindow && !result.exceeds && e('div', {
-              style: { background: 'rgba(52,199,89,0.08)', border: '1px solid rgba(52,199,89,0.2)', borderRadius: '10px', padding: '12px' }
-            },
-              e('div', { style: { fontSize: '13px', fontWeight: 600 } },
-                `Remaining safe correction: ${result.remainingBudget} mmol/L over the next ${result.remainingHours} hours`
-              )
-            ),
-
-            !result.beyondWindow && result.exceeds && e('div', {
-              style: { background: 'rgba(255,69,58,0.08)', border: '1px solid rgba(255,69,58,0.2)', borderRadius: '10px', padding: '12px' }
-            },
-              e('div', { style: { fontSize: '13px', fontWeight: 600 } },
-                `⚠️ Correction rate exceeds safe limit of ${targetRate} mmol/24h`
-              )
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '8px', fontStyle: 'italic' } },
+              'This calculates change over time only. It does not define safe correction targets; consult local protocols.'
             )
           ),
 
@@ -1040,25 +1011,18 @@
             paddingTop: 'calc(16px + env(safe-area-inset-top))'
           }
         },
-          e('div', { style: { display: 'flex', alignItems: 'center', gap: '14px' } },
-            e('div', {
-              style: {
-                width: '52px',
-                height: '52px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, var(--accent) 0%, #7C3AED 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(139,92,246,0.25)'
-              }
-            }, e('span', { style: { fontSize: '16px', fontWeight: 800, color: 'white' } }, 'Lab')),
-            e('div', null,
-              e('div', {
-                style: { fontSize: '30px', fontWeight: 800, letterSpacing: '-0.04em', color: 'var(--label)', fontFamily: 'var(--font-heading)' }
-              }, 'LabLogic')
-            )
-          )
+          e('div', {
+            style: {
+              fontSize: '32px',
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              fontFamily: 'var(--font-heading)',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #6366F1 50%, #8B5CF6 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }
+          }, 'LabLogic')
         ),
 
         // Module Cards
@@ -1117,7 +1081,7 @@
           style: { textAlign: 'center', padding: '24px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }
         },
           e('div', { style: { fontSize: '11px', color: 'var(--label3)', fontWeight: 600, marginBottom: '6px' } }, 'For healthcare professionals only'),
-          e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool — not a substitute for clinical judgement'),
+          e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool. Interpretation support only. Not a substitute for clinical judgement.'),
           e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '4px' } }, 'Verify reference ranges against your laboratory'),
           e('button', {
             onClick: () => onSelectModule('terms'),
@@ -1235,7 +1199,7 @@
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Is the patient acutely unwell?'),
             e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
-              label: 'Yes — acutely unwell or in ICU',
+              label: 'Yes - acutely unwell (eg, ICU)',
               selected: acutelyUnwell === true,
               onClick: () => {
                 clearAutoAdvance();
@@ -1245,7 +1209,7 @@
               color: 'var(--accent)'
             }),
             e(ChoiceButton, {
-              label: 'No — outpatient or stable',
+              label: 'No - stable outpatient',
               selected: acutelyUnwell === false,
               onClick: () => {
                 clearAutoAdvance();
@@ -1255,9 +1219,9 @@
               color: 'var(--accent)'
             }),
             acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
-              e('strong', null, 'Non-thyroidal illness (sick euthyroid)'), ' can cause transient TFT changes — most commonly ↓fT3, ↓fT4, and ↓TSH. Consider retesting when clinically stable before starting new thyroid treatment, unless results are markedly abnormal or clinical suspicion is high.'
+              e('strong', null, 'Acute illness'), ' can cause transient changes in thyroid function tests (often low T3, sometimes low T4 and/or low-normal TSH). Interpret alongside the clinical context, medications, and prior results. Repeat testing once clinically stable can help confirm whether abnormalities persist.'
             ),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
           // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
@@ -1400,34 +1364,27 @@
 
             tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3Status) && !(ft3Status === 'high') && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
-              tags: ['Recheck 6–8 weeks', 'AF risk', 'Osteoporosis risk'],
-              infoPanel: e(InfoPanel, { title: 'Why Subclinical Hyperthyroidism Matters' },
-                e('p', { style: { marginBottom: '10px' } }, 'The degree of TSH suppression affects clinical significance:'),
-                e('p', { style: { marginBottom: '10px' } },
-                  e('strong', null, 'TSH < 0.1 mU/L:'), ' Higher risk — associated with 3× increased risk of atrial fibrillation and accelerated bone loss, particularly in postmenopausal women and elderly.'
-                ),
-                e('p', { style: { marginBottom: '10px' } },
-                  e('strong', null, 'TSH 0.1–0.4 mU/L:'), ' Lower risk — may be observed if asymptomatic and no risk factors for AF or osteoporosis.'
-                ),
-                e('p', { style: { fontSize: '12px', color: 'var(--label3)' } }, 'Collet TH et al. JAMA 2012 — meta-analysis of subclinical hyperthyroidism and cardiovascular outcomes.')
+              tags: ['May be transient', 'Arrhythmia association', 'Bone health association'],
+              infoPanel: e(InfoPanel, { title: 'Subclinical Hyperthyroidism' },
+                e('p', null, 'Clinical significance varies with the degree and persistence of TSH suppression and the clinical context (age, comorbidities, and likely cause). Persistent or more marked suppression has been associated in some studies with higher rates of atrial arrhythmias and reduced bone density. Mild suppression is common and may be transient. Confirm discordant results and consider potential confounders (acute illness, medications, assay interference).')
               )
-            }, 'May be transient — recheck in 6–8 weeks. If persistent, risk of AF and osteoporosis.'),
+            }, 'Suppressed TSH with normal free T4 and free T3. Can be transient (eg, intercurrent illness, medication effects, resolving thyroiditis). If persistent, observational data suggest associations with atrial arrhythmias and reduced bone density, particularly in higher-risk groups.'),
 
             tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Central Hypothyroidism',
                 tags: ['Pituitary failure'],
                 defaultOpen: true,
-                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+                warning: e(React.Fragment, null, e('strong', null, 'Safety note:'), ' central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'),
                 infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                   e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
                   e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
                 )
-              }, 'Pituitary failure — not primary thyroid disease. Investigate urgently.'),
+              }, 'Low or inappropriately normal TSH with low free T4 suggests central hypothyroidism in the right clinical context. Correlate with pituitary symptoms, medications, intercurrent illness, and prior results; specialist review is often required.'),
               e(DiffListItem, {
                 title: 'Non-Thyroidal Illness (Recovery Phase)',
-                tags: ['Sick euthyroid', 'Transient', 'Recheck when well']
-              }, 'Transient TSH suppression during recovery from acute illness. Recheck TFTs in 4–6 weeks when stable.')
+                tags: ['Sick euthyroid pattern', 'Transient', 'Context-dependent']
+              }, 'During recovery from acute illness, transient discordant TFT patterns can occur (including a temporarily low or low-normal TSH with low free T4). If there has been recent acute illness, interpret cautiously and consider repeat testing once clinically stable before concluding persistent pituitary pathology.')
             ),
 
             // TSH HIGH pathways
@@ -1438,17 +1395,11 @@
 
             tshResult === 'high' && ft4Status === 'normal' && e(DiffListItem, {
               title: 'Subclinical Hypothyroidism',
-              tags: ['Recheck 6–8 weeks', 'Check TPO antibodies', 'Treat if TSH >10'],
-              infoPanel: e(InfoPanel, { title: 'When to Treat Subclinical Hypothyroidism' },
-                e('p', { style: { marginBottom: '10px' } },
-                  e('strong', null, 'TREAT IF:'), ' TSH >10 (except consider observation in >70y) · TSH 4–10 with positive TPOAb and symptoms · Pregnant or planning pregnancy (target TSH <2.5)'
-                ),
-                e('p', { style: { marginBottom: '10px' } },
-                  e('strong', null, 'OBSERVE IF:'), ' TSH 4–10 with negative TPOAb and asymptomatic · Elderly (>70 years) — even TSH >10 may not need treatment · Recovery from acute illness'
-                ),
-                e('p', { style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px' } }, 'Stott DJ et al. NEJM 2017 (TRUST trial) — levothyroxine provided no benefit in adults ≥65 years with subclinical hypothyroidism.')
+              tags: ['Common pattern', 'Autoimmune context', 'Persistence matters'],
+              infoPanel: e(InfoPanel, { title: 'Subclinical hypothyroidism: interpretation notes' },
+                e('p', null, 'Subclinical hypothyroidism is defined by elevated TSH with normal free T4. It can reflect early autoimmune thyroid disease, recovery from intercurrent illness, medication effects, or biological and analytical variation. Confirming persistence on repeat testing and assessing thyroid autoimmunity (where clinically relevant) can help with aetiology and risk of progression. Management approaches vary across guidelines and depend on patient factors; where uncertainty exists, follow local guidance and consider senior or endocrine input.')
               )
-            }, 'Common finding. Check TPO antibodies and recheck in 6–8 weeks.'),
+            }, 'Elevated TSH with normal free T4. Common finding that can be transient. Interpretation depends on persistence, degree of TSH elevation, symptoms, pregnancy status, and thyroid autoimmunity.'),
 
             tshResult === 'high' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference or TSH-oma',
@@ -1467,12 +1418,12 @@
                 title: 'Central Hypothyroidism',
                 tags: ['Pituitary failure'],
                 defaultOpen: true,
-                warning: e(React.Fragment, null, e('strong', null, 'Check cortisol before starting thyroxine.'), ' Starting thyroxine with unrecognised adrenal insufficiency can precipitate adrenal crisis.'),
+                warning: e(React.Fragment, null, e('strong', null, 'Safety note:'), ' central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'),
                 infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                   e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
                   e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
                 )
-              }, 'TSH is \'inappropriately normal\' for a low fT4. Investigate for pituitary pathology.'),
+              }, 'Low or inappropriately normal TSH with low free T4 suggests central hypothyroidism in the right clinical context. Correlate with pituitary symptoms, medications, intercurrent illness, and prior results; specialist review is often required.'),
               e(DiffListItem, {
                 title: 'Also Consider',
                 tags: ['Alternative explanations']
@@ -1482,7 +1433,7 @@
             tshResult === 'normal' && ft4Status === 'high' && e(DiffListItem, {
               title: 'Assay Interference',
               tags: ['Biotin supplements', 'Heterophile antibodies', 'Recheck']
-            }, 'Normal TSH with high fT4 is discordant. Most commonly caused by biotin supplement interference. Stop biotin for 48h and recheck, or request repeat on different assay platform.'),
+            }, 'Normal TSH with high free T4 is discordant. Common causes include assay interference (eg, biotin supplements) and interfering antibodies. If results are discordant with the clinical picture, confirm with repeat testing using an approach agreed with the laboratory (eg, repeat after withholding non-essential supplements, or test on a different platform).'),
 
             // Urgent pattern recognition - thyroid emergencies
             (tshResult === 'low' && ft4Status === 'high') && e('div', {
@@ -1522,7 +1473,7 @@
               e('div', { style: { fontSize: '13px', fontWeight: 700, marginBottom: '8px' } }, 'Further Workup to Clarify Cause'),
               e('div', { style: { fontSize: '12px', color: 'var(--label)', lineHeight: '1.6' } },
                 e('div', null, '• ', e('strong', null, 'TPO antibodies'), ' — positive in Hashimoto\'s thyroiditis (most common cause)'),
-                e('div', null, '• Recheck TFTs in 6–8 weeks if recent illness or uncertain chronicity')
+                e('div', null, '• Repeat TFTs after an interval if recent illness or uncertain chronicity')
               )
             ),
 
@@ -1576,10 +1527,11 @@
             ),
 
             e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction' },
+              e('p', { style: { marginBottom: '10px' } }, 'These medications can alter thyroid function and/or interfere with thyroid tests. In patients taking them, periodic thyroid function monitoring is commonly recommended, but frequency varies by guideline and local protocol. Interpret results in clinical context.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Amiodarone:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for interpretation. TFTs should be monitored every 6 months on amiodarone.'),
+              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for interpretation.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Lithium:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release. Monitor TFTs at baseline, 6 months, then annually.'),
+              e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Other drugs:'),
               e('p', null, 'Immune checkpoint inhibitors (pembrolizumab, nivolumab) → thyroiditis then hypothyroidism. Tyrosine kinase inhibitors → hypothyroidism. Dopamine/glucocorticoids → suppress TSH.')
             ),
@@ -1762,16 +1714,16 @@
               color: 'var(--accent)',
               onClick: () => goToStep(1)
             }),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
           // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
             e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'How quickly did this develop?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'If last known normal Na was >48h ago or unknown, treat as chronic'),
+            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'If the duration is >48 hours or unknown, it is generally classified as chronic for risk stratification.'),
             e(ChoiceButton, {
               label: 'Acute  ‹ 48 hours',
-              sublabel: 'Brain not adapted — can correct faster',
+              sublabel: 'Less time for cerebral adaptation',
               selected: chronicity === 'acute',
               onClick: () => {
                 clearAutoAdvance();
@@ -1782,7 +1734,7 @@
             }),
             e(ChoiceButton, {
               label: 'Chronic  › 48 hours',
-              sublabel: 'Brain adapted — rapid correction risks ODS',
+              sublabel: 'Cerebral adaptation likely; rapid change can be harmful',
               selected: chronicity === 'chronic',
               onClick: () => {
                 clearAutoAdvance();
@@ -1793,7 +1745,7 @@
             }),
             e(ChoiceButton, {
               label: 'Unknown',
-              sublabel: 'Treat as chronic (safer assumption)',
+              sublabel: 'If uncertain, classify as chronic (risk-averse)',
               selected: chronicity === 'unknown',
               onClick: () => {
                 clearAutoAdvance();
@@ -1865,7 +1817,7 @@
             ] }),
             e('div', {
               style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', marginBottom: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px' }
-            }, '💡 If iso-osmolar but clinical picture doesn\'t fit pseudohyponatraemia, check cortisol to exclude adrenal insufficiency.'),
+            }, '💡 If iso-osmolar but clinical picture doesn\'t fit pseudohyponatraemia, consider adrenal insufficiency in the differential if the clinical picture is compatible.'),
             e(DiffListItem, {
               title: 'Pseudohyponatraemia',
               tags: ['Measurement artefact', 'Check Na on VBG'],
@@ -2016,10 +1968,10 @@
                 title: 'Excess Water Intake',
                 description: 'Kidneys are diluting maximally but water intake exceeds their capacity to defend tonicity.'
               }),
-              e(DiffCard, { title: 'Excess IV fluid', description: 'Iatrogenic. Review fluid orders.' }),
+              e(DiffCard, { title: 'Excess IV fluid', description: 'Iatrogenic. Excess hypotonic fluid can contribute.' }),
               e(DiffCard, { title: 'Primary polydipsia', description: 'Psychiatric or medication-related. Water intake often >10L/day.' }),
               e(DiffCard, { title: 'Beer potomania', description: 'Very low solute diet limits renal free water excretion capacity.' }),
-              e(DiffCard, { title: 'Reset osmostat', description: 'Rare. Osmostat set lower but regulation intact. No treatment required.' })
+              e(DiffCard, { title: 'Reset osmostat', description: 'Stable mild hyponatraemia with intact water excretion (regulated around a lower set point).' })
             ),
 
             // PATH B: Low Urine Osm + High Urine Na
@@ -2056,8 +2008,9 @@
               }),
 
               e(DiffListItem, {
-                title: 'SIADH'
-              }, e(React.Fragment, null, 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion — ensure no adrenal insufficiency, hypothyroidism, or renal failure. ', e('strong', null, 'Important:'), ' exclude adrenal insufficiency (check cortisol) before diagnosing SIADH.')),
+                title: 'SIADH',
+                warning: 'Adrenal insufficiency can mimic SIADH biochemistry; consider it in the differential when evaluating euvolaemic hyponatraemia.'
+              }, 'Most common cause of euvolaemic hyponatraemia. Diagnosis of exclusion — ensure no adrenal insufficiency, hypothyroidism, or renal failure.'),
 
               e(DiffCard, { title: 'Adrenal insufficiency (Addison\'s, pan-hypopit)', description: 'Aldosterone deficiency → Na wasting. Cortisol deficiency → impaired free water excretion.' }),
 
@@ -2201,7 +2154,7 @@
               color: 'var(--red)'
             }),
             hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
           // SCREEN 1: CKD or heart failure? (ChoiceButtons, auto-advance)
@@ -2359,13 +2312,9 @@
               title: 'Iron Deficiency',
               defaultOpen: true,
               infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD' },
-                e('p', { style: { marginBottom: '10px' } }, 'In CKD, iron deficiency thresholds are higher due to impaired iron utilisation with ESA therapy.'),
-                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'KDIGO thresholds:'), ' TSAT <30% and ferritin <500 µg/L may benefit from IV iron in CKD patients on ESAs.'),
-                e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Kidney Disease: Improving Global Outcomes (KDIGO) Anemia Guideline 2012.')
+                e('p', null, 'In CKD and other inflammatory states, ferritin can be elevated despite iron-restricted erythropoiesis. Different thresholds are sometimes used to define absolute versus functional iron deficiency in CKD. Interpret ferritin and transferrin saturation alongside inflammation markers and clinical context, and refer to local renal/haematology guidance for management.')
               ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure' },
-                e('p', { style: { marginBottom: '10px' } }, 'Iron deficiency in HF is defined as ferritin <100 µg/L, OR ferritin 100–300 µg/L with TSAT <20%.'),
-                e('p', { style: { marginBottom: '10px' } }, 'FAIR-HF and AFFIRM-AHF trials demonstrated improved symptoms, functional capacity, and reduced HF hospitalisations with IV iron.'),
-                e('p', { style: { fontSize: '11px', color: 'var(--label3)' } }, 'Ponikowski P et al. Eur Heart J 2016; ESC Heart Failure Guidelines 2021.')
+                e('p', null, 'In heart failure, iron deficiency is common and definitions used in trials may differ from general population reference ranges. Interpretation in this context often considers ferritin and transferrin saturation together and should be aligned with local heart failure guidance.')
               ) : null
             }, 'Low ferritin + low TSAT confirms iron deficiency. Investigate the underlying cause.'),
 
@@ -2375,7 +2324,7 @@
               infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
-                e('p', null, e('strong', null, 'Pragmatic approach:'), ' If in doubt and the patient is symptomatic, a trial of IV iron is both diagnostic and therapeutic. If Hb rises, they were iron deficient.')
+                e('p', null, 'When ferritin is low-normal and transferrin saturation is low, possibilities include early iron deficiency, inflammation-driven iron sequestration, mixed aetiology, or analytical variation. Trends over time, inflammatory markers, and the clinical scenario can help clarify the most likely explanation.')
               )
             }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
 
@@ -2387,12 +2336,12 @@
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Common in:'), ' CKD (especially on ESAs), chronic inflammation not reflected in CRP, high erythropoietic demand (haemolysis, bleeding).'),
                 e('p', null, e('strong', null, 'Also consider:'), ' Early true iron deficiency — stores depleting but ferritin not yet fallen. Repeat testing in 4–6 weeks if clinical suspicion.')
               )
-            }, 'Stores present but not mobilised effectively. Consider trial of iron therapy.'),
+            }, 'Stores present but not mobilised effectively. Consider clinical context, likely cause of reduced stores (eg, blood loss, intake), and trend over time.'),
 
             // Pattern: Ferritin low-normal + TSAT normal = borderline stores
             ferritinResult === 'lowNormal' && tsatResult === 'normal' && e(DiffListItem, {
               title: 'Borderline Iron Stores'
-            }, 'Ferritin 30–100 µg/L with normal TSAT suggests early depletion of stores not yet affecting erythropoiesis. If symptomatic or high-risk (pregnancy, heavy menses), consider iron supplementation.'),
+            }, 'Ferritin 30–100 µg/L with normal TSAT suggests early depletion of stores not yet affecting erythropoiesis. Consider clinical context, likely cause of reduced stores (eg, blood loss, intake), and trend over time.'),
 
             // Pattern: Ferritin normal + TSAT normal (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
@@ -2590,7 +2539,7 @@
               },
               color: 'var(--green)'
             }),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges are Australian standard ranges. Verify against your laboratory.')
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
           // SCREEN 1: Results
@@ -2608,14 +2557,14 @@
 
             // Pattern A: Isolated prolonged PT
             pattern === 'A' && e(React.Fragment, null,
-              e(DiffListItem, { title: 'Warfarin', tags: ['Most common', 'Check INR target'] },
-                'Check INR — is it in therapeutic range for the indication? Supratherapeutic INR: hold warfarin, give vitamin K (oral if INR 5–9 and not bleeding, IV if active bleeding). Repeat INR in 6–12 hours.'),
+              e(DiffListItem, { title: 'Warfarin', tags: ['Most common', 'Therapeutic target context'] },
+                'A supratherapeutic INR can explain an isolated prolonged PT in a patient taking warfarin. Interpret relative to the therapeutic target for the indication and the clinical bleeding context. Management (including reversal) should follow local anticoagulation guidance.'),
               e(DiffListItem, { title: 'Early Liver Disease', tags: ['Factor VII shortest half-life (~6h)', 'First to fall'] },
                 'Factor VII has the shortest half-life (~6 hours) — PT rises before APTT in hepatic synthetic failure. Check albumin, bilirubin, and other LFTs.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] },
-                'Fat-soluble vitamin. Common in malabsorption (coeliac, IBD, short gut), malnutrition, prolonged antibiotics (gut flora produce vitamin K), and obstructive jaundice (bile salts needed for absorption). Responds to IV/oral vitamin K within 12–24 hours.'),
+                'Can cause an isolated prolonged PT/INR due to reduced vitamin K-dependent clotting factors. Interpretation is supported by clinical context (eg, malabsorption, poor intake, antibiotics) and correction of coagulation studies after vitamin K repletion if undertaken as part of standard care.'),
               e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] },
-                'Anti-Xa DOACs variably prolong PT (rivaroxaban more than apixaban) but standard coag is unreliable for measuring drug effect. Use calibrated anti-Xa level. If urgent reversal needed: andexanet alfa (specific) or prothrombin complex concentrate (PCC).'),
+                'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
               e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] },
                 'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding. Recombinant Factor VIIa (NovoSeven) available for severe bleeding.')
             ),
@@ -2626,24 +2575,23 @@
                 title: 'Heparin',
                 tags: ['Most common in hospital', 'UFH vs LMWH'],
                 infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
-                  e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Unfractionated heparin (UFH):'), ' Strongly prolongs APTT. Monitor with APTT ratio or anti-Xa level. Reversed with protamine.'),
-                  e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'LMWH (enoxaparin, dalteparin):'), ' Minimal effect on APTT — may be normal even at therapeutic doses. Monitor with anti-Xa level (peak 4h post-dose). Protamine partially reverses (~60%).'),
+                  e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
+                  e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
                   e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
                 )
               }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
               e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
-                'X-linked. Severity correlates with factor level: severe <1%, moderate 1–5%, mild 5–40%.'),
+                'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
               e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
-                'Clinically identical to Haemophilia A — distinguish by factor levels only.'),
+                'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
               e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
-                'Most common inherited bleeding disorder. vWF stabilises Factor VIII — low vWF causes secondary VIII deficiency. Check vWF antigen, activity, and Factor VIII.'),
+                'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
               e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
                 'Common in Ashkenazi Jewish populations. Bleeding risk poorly correlates with factor level.'),
               e(DiffListItem, {
                 title: 'Factor XII Deficiency',
-                tags: ['NO bleeding risk', 'Do NOT delay surgery'],
-                warning: 'Factor XII deficiency and lupus anticoagulant prolong APTT but do NOT cause bleeding. Do NOT delay surgery for either of these.'
-              }, 'Prolongs APTT but causes NO bleeding risk whatsoever. Safe for surgery.'),
+                tags: ['NO bleeding risk', 'APTT prolongation only']
+              }, 'Factor XII deficiency can markedly prolong APTT but is not typically associated with clinical bleeding. Consider this when interpreting an isolated prolonged APTT with no bleeding history.'),
               e(DiffListItem, {
                 title: 'Lupus Anticoagulant',
                 tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
@@ -2698,18 +2646,18 @@
                 )
               }),
               e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] },
-                'Dilution of factors and platelets after large-volume resuscitation. Follow massive transfusion protocol.'),
+                'After large-volume resuscitation and transfusion, dilutional coagulopathy can cause prolonged PT/APTT with low fibrinogen and thrombocytopenia. Interpret coagulation results in the clinical context and alongside transfusion history.'),
               e(DiffListItem, {
                 title: 'TTP / HUS',
                 tags: ['ADAMTS13', 'Schistocytes', 'Fibrinogen NORMAL', 'Haematology emergency'],
-                warning: 'If schistocytes on blood film + thrombocytopenia + AKI or neurological features → suspect TTP until proven otherwise. Do NOT delay plasma exchange for ADAMTS13 result.'
+                warning: 'If thrombocytopenia, haemolysis (eg, schistocytes) and organ involvement are present, consider TTP in the differential. This is time-critical and requires urgent haematology involvement and local escalation pathways.'
               }, 'Microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen typically NORMAL.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] },
-                'Affects Factors II, VII, IX, X — prolonging both pathways. IV vitamin K improves within 6–8 hours.'),
-              e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Very high INR'] },
-                'Very high INR. If bleeding: IV vitamin K + PCC. If not bleeding: hold warfarin, oral vitamin K 1–2 mg.'),
+                'Can cause an isolated prolonged PT/INR due to reduced vitamin K-dependent clotting factors. Interpretation is supported by clinical context (eg, malabsorption, poor intake, antibiotics) and correction of coagulation studies after vitamin K repletion if undertaken as part of standard care.'),
+              e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Therapeutic target context'] },
+                'A supratherapeutic INR can explain an isolated prolonged PT in a patient taking warfarin. Interpret relative to the therapeutic target for the indication and the clinical bleeding context. Management (including reversal) should follow local anticoagulation guidance.'),
               e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
-                'At high levels, prolongs both APTT and PT. Dabigatran: reverse with idarucizumab. Argatroban: reduce infusion.'),
+                'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
               e(DiffListItem, {
                 title: 'Isolated Hypofibrinogenaemia',
                 tags: ['Congenital', 'Acquired', 'L-asparaginase', 'Liver failure']
@@ -2799,7 +2747,7 @@
               e('strong', { style: { color: 'var(--label)' } }, 'educational reference tool'),
               ' for qualified healthcare professionals.'
             ),
-            e('p', null, 'Always verify against your local laboratory reference ranges. This tool supports — but does not replace — clinical judgment.')
+            e('p', null, 'Always verify against your local laboratory reference ranges. This tool is an interpretation aid only and does not provide treatment recommendations. It supports clinical judgement but does not replace it.')
           ),
           e('div', {
             onClick: () => setHasChecked(!hasChecked),
