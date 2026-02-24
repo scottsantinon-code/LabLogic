@@ -6,6 +6,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#f5f5f7">
+  <meta name="author" content="Critical Condition">
+  <meta name="description" content="Laboratory investigation interpreter for healthcare professionals">
   <title>LabLogic</title>
   <style>
     :root {
@@ -1112,7 +1114,21 @@
         },
           e('div', { style: { fontSize: '11px', color: 'var(--label3)', fontWeight: 600, marginBottom: '6px' } }, 'For healthcare professionals only'),
           e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool — not a substitute for clinical judgement'),
-          e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '4px' } }, 'Verify reference ranges against your laboratory')
+          e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '4px' } }, 'Verify reference ranges against your laboratory'),
+          e('button', {
+            onClick: () => onSelectModule('terms'),
+            style: {
+              background: 'none',
+              border: 'none',
+              color: 'var(--blue)',
+              fontSize: '11px',
+              fontWeight: 500,
+              marginTop: '12px',
+              cursor: 'pointer',
+              fontFamily: 'var(--font)'
+            }
+          }, 'Terms of Use'),
+          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '8px' } }, '© 2026 Critical Condition')
         )
       );
     }
@@ -2770,10 +2786,221 @@
       );
     }
 
+    // ========== DISCLAIMER POPUP ==========
+
+    function DisclaimerPopup({ onAccept }) {
+      const [hasChecked, setHasChecked] = useState(false);
+      return e('div', {
+        style: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px',
+          zIndex: 10000
+        }
+      },
+        e('div', {
+          style: {
+            background: 'var(--card)',
+            borderRadius: '16px',
+            padding: '24px',
+            maxWidth: '340px',
+            width: '100%',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+          }
+        },
+          e('div', { style: { textAlign: 'center', marginBottom: '16px' } },
+            e('div', { style: { fontSize: '36px', marginBottom: '8px' } }, '⚕️'),
+            e('h2', { style: { fontSize: '18px', fontWeight: '700', color: 'var(--label)', marginBottom: '4px' } }, 'For Healthcare Professionals')
+          ),
+          e('div', { style: { fontSize: '13px', lineHeight: '1.6', color: 'var(--label3)', marginBottom: '16px' } },
+            e('p', { style: { marginBottom: '10px' } },
+              'This app is an ',
+              e('strong', { style: { color: 'var(--label)' } }, 'educational reference tool'),
+              ' for qualified healthcare professionals.'
+            ),
+            e('p', null, 'Always verify against your local laboratory reference ranges. This tool supports — but does not replace — clinical judgment.')
+          ),
+          e('div', {
+            onClick: () => setHasChecked(!hasChecked),
+            style: {
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '10px',
+              padding: '12px',
+              background: hasChecked ? 'rgba(0,113,227,0.1)' : 'var(--sep)',
+              border: hasChecked ? '1px solid var(--blue)' : '1px solid var(--sep)',
+              borderRadius: '10px',
+              cursor: 'pointer',
+              marginBottom: '16px'
+            }
+          },
+            e('div', {
+              style: {
+                width: '20px',
+                height: '20px',
+                borderRadius: '4px',
+                border: hasChecked ? 'none' : '2px solid var(--label4)',
+                background: hasChecked ? 'var(--blue)' : 'var(--card)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '1px'
+              }
+            }, hasChecked && e('span', { style: { color: 'white', fontSize: '14px' } }, '✓')),
+            e('span', { style: { fontSize: '12px', lineHeight: '1.5', color: 'var(--label)' } },
+              'I am a healthcare professional and accept the ',
+              e('strong', null, 'Terms of Use')
+            )
+          ),
+          e('button', {
+            onClick: () => { if (hasChecked) onAccept(); },
+            style: {
+              width: '100%',
+              padding: '14px',
+              fontSize: '15px',
+              fontWeight: '600',
+              background: hasChecked ? 'var(--blue)' : 'var(--label4)',
+              color: hasChecked ? 'white' : 'var(--label3)',
+              border: 'none',
+              borderRadius: '10px',
+              cursor: hasChecked ? 'pointer' : 'default',
+              fontFamily: 'var(--font)'
+            }
+          }, 'Continue'),
+          e('p', { style: { textAlign: 'center', marginTop: '12px', fontSize: '11px', color: 'var(--label4)' } }, 'Full terms available in app')
+        )
+      );
+    }
+
+    // ========== FULL TERMS SCREEN ==========
+
+    function FullTermsScreen({ onBack }) {
+      const sectionStyle = { fontSize: '13px', fontWeight: '600', color: 'var(--label)', marginTop: '16px', marginBottom: '6px' };
+      const paraStyle = { marginBottom: '12px', fontSize: '13px', lineHeight: '1.6', color: 'var(--label2)' };
+
+      return e('div', { className: 'app-container' },
+        e(NavBar, { title: 'Terms of Use', onBack }),
+        e('div', { style: { padding: '16px 20px 40px' } },
+          e('p', { style: { marginBottom: '12px', fontSize: '12px', color: 'var(--label3)' } },
+            e('strong', null, 'Last Updated:'), ' February 2026'
+          ),
+
+          e('h3', { style: sectionStyle }, '1. NOT A MEDICAL DEVICE'),
+          e('p', { style: paraStyle }, 'This application is NOT a medical device. It has not been cleared, approved, or certified by the TGA, FDA, or any regulatory body.'),
+
+          e('h3', { style: sectionStyle }, '2. EDUCATIONAL PURPOSES ONLY'),
+          e('p', { style: paraStyle }, 'This application is designed solely for educational and informational purposes as a learning tool for understanding laboratory investigations.'),
+
+          e('h3', { style: sectionStyle }, '3. NOT MEDICAL ADVICE'),
+          e('p', { style: paraStyle }, 'This application does NOT provide medical advice, diagnosis, or treatment. All clinical decisions must be made by qualified healthcare professionals.'),
+
+          e('h3', { style: sectionStyle }, '4. NO DOCTOR-PATIENT RELATIONSHIP'),
+          e('p', { style: paraStyle }, 'Use of this application does not create any professional healthcare relationship.'),
+
+          e('h3', { style: sectionStyle }, '5. PROFESSIONAL RESPONSIBILITY'),
+          e('p', { style: paraStyle }, 'Healthcare professionals remain solely responsible for all clinical decisions and must verify all information through primary sources and local laboratory reference ranges.'),
+
+          e('h3', { style: sectionStyle }, '6. NO WARRANTY'),
+          e('p', { style: paraStyle }, 'This application is provided "AS IS" without warranty of any kind. No representations are made regarding accuracy, reliability, or completeness.'),
+
+          e('h3', { style: sectionStyle }, '7. LIMITATION OF LIABILITY'),
+          e('p', { style: paraStyle }, 'To the fullest extent permitted by law, Critical Condition shall not be liable for any damages arising from use of this application.'),
+
+          e('h3', { style: sectionStyle }, '8. ASSUMPTION OF RISK'),
+          e('p', { style: paraStyle }, 'You assume full responsibility for any consequences arising from your use of this application.'),
+
+          e('h3', { style: sectionStyle }, '9. INDEMNIFICATION'),
+          e('p', { style: paraStyle }, 'You agree to indemnify and hold harmless Critical Condition from all claims arising from your use of this application.'),
+
+          e('h3', { style: sectionStyle }, '10. EMERGENCY WARNING'),
+          e('p', { style: { ...paraStyle, padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px', color: 'var(--red)' } },
+            e('strong', null, 'DO NOT USE IN EMERGENCIES.'), ' Call emergency services (000/911/999/112) immediately.'
+          ),
+
+          e('h3', { style: sectionStyle }, '11. INTENDED AUDIENCE'),
+          e('p', { style: paraStyle }, 'This application is intended for healthcare professionals and students as an educational reference only.'),
+
+          e('h3', { style: sectionStyle }, '12. MODIFICATIONS'),
+          e('p', { style: paraStyle }, 'These terms may be modified at any time. Continued use constitutes acceptance.'),
+
+          e('h3', { style: sectionStyle }, '13. SEVERABILITY'),
+          e('p', { style: paraStyle }, 'If any provision is found unenforceable, remaining provisions remain in effect.'),
+
+          e('h3', { style: sectionStyle }, '14. PRIVACY POLICY'),
+          e('div', { style: { marginBottom: '12px', padding: '10px', background: 'var(--sep)', borderRadius: '8px', fontSize: '12px', lineHeight: '1.6' } },
+            e('p', null, e('strong', null, 'Data Collection:'), ' This application does not collect, store, transmit, or share any personal data or usage analytics.'),
+            e('p', { style: { marginTop: '6px' } }, e('strong', null, 'Local Storage:'), ' All data is stored locally on your device only.'),
+            e('p', { style: { marginTop: '6px' } }, e('strong', null, 'Network Access:'), ' This application functions entirely offline.')
+          ),
+
+          e('h3', { style: sectionStyle }, '15. GOVERNING LAW'),
+          e('p', { style: paraStyle }, 'These terms shall be governed by and construed in accordance with the laws of Victoria, Australia. Any disputes shall be subject to the exclusive jurisdiction of the courts of Victoria, Australia.'),
+
+          e('h3', { style: sectionStyle }, '16. ADVERSE EVENT REPORTING'),
+          e('p', { style: paraStyle }, 'If you become aware of any error, malfunction, or adverse event associated with use of this application, please report it immediately to: support@criticalcondition.com.au. Where required, Critical Condition will report serious incidents to the Therapeutic Goods Administration (TGA).'),
+
+          e('h3', { style: sectionStyle }, '17. CONTACT'),
+          e('p', { style: paraStyle }, 'For questions about these terms: support@criticalcondition.com.au'),
+          e('p', { style: paraStyle }, 'Website: www.criticalcondition.com.au'),
+
+          e('h3', { style: sectionStyle }, 'OUR APPS'),
+          e('p', { style: { marginBottom: '6px', fontSize: '12px', color: 'var(--label3)' } }, 'Critical Condition develops clinical decision support tools for healthcare professionals:'),
+          e('p', { style: { marginBottom: '12px', fontSize: '12px', color: 'var(--label2)' } },
+            e('strong', null, 'LabLogic'), ' – Laboratory investigation interpreter', e('br'),
+            e('strong', null, 'Blood Gas Pro'), ' – ABG interpretation', e('br'),
+            e('strong', null, 'CodeClock'), ' – Cardiac arrest timing & management', e('br'),
+            e('strong', null, 'IntubAid'), ' – Airway management cognitive aid', e('br'),
+            e('strong', null, 'METmate'), ' – Deteriorating patient assessment'
+          ),
+
+          e('div', { style: { textAlign: 'center', padding: '16px', marginTop: '16px', borderTop: '1px solid var(--sep)' } },
+            e('p', { style: { fontSize: '11px', color: 'var(--label4)' } }, '© 2026 Critical Condition. All rights reserved.')
+          )
+        )
+      );
+    }
+
     // ========== MAIN APP ==========
 
     function App() {
       const [screen, setScreen] = useState('home');
+      const [hasAcceptedDisclaimer, setHasAcceptedDisclaimer] = useState(() => {
+        try {
+          return localStorage.getItem('lablogic_disclaimer_accepted') === 'true';
+        } catch (e) {
+          return false;
+        }
+      });
+
+      const handleAcceptDisclaimer = () => {
+        try {
+          localStorage.setItem('lablogic_disclaimer_accepted', 'true');
+          localStorage.setItem('lablogic_disclaimer_date', new Date().toISOString());
+        } catch (e) {
+          // localStorage not available, continue anyway
+        }
+        setHasAcceptedDisclaimer(true);
+      };
+
+      // Show disclaimer if not accepted
+      if (!hasAcceptedDisclaimer) {
+        return e('div', { className: 'app-container' },
+          e(DisclaimerPopup, { onAccept: handleAcceptDisclaimer })
+        );
+      }
+
+      // Terms screen
+      if (screen === 'terms') {
+        return e(FullTermsScreen, { onBack: () => setScreen('home') });
+      }
 
       if (screen === 'home') {
         return e('div', { className: 'app-container' },
