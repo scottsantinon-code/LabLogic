@@ -381,8 +381,8 @@
     }
 
     // 6. InfoPanel
-    function InfoPanel({ title, children }) {
-      const [isOpen, setIsOpen] = useState(false);
+    function InfoPanel({ title, children, defaultOpen = false }) {
+      const [isOpen, setIsOpen] = useState(defaultOpen);
       return e('div', {
         style: {
           background: isOpen ? 'rgba(139,92,246,0.06)' : 'var(--card)',
@@ -1002,7 +1002,7 @@
           ),
 
           // ODS InfoPanel
-          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)', collapsed: true },
+          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)' },
             e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
             e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
             e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
@@ -1521,7 +1521,7 @@
             e(LearnMoreDivider),
 
             // Causes of Hyperthyroidism InfoPanel (when hyperthyroid)
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism', collapsed: true },
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism' },
               e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'High uptake on thyroid scan (↑ synthesis):'),
               e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
                 e('li', null, 'Graves\' disease — diffuse uptake, TRAb positive'),
@@ -2506,6 +2506,8 @@
         let score = 0;
         if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
         if (dd <= 0.5) score += 0; else if (dd <= 5) score += 1; else score += 2;
+        // PT baseline assumed to be 12 seconds (standard reference range 11-13s)
+        // ISTH DIC scoring uses prolongation above institutional normal
         const ptProlongation = ptVal - 12;
         if (ptProlongation < 3) score += 0; else if (ptProlongation <= 6) score += 1; else score += 2;
         if (fib >= 1.0) score += 0; else score += 2;
