@@ -99,6 +99,7 @@
     const e = React.createElement;
 
     // Auto-advance hook for ChoiceButton-only screens
+    // Fixed: Prevents race condition by clearing existing timer and nulling ref after callback
     function useAutoAdvance() {
       const timerRef = useRef(null);
       const clearAutoAdvance = () => {
@@ -108,8 +109,11 @@
         }
       };
       const scheduleAdvance = (callback, hasWarning = false) => {
-        clearAutoAdvance();
-        timerRef.current = setTimeout(callback, hasWarning ? 800 : 300);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(() => {
+          timerRef.current = null;
+          callback();
+        }, hasWarning ? 800 : 300);
       };
       useEffect(() => () => clearAutoAdvance(), []);
       return { scheduleAdvance, clearAutoAdvance };
@@ -122,6 +126,12 @@
       { id: "iron", name: "Iron Studies", icon: "iron" },
       { id: "coag", name: "Coagulation", icon: "coag" }
     ];
+
+    // Reusable style constants for screen titles and subtitles
+    const STYLES = {
+      screenTitle: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px' },
+      screenSubtitle: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' }
+    };
 
     // Module icons (simplified SVG paths)
     const moduleIcons = {
@@ -145,6 +155,11 @@
         e('path', { d: 'm181.06 40.094c-41.331-53.354-109.181-53.344-150.504 0-65.194 84.156-18.374 228.14 75.252 228.14 93.582-.001 140.491-143.926 75.252-228.14zm-75.252 213.155c-49.932 0-90.554-53.416-90.554-119.072s40.622-119.073 90.554-119.073 90.554 53.416 90.554 119.072-40.622 119.073-90.554 119.073z' }),
         e('path', { d: 'm257.844 271.391c-105.609 13.41-174.312 148.326-108.108 214.531 66.316 66.312 201.138-2.63 214.531-108.109 8.499-66.942-39.48-114.929-106.423-106.422zm50.715 183.77c-74.45 74.45-180.64 43.598-168.904-48.829 8.12-63.956 70.977-120.941 133.24-120.941 84.536.001 104.634 100.8 35.664 169.77z' }),
         e('path', { d: 'm510.774 134.14c-4.017-31.637-20.038-62.87-45.111-87.943-47.492-47.491-124.391-65.193-169.419-20.166-20.194 20.194-29.053 49.13-24.946 81.477 4.017 31.637 20.038 62.87 45.111 87.943 47.618 47.616 124.48 65.103 169.42 20.166 20.194-20.193 29.053-49.129 24.945-81.477zm-35.54 70.881c-36.527 36.528-103.486 24.578-148.229-20.166-46.426-46.426-55.473-112.922-20.165-148.228 36.746-36.747 103.774-24.289 148.228 20.166 46.426 46.426 55.472 112.922 20.166 148.228z' })
+      ),
+      // Default fallback icon (simple circle with question mark)
+      default: e('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'white' },
+        e('circle', { cx: 12, cy: 12, r: 10, fill: 'none', stroke: 'white', strokeWidth: 2 }),
+        e('text', { x: 12, y: 16, textAnchor: 'middle', fontSize: 12, fill: 'white' }, '?')
       )
     };
 
@@ -904,6 +919,10 @@
         const latest = parseFloat(latestNa);
         const hours = parseFloat(hoursElapsed);
         if (isNaN(start) || isNaN(latest) || isNaN(hours) || hours <= 0) return null;
+        // Bounds checking for sodium values (physiologically plausible range: 100-180 mEq/L)
+        if (start < 100 || start > 180 || latest < 100 || latest > 180) return null;
+        // Reject negative hours
+        if (hours < 0) return null;
 
         const naChange = latest - start;
         const ratePerHour = naChange / hours;
@@ -1062,7 +1081,7 @@
                     boxShadow: '0 3px 10px rgba(139,92,246,0.2)',
                     flexShrink: 0
                   }
-                }, moduleIcons[mod.icon]),
+                }, moduleIcons[mod.icon] || moduleIcons.default || null),
                 // Text
                 e('div', { style: { flex: 1 } },
                   e('div', {
@@ -1129,9 +1148,15 @@
       const containerRef = useRef(null);
       const [step, setStep] = useState(0);
       const [acutelyUnwell, setAcutelyUnwell] = useState(null);
-      const [tshResult, setTshResult] = useState(null);
-      const [ft4Status, setFt4Status] = useState(null); // 'low', 'normal', 'high'
-      const [ft3Status, setFt3Status] = useState(null); // 'low', 'normal', 'high'
+      // Consolidated related thyroid state to reduce re-renders
+      const [tftState, setTftState] = useState({ tsh: null, ft4: null, ft3: null });
+      // Convenience accessors
+      const tshResult = tftState.tsh;
+      const ft4Status = tftState.ft4;
+      const ft3Status = tftState.ft3;
+      const setTshResult = (val) => setTftState(prev => ({ ...prev, tsh: val }));
+      const setFt4Status = (val) => setTftState(prev => ({ ...prev, ft4: val }));
+      const setFt3Status = (val) => setTftState(prev => ({ ...prev, ft3: val }));
 
       // Auto-advance for ChoiceButton-only screens
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
@@ -1163,29 +1188,33 @@
       const resetModule = () => {
         setStep(0);
         setAcutelyUnwell(null);
-        setTshResult(null);
-        setFt4Status(null);
-        setFt3Status(null);
+        setTftState({ tsh: null, ft4: null, ft3: null });
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
 
-      // Get TSH display values
+      // Get TSH display values with explicit null/undefined handling
       const getTSHDisplay = () => {
+        if (tshResult === null || tshResult === undefined) return { value: 'Not set', interpretation: '' };
         if (tshResult === 'low') return { value: 'Low (< 0.4)', interpretation: 'Suppressed' };
         if (tshResult === 'high') return { value: 'High (> 4.0)', interpretation: 'Elevated' };
-        return { value: 'Normal (0.4–4.0)', interpretation: 'Within range' };
+        if (tshResult === 'normal') return { value: 'Normal (0.4–4.0)', interpretation: 'Within range' };
+        return { value: 'Unknown', interpretation: '' };
       };
 
       const getFT4Display = () => {
+        if (ft4Status === null || ft4Status === undefined) return { value: 'Not set', interp: '' };
         if (ft4Status === 'low') return { value: 'Low (< 12)', interp: 'Below range' };
         if (ft4Status === 'high') return { value: 'High (> 22)', interp: 'Above range' };
-        return { value: 'Normal (12–22)', interp: 'Within range' };
+        if (ft4Status === 'normal') return { value: 'Normal (12–22)', interp: 'Within range' };
+        return { value: 'Unknown', interp: '' };
       };
 
       const getFT3Display = () => {
+        if (ft3Status === null || ft3Status === undefined) return { value: 'Not set', interp: '' };
         if (ft3Status === 'low') return { value: 'Low (< 3.1)', interp: 'Below range' };
         if (ft3Status === 'high') return { value: 'High (> 6.8)', interp: 'Above range' };
-        return { value: 'Normal (3.1–6.8)', interp: 'Within range' };
+        if (ft3Status === 'normal') return { value: 'Normal (3.1–6.8)', interp: 'Within range' };
+        return { value: 'Unknown', interp: '' };
       };
 
       // Main TFT flow
@@ -1196,8 +1225,8 @@
 
           // SCREEN 0: Is the patient acutely unwell? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Is the patient acutely unwell?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This changes how we interpret the results'),
+            e('div', { style: STYLES.screenTitle }, 'Is the patient acutely unwell?'),
+            e('div', { style: STYLES.screenSubtitle }, 'This changes how we interpret the results'),
             e(ChoiceButton, {
               label: 'Yes - acutely unwell (eg, ICU)',
               selected: acutelyUnwell === true,
@@ -1226,8 +1255,8 @@
 
           // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the TSH?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 0.4–4.0 mU/L'),
+            e('div', { style: STYLES.screenTitle }, 'What is the TSH?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Normal: 0.4–4.0 mU/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 0.4 mU/L',
               selected: tshResult === 'low',
@@ -1265,8 +1294,8 @@
 
           // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the fT4?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 12–22 pmol/L'),
+            e('div', { style: STYLES.screenTitle }, 'What is the fT4?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Normal: 12–22 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 12 pmol/L',
               selected: ft4Status === 'low',
@@ -1301,8 +1330,8 @@
 
           // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
           step === 3 && tshResult === 'low' && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the fT3?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Normal: 3.1–6.8 pmol/L'),
+            e('div', { style: STYLES.screenTitle }, 'What is the fT3?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Normal: 3.1–6.8 pmol/L'),
             e(ChoiceButton, {
               label: 'Low  ‹ 3.1 pmol/L',
               selected: ft3Status === 'low',
@@ -1340,7 +1369,7 @@
 
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
           step === getResultsScreen() && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px' } }, 'Interpretation'),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
 
             // Compact input summary
             e(InputSummaryStrip, { items: [
@@ -1669,24 +1698,28 @@
         };
       };
 
+      // Display functions with explicit null/undefined handling
       const getSerumOsmDisplay = () => {
+        if (serumOsmResult === null || serumOsmResult === undefined) return { value: 'Not set', interpretation: '' };
         if (serumOsmResult === 'low') return { value: 'Low (< 275)', interpretation: 'Hypotonic' };
         if (serumOsmResult === 'normal') return { value: 'Normal (275–295)', interpretation: 'Iso-osmolar' };
         if (serumOsmResult === 'high') return { value: 'High (> 295)', interpretation: 'Hyper-osmolar' };
         if (serumOsmResult === 'skip') return { value: 'Not available', interpretation: 'Assumed hypotonic', color: 'var(--label3)' };
-        return { value: '', interpretation: '' };
+        return { value: 'Unknown', interpretation: '' };
       };
 
       const getUrineOsmDisplay = () => {
+        if (urineOsmResult === null || urineOsmResult === undefined) return { value: 'Not set', interpretation: '' };
         if (urineOsmResult === 'low') return { value: 'Low (< 100)', interpretation: 'Dilute — kidneys working' };
         if (urineOsmResult === 'high') return { value: 'High (> 100)', interpretation: 'Concentrated — ADH active' };
-        return { value: '', interpretation: '' };
+        return { value: 'Unknown', interpretation: '' };
       };
 
       const getUrineNaDisplay = () => {
+        if (urineNaResult === null || urineNaResult === undefined) return { value: 'Not set', interpretation: '' };
         if (urineNaResult === 'low') return { value: 'Low (< 30)', interpretation: 'Retained — kidneys conserving' };
         if (urineNaResult === 'high') return { value: 'High (> 30)', interpretation: 'Wasted — sodium loss' };
-        return { value: '', interpretation: '' };
+        return { value: 'Unknown', interpretation: '' };
       };
 
       // Main flow
@@ -1697,8 +1730,8 @@
 
           // SCREEN 0: Serum sodium (ValueInput, Next button)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the serum sodium?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'This determines the severity'),
+            e('div', { style: STYLES.screenTitle }, 'What is the serum sodium?'),
+            e('div', { style: STYLES.screenSubtitle }, 'This determines the severity'),
             e(ValueInput, {
               label: 'Serum Sodium',
               unit: 'mmol/L',
@@ -1719,8 +1752,8 @@
 
           // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'How quickly did this develop?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'If the duration is >48 hours or unknown, it is generally classified as chronic for risk stratification.'),
+            e('div', { style: STYLES.screenTitle }, 'How quickly did this develop?'),
+            e('div', { style: STYLES.screenSubtitle }, 'If the duration is >48 hours or unknown, it is generally classified as chronic for risk stratification.'),
             e(ChoiceButton, {
               label: 'Acute  ‹ 48 hours',
               sublabel: 'Less time for cerebral adaptation',
@@ -1759,8 +1792,8 @@
 
           // SCREEN 2: Serum osmolality (ChoiceButtons, auto-advance, branches)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Check serum osmolality'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Determines whether this is true hyponatraemia'),
+            e('div', { style: STYLES.screenTitle }, 'Check serum osmolality'),
+            e('div', { style: STYLES.screenSubtitle }, 'Determines whether this is true hyponatraemia'),
             e(ChoiceButton, {
               label: 'Low  ‹ 275 mOsm/kg',
               selected: serumOsmResult === 'low',
@@ -1809,8 +1842,8 @@
           // SCREEN 3: Path-dependent
           // If iso-osmolar → Results
           step === 3 && isIsoOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Iso-osmolar hyponatraemia'),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('div', { style: STYLES.screenSubtitle }, 'Iso-osmolar hyponatraemia'),
             e(InputSummaryStrip, { items: [
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() }
@@ -1840,8 +1873,8 @@
 
           // If hyper-osmolar → Glucose input screen
           step === 3 && isHyperOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Enter glucose'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'To calculate corrected sodium'),
+            e('div', { style: STYLES.screenTitle }, 'Enter glucose'),
+            e('div', { style: STYLES.screenSubtitle }, 'To calculate corrected sodium'),
             e(ValueInput, {
               label: 'Glucose',
               unit: 'mmol/L',
@@ -1865,8 +1898,8 @@
 
           // If hypotonic → Urine Osmolality
           step === 3 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the urine osmolality?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Is the kidney diluting appropriately?'),
+            e('div', { style: STYLES.screenTitle }, 'What is the urine osmolality?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Is the kidney diluting appropriately?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 100 mOsm/kg',
               selected: urineOsmResult === 'low',
@@ -1893,8 +1926,8 @@
           // SCREEN 4: Path-dependent
           // If hyper-osmolar → Results
           step === 4 && isHyperOsmolar && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hyper-osmolar hyponatraemia'),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('div', { style: STYLES.screenSubtitle }, 'Hyper-osmolar hyponatraemia'),
             e(InputSummaryStrip, { items: [
               { label: 'Na', ...getNaDisplay() },
               { label: 'Serum Osm', ...getSerumOsmDisplay() },
@@ -1921,8 +1954,8 @@
 
           // If hypotonic → Urine Sodium
           step === 4 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the urine sodium?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Is the kidney conserving sodium?'),
+            e('div', { style: STYLES.screenTitle }, 'What is the urine sodium?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Is the kidney conserving sodium?'),
             e(ChoiceButton, {
               label: 'Low  ‹ 30 mmol/L',
               selected: urineNaResult === 'low',
@@ -1947,8 +1980,8 @@
 
           // SCREEN 5: Hypotonic Results (full differential)
           step === 5 && !isShortPath && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Hypotonic hyponatraemia'),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('div', { style: STYLES.screenSubtitle }, 'Hypotonic hyponatraemia'),
 
             // Compact input summary
             e(InputSummaryStrip, { items: [
@@ -2131,8 +2164,8 @@
 
           // SCREEN 0: Is the patient inflamed? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Is the patient inflamed?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
+            e('div', { style: STYLES.screenTitle }, 'Is the patient inflamed?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
               label: 'Yes — CRP elevated',
               selected: hasInflammation === true,
@@ -2159,8 +2192,8 @@
 
           // SCREEN 1: CKD or heart failure? (ChoiceButtons, auto-advance)
           step === 1 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Does the patient have CKD or heart failure?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Different iron deficiency thresholds apply'),
+            e('div', { style: STYLES.screenTitle }, 'Does the patient have CKD or heart failure?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Different iron deficiency thresholds apply'),
             e(ChoiceButton, {
               label: 'CKD or haemodialysis',
               selected: clinicalContext === 'ckd',
@@ -2195,8 +2228,8 @@
 
           // SCREEN 2: Ferritin (ChoiceButtons, auto-advance)
           step === 2 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the ferritin (µg/L)?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'The starting point — interpret with context'),
+            e('div', { style: STYLES.screenTitle }, 'What is the ferritin (µg/L)?'),
+            e('div', { style: STYLES.screenSubtitle }, 'The starting point — interpret with context'),
             e(ChoiceButton, {
               label: 'Very low  ‹ 30 µg/L',
               selected: ferritinResult === 'veryLow',
@@ -2253,8 +2286,8 @@
 
           // SCREEN 3: TSAT (ChoiceButtons, auto-advance)
           step === 3 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'What is the TSAT?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Transferrin saturation (normal: 16–45%)'),
+            e('div', { style: STYLES.screenTitle }, 'What is the TSAT?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Transferrin saturation (normal: 16–45%)'),
             e(ChoiceButton, {
               label: 'Low  ‹ 16%',
               selected: tsatResult === 'low',
@@ -2290,7 +2323,7 @@
           // SCREEN 4: Results
           step === 4 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
+              e('div', { style: STYLES.screenTitle }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
                 (() => {
                   const ferr = { veryLow: 'Ferritin ↓↓', lowNormal: 'Ferritin low-normal', normal: 'Ferritin normal', high: 'Ferritin ↑', veryHigh: 'Ferritin ↑↑' }[ferritinResult] || '';
@@ -2458,14 +2491,19 @@
       const isPtProlonged = pt && parseFloat(pt) > 13.5;
       const isApttProlonged = aptt && parseFloat(aptt) > 38;
 
-      // ISTH DIC Score calculation
+      // ISTH DIC Score calculation with bounds validation
       const calcDICScore = () => {
         if (!platelets || !dDimer || !pt || !fibrinogen) return null;
-        let score = 0;
         const plt = parseFloat(platelets);
         const dd = parseFloat(dDimer);
         const ptVal = parseFloat(pt);
         const fib = parseFloat(fibrinogen);
+        // Reject negative or physiologically impossible values
+        if (isNaN(plt) || isNaN(dd) || isNaN(ptVal) || isNaN(fib)) return null;
+        if (plt < 0 || dd < 0 || ptVal < 0 || fib < 0) return null;
+        // Sensible upper bounds (platelets > 1000, PT > 200, fibrinogen > 20 unlikely)
+        if (plt > 1000 || ptVal > 200 || fib > 20 || dd > 100) return null;
+        let score = 0;
         if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
         if (dd <= 0.5) score += 0; else if (dd <= 5) score += 1; else score += 2;
         const ptProlongation = ptVal - 12;
@@ -2493,8 +2531,8 @@
 
           // SCREEN 0: What pattern do you see? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)', marginBottom: '8px', fontFamily: 'var(--font-heading)' } }, 'Which values are prolonged?'),
-            e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '20px' } }, 'Check the PT and APTT on the coag panel'),
+            e('div', { style: STYLES.screenTitle }, 'Which values are prolonged?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Check the PT and APTT on the coag panel'),
             e(ChoiceButton, {
               label: 'Isolated prolonged PT',
               sublabel: 'Extrinsic pathway',
@@ -2545,7 +2583,7 @@
           // SCREEN 1: Results
           step === 1 && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: { fontSize: '22px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--label)', fontFamily: 'var(--font-heading)' } }, 'Interpretation'),
+              e('div', { style: STYLES.screenTitle }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
                 pattern === 'A' ? 'Isolated prolonged PT' : pattern === 'B' ? 'Isolated prolonged APTT' : pattern === 'C' ? 'Both PT and APTT prolonged' : 'Both normal'
               )
