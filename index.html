@@ -1391,7 +1391,7 @@
               tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
             }, 'About 5% of hyperthyroidism is T3-predominant. Consider early Graves\' or autonomous adenoma.'),
 
-            tshResult === 'low' && ft4Status === 'normal' && (ft3Status === 'normal' || !ft3Status) && !(ft3Status === 'high') && e(DiffListItem, {
+            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'normal' && e(DiffListItem, {
               title: 'Subclinical Hyperthyroidism',
               tags: ['May be transient', 'Arrhythmia association', 'Bone health association'],
               infoPanel: e(InfoPanel, { title: 'Subclinical Hyperthyroidism' },
