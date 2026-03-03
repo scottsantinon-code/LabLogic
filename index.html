@@ -985,7 +985,7 @@
           e(ValueInput, { label: 'Latest Na', unit: 'mmol/L', value: latestNa, onChange: setLatestNa, placeholder: 'e.g. 122' }),
 
           // Date/time inputs
-          e('div', { style: { marginBottom: '12px' } },
+          e('div', { style: { marginBottom: '12px', overflow: 'hidden' } },
             e('label', { style: { fontSize: '12px', color: 'var(--label3)', display: 'block', marginBottom: '6px' } }, 'Time of first Na'),
             e('input', {
               type: 'datetime-local',
@@ -993,8 +993,9 @@
               onChange: (ev) => setStartDateTime(ev.target.value),
               style: {
                 width: '100%',
-                padding: '10px 12px',
-                fontSize: '15px',
+                maxWidth: '100%',
+                padding: '8px 10px',
+                fontSize: '14px',
                 fontFamily: 'var(--font)',
                 border: '1px solid var(--sep)',
                 borderRadius: '10px',
@@ -1004,7 +1005,7 @@
               }
             })
           ),
-          e('div', { style: { marginBottom: '12px' } },
+          e('div', { style: { marginBottom: '12px', overflow: 'hidden' } },
             e('label', { style: { fontSize: '12px', color: 'var(--label3)', display: 'block', marginBottom: '6px' } }, 'Time of latest Na'),
             e('input', {
               type: 'datetime-local',
@@ -1012,8 +1013,9 @@
               onChange: (ev) => setLatestDateTime(ev.target.value),
               style: {
                 width: '100%',
-                padding: '10px 12px',
-                fontSize: '15px',
+                maxWidth: '100%',
+                padding: '8px 10px',
+                fontSize: '14px',
                 fontFamily: 'var(--font)',
                 border: '1px solid var(--sep)',
                 borderRadius: '10px',
@@ -3163,7 +3165,7 @@
               pattern === 'B' && mixingResult && mixingResult !== 'notDone' && { label: 'Mixing', value: mixingResult === 'corrects' ? 'Corrects' : 'Does not correct', interpretation: mixingResult === 'corrects' ? 'Factor deficiency' : 'Inhibitor present' }
             ].filter(Boolean) }),
 
-            e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?' },
+            e(InfoPanel, { title: 'Is it the DOAC or a real problem?' },
               e('p', { style: { marginBottom: '10px' } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem:'),
               e('p', { style: { marginBottom: '10px' } },
                 e('strong', null, 'Dabigatran (direct thrombin inhibitor):'), ' Prolongs APTT and thrombin time. Thrombin time is very sensitive — if normal, dabigatran effect is excluded. For quantification: dilute thrombin time (Hemoclot).'
