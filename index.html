@@ -1685,23 +1685,6 @@
               e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release.'),
               e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Other drugs:'),
               e('p', null, 'Immune checkpoint inhibitors (pembrolizumab, nivolumab) → thyroiditis then hypothyroidism. Tyrosine kinase inhibitors → hypothyroidism. Dopamine/glucocorticoids → suppress TSH.')
-            ),
-
-            // Postpartum thyroiditis - show when hyperthyroid
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Postpartum Thyroiditis' },
-              e('p', { style: { marginBottom: '10px' } }, 'Affects 5–10% of women within 12 months of delivery. Autoimmune destructive process — often TPO antibody positive.'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Typical pattern:'),
-              e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
-                e('li', null, 'Hyperthyroid phase (1–4 months postpartum) — preformed hormone release'),
-                e('li', null, 'Hypothyroid phase (4–8 months postpartum) — gland recovery'),
-                e('li', null, 'Usually self-resolves, but ~20% develop permanent hypothyroidism')
-              ),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Key interpretation points:'),
-              e('ul', { style: { marginLeft: '16px' } },
-                e('li', null, 'Low uptake on thyroid scan (distinguishes from Graves\')'),
-                e('li', null, 'No eye signs (unlike Graves\')'),
-                e('li', null, 'Often painless (unlike subacute thyroiditis)')
-              )
             )
           )
         )
