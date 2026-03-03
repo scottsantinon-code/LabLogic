@@ -1922,49 +1922,64 @@
 
             e(LearnMoreDivider),
 
-            // Causes of Hyperthyroidism InfoPanel (when hyperthyroid)
-            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism' },
-              e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'High uptake on thyroid scan (↑ synthesis):'),
-              e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
-                e('li', null, 'Graves\' disease — diffuse uptake, TRAb positive'),
-                e('li', null, 'Toxic multinodular goitre — patchy uptake'),
-                e('li', null, 'Toxic adenoma — single hot nodule')
+            // Causes of Hyperthyroidism InfoModalTrigger (when hyperthyroid)
+            (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoModalTrigger, { title: 'Causes of Hyperthyroidism' },
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'High uptake on thyroid scan (↑ synthesis):'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, e('strong', null, 'Graves\' disease'), ' — diffuse uptake, TRAb positive'),
+                e('li', null, e('strong', null, 'Toxic multinodular goitre'), ' — patchy uptake'),
+                e('li', null, e('strong', null, 'Toxic adenoma'), ' — single hot nodule')
               ),
-              e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'Low uptake on thyroid scan (preformed hormone release):'),
-              e('ul', { style: { marginLeft: '16px', marginBottom: '12px' } },
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Low uptake on thyroid scan (preformed hormone release):'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
                 e('li', null, 'Thyroiditis (subacute, postpartum, silent)'),
                 e('li', null, 'Exogenous thyroid hormone'),
                 e('li', null, 'Iodine-induced (amiodarone, contrast)')
               ),
-              e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'Key distinguishing features:'),
-              e('ul', { style: { marginLeft: '16px' } },
-                e('li', null, 'Graves\': eye signs, diffuse goitre, TRAb positive'),
-                e('li', null, 'Thyroiditis: tender thyroid, self-limiting'),
-                e('li', null, 'Amiodarone: Type 1 (synthesis) vs Type 2 (destructive)')
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key distinguishing features:'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, e('strong', null, 'Graves\':'), ' eye signs, diffuse goitre, TRAb positive'),
+                e('li', null, e('strong', null, 'Thyroiditis:'), ' tender thyroid, self-limiting, often follows viral illness'),
+                e('li', null, e('strong', null, 'Amiodarone:'), ' Type 1 (synthesis) vs Type 2 (destructive) — Doppler can help distinguish')
               )
             ),
 
             // Assay interference panel - only show when relevant
-            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoPanel, { title: 'Assay Interference — the Hidden Trap' },
-              e('p', { style: { marginBottom: '10px' } },
-                e('strong', null, 'Biotin (Vitamin B7):'), ' High-dose biotin supplements (common in "hair and nails" products, also MS treatment) interfere with streptavidin-biotin immunoassays. Can cause falsely ↑fT4, ↑fT3, ↓TSH — mimicking hyperthyroidism.'
+            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoModalTrigger, { title: 'Assay Interference — the Hidden Trap' },
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Biotin (Vitamin B7)'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } },
+                'High-dose biotin supplements (common in "hair and nails" products, also MS treatment) interfere with streptavidin-biotin immunoassays. Can cause falsely ↑fT4, ↑fT3, ↓TSH — ', e('strong', null, 'mimicking hyperthyroidism'), '.'
               ),
-              e('p', { style: { marginBottom: '10px' } },
-                e('strong', null, 'Heterophile antibodies:'), ' Antibodies that interfere with immunoassays. Can cause falsely high or low results. Suspect if discordant with clinical picture.'
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Heterophile antibodies'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } },
+                'Antibodies (often from mouse exposure or prior immunotherapy) that interfere with immunoassays. Can cause falsely high or low results. ', e('strong', null, 'Suspect if results are discordant with clinical picture.'), ' Contact lab to request heterophile antibody blocking.'
               ),
-              e('p', null,
-                e('strong', null, 'Hook effect:'), ' Very high analyte concentrations can saturate assay and give falsely low/normal results. Rare but relevant in pregnancy and severe thyrotoxicosis.'
-              )
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Hook effect'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } },
+                'Very high analyte concentrations can saturate assay and give falsely low/normal results. Rare but relevant in pregnancy (hCG) and severe thyrotoxicosis.'
+              ),
+              e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'When in doubt, discuss with the laboratory. Many interferences can be detected or circumvented with alternative assay methods.')
             ),
 
-            e(InfoPanel, { title: 'Drug-Induced Thyroid Dysfunction' },
-              e('p', { style: { marginBottom: '10px' } }, 'These medications can alter thyroid function and/or interfere with thyroid tests. In patients taking them, periodic thyroid function monitoring is commonly recommended, but frequency varies by guideline and local protocol. Interpret results in clinical context.'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Amiodarone:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for interpretation.'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Lithium:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release.'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Other drugs:'),
-              e('p', null, 'Immune checkpoint inhibitors (pembrolizumab, nivolumab) → thyroiditis then hypothyroidism. Tyrosine kinase inhibitors → hypothyroidism. Dopamine/glucocorticoids → suppress TSH.')
+            e(InfoModalTrigger, { title: 'Drug-Induced Thyroid Dysfunction' },
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'These medications can alter thyroid function and/or interfere with thyroid tests. Interpret TFT results in the context of current medications.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Amiodarone'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Can cause BOTH hypo- and hyperthyroidism. Hypothyroidism more common in iodine-replete populations (Australia). Type 1 thyrotoxicosis (excess synthesis) vs Type 2 (destructive thyroiditis) — distinction matters for treatment. Colour-flow Doppler and IL-6 levels can help differentiate.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Lithium'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Causes hypothyroidism in up to 20% of patients. Concentrates in thyroid and inhibits hormone release. Also associated with goitre. Monitor TFTs at baseline and periodically.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Immune checkpoint inhibitors'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Pembrolizumab, nivolumab, ipilimumab can cause immune-related thyroiditis → often transient thyrotoxicosis followed by hypothyroidism. Screen before each cycle.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Other medications'),
+              e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, e('strong', null, 'Tyrosine kinase inhibitors'), ' (sunitinib, sorafenib) → hypothyroidism'),
+                e('li', null, e('strong', null, 'Dopamine/glucocorticoids'), ' → suppress TSH secretion'),
+                e('li', null, e('strong', null, 'Interferon-α'), ' → thyroiditis, may be permanent'),
+                e('li', null, e('strong', null, 'Iodinated contrast'), ' → transient thyroid dysfunction (Jod-Basedow or Wolff-Chaikoff)')
+              )
             )
           )
         )
@@ -2332,20 +2347,42 @@
 
               e(DiffCard, { title: 'Post-obstructive diuresis / Polyuric ATN', description: 'Recovery phase — kidneys wasting everything.' }),
 
-              e(InfoPanel, { title: 'SIADH vs Cerebral Salt Wasting — the Key Distinction' },
-                e('p', { style: { marginBottom: '12px' } }, 'Both cause hyponatraemia with high urine osm and high urine Na. The critical difference is volume status:'),
-                e('div', { style: { display: 'flex', gap: '8px', marginBottom: '12px' } },
-                  e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
-                    e('strong', null, 'SIADH:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic. Urine output variable. Urine osm usually >100 (often > serum), reflecting inappropriate ADH effect. Diagnosis requires exclusion of adrenal insufficiency, hypothyroidism, and renal failure.')
+              e(InfoModalTrigger, { title: 'SIADH vs Cerebral Salt Wasting' },
+                e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Both cause hyponatraemia with high urine osmolality and high urine sodium. The critical difference is ', e('strong', null, 'volume status'), '.'),
+
+                e('div', { style: { display: 'flex', gap: '12px', marginBottom: '16px' } },
+                  e('div', { style: { flex: 1, background: 'rgba(0,113,227,0.06)', borderRadius: '12px', padding: '14px' } },
+                    e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--label)' } }, 'SIADH'),
+                    e('ul', { style: { margin: 0, paddingLeft: '16px', fontSize: '13px', lineHeight: 1.6 } },
+                      e('li', null, 'Euvolaemic'),
+                      e('li', null, 'Urine output variable'),
+                      e('li', null, 'Urine osm >100 (often > serum)'),
+                      e('li', null, 'Low serum uric acid')
+                    )
                   ),
-                  e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
-                    e('strong', null, 'CSW:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric (high urine output). Signs of volume depletion (tachycardia, orthostatic hypotension, negative fluid balance).')
+                  e('div', { style: { flex: 1, background: 'rgba(255,149,0,0.08)', borderRadius: '12px', padding: '14px' } },
+                    e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--label)' } }, 'CSW'),
+                    e('ul', { style: { margin: 0, paddingLeft: '16px', fontSize: '13px', lineHeight: 1.6 } },
+                      e('li', null, e('strong', null, 'Hypovolaemic')),
+                      e('li', null, 'Polyuric (high output)'),
+                      e('li', null, 'Negative fluid balance'),
+                      e('li', null, 'Tachycardia, orthostasis')
+                    )
                   )
                 ),
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Distinguishing these matters:'), ' management differs significantly and misdiagnosis can worsen outcomes.'),
-                e('p', { style: { fontSize: '12px', color: 'var(--orange)' } }, '⚠️ Do not use urine output alone to distinguish SIADH from CSW. Assess volume status, fluid balance trajectory, and consider specialist input.')
+
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Why it matters'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, e('strong', null, 'SIADH:'), ' Treat with fluid restriction ± salt tablets ± vasopressin antagonist'),
+                  e('li', null, e('strong', null, 'CSW:'), ' Treat with volume replacement (saline) — fluid restriction would be harmful')
+                ),
+
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'SIADH is a diagnosis of exclusion'),
+                e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Must exclude: adrenal insufficiency, hypothyroidism, renal failure, diuretics, and hypovolaemia (including CSW).'),
+
+                e('div', { style: { background: 'rgba(255,149,0,0.1)', borderRadius: '10px', padding: '12px' } },
+                  e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '⚠️ Do not use urine output alone to distinguish SIADH from CSW. Assess volume status clinically, track fluid balance trajectory, and consider specialist input when uncertain.')
+                )
               )
             ),
 
@@ -3024,11 +3061,29 @@
               },
               color: 'var(--accent)'
             }),
-            e(InfoPanel, { title: 'Understanding the Mixing Study' },
-              e('p', { style: { marginBottom: '10px' } }, 'When APTT is prolonged, mixing 1:1 with normal plasma helps distinguish factor deficiency from inhibitors.'),
-              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
-              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate non-correction suggests lupus anticoagulant or heparin. Time-dependent non-correction (prolonged again after 2 hour incubation) suggests acquired Factor VIII inhibitor.'),
-              e('p', null, 'Do not interpret mixing studies if the patient is on DOACs or heparin unless the lab has neutralised or verified absence of these agents.')
+            e(InfoModalTrigger, { title: 'Understanding the Mixing Study' },
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'When APTT is prolonged, mixing the patient\'s plasma 1:1 with normal plasma helps distinguish factor deficiency from inhibitors.'),
+
+              e('div', { style: { display: 'flex', gap: '12px', marginBottom: '16px' } },
+                e('div', { style: { flex: 1, background: 'rgba(52,199,89,0.1)', borderRadius: '12px', padding: '14px' } },
+                  e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--green)' } }, 'Corrects'),
+                  e('p', { style: { fontSize: '13px', lineHeight: 1.6, margin: 0 } }, 'Factor deficiency — normal plasma provides the missing factor')
+                ),
+                e('div', { style: { flex: 1, background: 'rgba(255,69,58,0.1)', borderRadius: '12px', padding: '14px' } },
+                  e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--red)' } }, 'Does not correct'),
+                  e('p', { style: { fontSize: '13px', lineHeight: 1.6, margin: 0 } }, 'Inhibitor present — something is interfering with clotting')
+                )
+              ),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Non-correction patterns'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, e('strong', null, 'Immediate non-correction:'), ' Lupus anticoagulant, heparin, dabigatran'),
+                e('li', null, e('strong', null, 'Time-dependent non-correction'), ' (prolonged again after 2h incubation): Acquired Factor VIII inhibitor — this is a haematology emergency')
+              ),
+
+              e('div', { style: { background: 'rgba(255,149,0,0.1)', borderRadius: '10px', padding: '12px' } },
+                e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '⚠️ Do not interpret mixing studies if the patient is on DOACs or heparin unless the lab has neutralised or verified absence of these agents — they will cause non-correction and confound interpretation.')
+              )
             )
           ),
 
@@ -3094,10 +3149,20 @@
                 e(DiffListItem, {
                   title: 'Heparin',
                   tags: ['Most common in hospital', 'UFH vs LMWH'],
-                  infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
-                    e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
-                    e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
-                    e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
+                  infoPanel: e(InfoModalTrigger, { title: 'UFH vs LMWH' },
+                    e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Unfractionated Heparin (UFH)'),
+                    e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                      e('li', null, 'Typically prolongs APTT (monitoring varies by lab — APTT ratio vs anti-Xa)'),
+                      e('li', null, 'Also prolongs thrombin time'),
+                      e('li', null, e('strong', null, 'Thrombin time is very sensitive'), ' — prolonged even with trace contamination')
+                    ),
+                    e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Low Molecular Weight Heparin (LMWH)'),
+                    e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                      e('li', null, 'Often has minimal effect on APTT'),
+                      e('li', null, 'Anti-Xa assays (calibrated for LMWH) are more informative when monitoring is needed'),
+                      e('li', null, 'Interpret results in context of timing of last dose')
+                    ),
+                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Normal thrombin time excludes significant UFH effect.')
                   )
                 }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
                 e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
@@ -3109,10 +3174,20 @@
                 e(DiffListItem, {
                   title: 'Heparin',
                   tags: ['Most common in hospital', 'UFH vs LMWH'],
-                  infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
-                    e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
-                    e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
-                    e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
+                  infoPanel: e(InfoModalTrigger, { title: 'UFH vs LMWH' },
+                    e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Unfractionated Heparin (UFH)'),
+                    e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                      e('li', null, 'Typically prolongs APTT (monitoring varies by lab — APTT ratio vs anti-Xa)'),
+                      e('li', null, 'Also prolongs thrombin time'),
+                      e('li', null, e('strong', null, 'Thrombin time is very sensitive'), ' — prolonged even with trace contamination')
+                    ),
+                    e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Low Molecular Weight Heparin (LMWH)'),
+                    e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                      e('li', null, 'Often has minimal effect on APTT'),
+                      e('li', null, 'Anti-Xa assays (calibrated for LMWH) are more informative when monitoring is needed'),
+                      e('li', null, 'Interpret results in context of timing of last dose')
+                    ),
+                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Normal thrombin time excludes significant UFH effect.')
                   )
                 }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
                 e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
@@ -3198,10 +3273,29 @@
               e(DiffListItem, {
                 title: 'Severe Liver Disease',
                 tags: ['Impaired synthesis', 'Factor VIII often normal/↑'],
-                infoPanel: e(InfoPanel, { title: 'Liver vs DIC' },
-                  e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
-                  e('p', { style: { marginBottom: '8px' } }, 'Factor VIII may be helpful in some contexts (often normal/high in liver disease, low in DIC) but is an acute phase reactant and not definitive. Interpret alongside clinical context, fibrinogen trend, and underlying condition.'),
-                  e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
+                infoPanel: e(InfoModalTrigger, { title: 'Liver Disease vs DIC' },
+                  e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Both can cause: prolonged PT + APTT, low fibrinogen, thrombocytopenia, elevated D-dimer. Distinguishing them matters for management.'),
+
+                  e('div', { style: { display: 'flex', gap: '12px', marginBottom: '16px' } },
+                    e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.08)', borderRadius: '12px', padding: '14px' } },
+                      e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--label)' } }, 'Liver Disease'),
+                      e('ul', { style: { margin: 0, paddingLeft: '16px', fontSize: '13px', lineHeight: 1.6 } },
+                        e('li', null, 'Factor VIII often normal/↑'),
+                        e('li', null, 'Target cells, acanthocytes on film'),
+                        e('li', null, 'Clinical context of cirrhosis')
+                      )
+                    ),
+                    e('div', { style: { flex: 1, background: 'rgba(255,69,58,0.08)', borderRadius: '12px', padding: '14px' } },
+                      e('div', { style: { fontWeight: 700, marginBottom: '8px', color: 'var(--label)' } }, 'DIC'),
+                      e('ul', { style: { margin: 0, paddingLeft: '16px', fontSize: '13px', lineHeight: 1.6 } },
+                        e('li', null, 'Factor VIII often low'),
+                        e('li', null, e('strong', null, 'Schistocytes'), ' on film'),
+                        e('li', null, 'Underlying trigger (sepsis, trauma)')
+                      )
+                    )
+                  ),
+
+                  e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Factor VIII is an acute phase reactant — interpret with caution. Trend fibrinogen and use clinical context.')
                 )
               }),
               e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] },
@@ -3242,16 +3336,31 @@
                 'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.')
             ),
 
-            e(InfoPanel, { title: 'Is it the DOAC or a real problem?' },
-              e('p', { style: { marginBottom: '10px' } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem:'),
-              e('p', { style: { marginBottom: '10px' } },
-                e('strong', null, 'Dabigatran (direct thrombin inhibitor):'), ' Prolongs APTT and thrombin time. Thrombin time is very sensitive — if normal, dabigatran effect is excluded. For quantification: dilute thrombin time (Hemoclot).'
+            e(InfoModalTrigger, { title: 'Is it the DOAC or a real problem?' },
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Dabigatran (direct thrombin inhibitor)'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Prolongs APTT and thrombin time'),
+                e('li', null, e('strong', null, 'Thrombin time is very sensitive'), ' — if normal, dabigatran effect is excluded'),
+                e('li', null, 'For quantification: dilute thrombin time (Hemoclot)')
               ),
-              e('p', { style: { marginBottom: '10px' } },
-                e('strong', null, 'Rivaroxaban / Apixaban (anti-Xa):'), ' Routine PT/APTT are variably sensitive and may be normal at trough. Use a drug-calibrated anti-Xa assay for quantification (if available) or lab-advised method.'
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Rivaroxaban / Apixaban / Edoxaban (anti-Xa)'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Routine PT/APTT are variably sensitive and may be normal at trough'),
+                e('li', null, 'PT may be prolonged (especially rivaroxaban) but this is not reliable for quantification'),
+                e('li', null, 'Use a ', e('strong', null, 'drug-calibrated anti-Xa assay'), ' for quantification')
               ),
-              e('p', null,
-                e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Warfarin'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Prolongs PT/INR (primary monitoring test)'),
+                e('li', null, 'If APTT is also very prolonged → consider supratherapeutic dosing or concomitant problem')
+              ),
+
+              e('div', { style: { background: 'rgba(0,113,227,0.06)', borderRadius: '10px', padding: '12px' } },
+                e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '💡 When in doubt, contact your lab — they can advise on which assays to use and help interpret results in the context of anticoagulant therapy.')
               )
             ),
 
