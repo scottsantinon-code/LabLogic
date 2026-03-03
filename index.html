@@ -2570,7 +2570,7 @@
               style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' }
             }, clinicalContext === 'heartFailure'
               ? '💡 Major heart failure trials (FAIR-HF, AFFIRM-AHF) defined iron deficiency as TSAT <20% (not <16%). Values of 16–20% may represent clinically significant iron deficiency in heart failure.'
-              : '💡 KDIGO guidelines for CKD use TSAT <20% as part of the threshold for considering iron supplementation. Values of 16–20% may represent clinically significant iron deficiency in CKD.'
+              : '💡 Current KDIGO guidelines recommend considering iron supplementation when TSAT ≤30% and ferritin ≤500 µg/L (non-dialysis CKD) or ≤300 µg/L (dialysis CKD). Individualise thresholds.'
             )
           ),
 
@@ -2622,7 +2622,7 @@
                   title: 'Iron Studies — Interpret in Context',
                   description: clinicalContext === 'heartFailure'
                     ? 'Standard thresholds suggest adequate iron. However, major heart failure trials defined iron deficiency as ferritin <100 or ferritin 100–300 with TSAT <20%. If TSAT is 16–20%, iron deficiency by trial criteria cannot be excluded. Consider local heart failure iron supplementation guidance.'
-                    : 'Standard thresholds suggest adequate iron. However, KDIGO CKD guidelines use different thresholds and values close to the threshold may still warrant iron supplementation, particularly in patients on ESAs. Refer to local renal guidance.'
+                    : 'Standard thresholds suggest adequate iron. However, current KDIGO guidelines use TSAT ≤30% (not <16%) with ferritin thresholds varying by dialysis status. Values may still warrant iron supplementation. Individualise and refer to local renal guidance.'
                 });
               }
               if (ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && clinicalContext === 'none') {
@@ -2729,11 +2729,11 @@
               infoPanel: e(InfoPanel, { title: 'Iron Deficiency Thresholds in CKD and Heart Failure' },
                 e('p', { style: { marginBottom: '10px' } }, 'Standard laboratory reference ranges for TSAT (<16% = low) differ from thresholds used in major clinical trials and guidelines for CKD and heart failure.'),
                 e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Heart failure trials (FAIR-HF, AFFIRM-AHF):'), ' Iron deficiency defined as ferritin <100 µg/L OR ferritin 100–300 µg/L with TSAT <20%.'),
-                e('p', null, e('strong', null, 'KDIGO CKD guidelines:'), ' Consider iron supplementation when TSAT <20% and ferritin <100–500 µg/L depending on dialysis status and ESA use.')
+                e('p', null, e('strong', null, 'Current KDIGO CKD guidelines:'), ' Consider iron supplementation when TSAT ≤30% AND ferritin ≤500 µg/L (non-dialysis CKD) or ferritin ≤300 µg/L (dialysis CKD). Individualise based on Hb response, ESA use, and clinical context.')
               )
             }, clinicalContext === 'heartFailure'
               ? 'Standard thresholds suggest adequate iron, but heart failure trial definitions use TSAT <20%. If TSAT is 16–20%, consider local heart failure iron guidance.'
-              : 'Standard thresholds suggest adequate iron, but KDIGO uses TSAT <20% for CKD. If TSAT is 16–20%, consider local renal iron guidance.'
+              : 'Standard thresholds suggest adequate iron, but KDIGO uses TSAT ≤30% for CKD with ferritin thresholds varying by dialysis status. Consider local renal iron guidance.'
             ),
 
             // Pattern: Ferritin normal + TSAT normal (no inflammation, general context)
