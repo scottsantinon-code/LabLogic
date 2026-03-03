@@ -2555,6 +2555,8 @@
 
       // Screen 0: Pattern
       const [pattern, setPattern] = useState(null);
+      // Screen 1 (Pattern B only): Mixing study
+      const [mixingResult, setMixingResult] = useState(null);
       // Optional lab inputs (collapsed on results)
       const [showLabs, setShowLabs] = useState(false);
       const [pt, setPt] = useState('');
@@ -2564,7 +2566,9 @@
       const [dDimer, setDDimer] = useState('');
       const [platelets, setPlatelets] = useState('');
 
-      const getTotalScreens = () => 2;
+      // Pattern B has 3 screens (pattern → mixing → results), others have 2
+      const getTotalScreens = () => pattern === 'B' ? 3 : 2;
+      const getResultsStep = () => pattern === 'B' ? 2 : 1;
 
       const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
       const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
@@ -2572,6 +2576,7 @@
       const resetModule = () => {
         setStep(0);
         setPattern(null);
+        setMixingResult(null);
         setShowLabs(false);
         setPt('');
         setInr('');
@@ -2682,8 +2687,50 @@
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
-          // SCREEN 1: Results
-          step === 1 && e(FadeIn, null,
+          // SCREEN 1 (Pattern B only): Mixing Study
+          step === 1 && pattern === 'B' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Was a mixing study performed?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Mix 1:1 patient plasma with normal plasma and recheck APTT'),
+            e(ChoiceButton, {
+              label: 'APTT corrects',
+              selected: mixingResult === 'corrects',
+              onClick: () => {
+                clearAutoAdvance();
+                setMixingResult('corrects');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'APTT does not correct',
+              selected: mixingResult === 'notCorrects',
+              onClick: () => {
+                clearAutoAdvance();
+                setMixingResult('notCorrects');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Not performed',
+              selected: mixingResult === 'notDone',
+              onClick: () => {
+                clearAutoAdvance();
+                setMixingResult('notDone');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(InfoPanel, { title: 'Understanding the Mixing Study' },
+              e('p', { style: { marginBottom: '10px' } }, 'When APTT is prolonged, mixing 1:1 with normal plasma helps distinguish factor deficiency from inhibitors.'),
+              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
+              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate non-correction suggests lupus anticoagulant or heparin. Time-dependent non-correction (prolonged again after 2 hour incubation) suggests acquired Factor VIII inhibitor.'),
+              e('p', null, 'If the patient is on heparin, the mixing study cannot be reliably interpreted.')
+            )
+          ),
+
+          // RESULTS SCREEN (step 1 for A/C/D, step 2 for B)
+          step === getResultsStep() && e(FadeIn, null,
             e('div', { style: { marginBottom: '20px' } },
               e('div', { style: STYLES.screenTitle }, 'Interpretation'),
               e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
@@ -2709,45 +2756,89 @@
                 'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding. Recombinant Factor VIIa (NovoSeven) available for severe bleeding.')
             ),
 
-            // Pattern B: Isolated prolonged APTT
+            // Pattern B: Isolated prolonged APTT (filtered by mixing study result)
             pattern === 'B' && e(React.Fragment, null,
-              e(DiffListItem, {
-                title: 'Heparin',
-                tags: ['Most common in hospital', 'UFH vs LMWH'],
-                infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
-                  e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
-                  e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
-                  e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
-                )
-              }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
-              e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
-                'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
-              e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
-                'X-linked. Confirm with factor IX assay. Severity and management are specialist-led.'),
-              e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
-                'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
-              e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
-                'Common in Ashkenazi Jewish populations. Bleeding risk poorly correlates with factor level.'),
-              e(DiffListItem, {
-                title: 'Factor XII Deficiency',
-                tags: ['NO bleeding risk', 'APTT prolongation only']
-              }, 'Factor XII deficiency can markedly prolong APTT but is not typically associated with clinical bleeding. Consider this when interpreting an isolated prolonged APTT with no bleeding history.'),
-              e(DiffListItem, {
-                title: 'Lupus Anticoagulant',
-                tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
-              }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo — the clinical risk is clotting, not bleeding.'),
-              e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
-                'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.'),
-              e(DiffListItem, {
-                title: 'Acquired Factor VIII Inhibitor',
-                tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
-                defaultOpen: true,
-                warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
-              }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. APTT does not correct on mixing study. Contact haematology immediately.'),
-              e(InfoPanel, { title: 'The Mixing Study' },
-                e('p', { style: { marginBottom: '8px' } }, 'When APTT is prolonged, mix 1:1 patient plasma with normal plasma:'),
-                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
-                e('p', null, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate: lupus anticoagulant, heparin. Time-dependent (2h): acquired Factor VIII inhibitor (serious).', e('br'), 'If patient is on heparin, the mixing study is useless.')
+              // Show mixing study result in input summary if performed
+              mixingResult && mixingResult !== 'notDone' && e(InputSummaryStrip, { items: [
+                { label: 'Mixing', value: mixingResult === 'corrects' ? 'Corrects' : 'Does not correct', color: 'var(--accent)' }
+              ] }),
+
+              // If corrects: factor deficiencies only
+              (mixingResult === 'corrects') && e(React.Fragment, null,
+                e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
+                  'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
+                e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
+                  'X-linked. Confirm with factor IX assay. Severity and management are specialist-led.'),
+                e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
+                  'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
+                e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
+                  'Common in Ashkenazi Jewish populations. Bleeding risk poorly correlates with factor level.'),
+                e(DiffListItem, {
+                  title: 'Factor XII Deficiency',
+                  tags: ['NO bleeding risk', 'APTT prolongation only']
+                }, 'Factor XII deficiency can markedly prolong APTT but is not typically associated with clinical bleeding. Consider this when interpreting an isolated prolonged APTT with no bleeding history.')
+              ),
+
+              // If does not correct: inhibitors only
+              (mixingResult === 'notCorrects') && e(React.Fragment, null,
+                e(DiffListItem, {
+                  title: 'Lupus Anticoagulant',
+                  tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
+                }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo — the clinical risk is clotting, not bleeding.'),
+                e(DiffListItem, {
+                  title: 'Acquired Factor VIII Inhibitor',
+                  tags: ['Haematology EMERGENCY', 'Elderly', 'Time-dependent'],
+                  defaultOpen: true,
+                  warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
+                }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. Time-dependent non-correction (prolonged again after 2h incubation). Contact haematology immediately.'),
+                e(DiffListItem, {
+                  title: 'Heparin',
+                  tags: ['Most common in hospital', 'UFH vs LMWH'],
+                  infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
+                    e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
+                    e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
+                    e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
+                  )
+                }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
+                e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
+                  'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.')
+              ),
+
+              // If not done: show all differentials (fallback)
+              (mixingResult === 'notDone') && e(React.Fragment, null,
+                e(DiffListItem, {
+                  title: 'Heparin',
+                  tags: ['Most common in hospital', 'UFH vs LMWH'],
+                  infoPanel: e(InfoPanel, { title: 'UFH vs LMWH' },
+                    e('p', { style: { marginBottom: '10px' } }, 'UFH typically prolongs the APTT and can also affect thrombin time. Monitoring approach depends on local laboratory practice (APTT ratio versus anti-Xa).'),
+                    e('p', { style: { marginBottom: '10px' } }, 'LMWH often has minimal effect on APTT; anti-Xa assays (when used) are more informative. Interpret results in context of timing of last dose and sample collection.'),
+                    e('p', null, e('strong', null, 'Thrombin time (TT):'), ' Very sensitive to UFH — prolonged even with trace contamination. Normal TT excludes UFH effect.')
+                  )
+                }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
+                e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
+                  'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
+                e(DiffListItem, { title: 'Haemophilia B (Factor IX ↓)', tags: ['X-linked', 'Clinically identical to A'] },
+                  'X-linked. Confirm with factor IX assay. Severity and management are specialist-led.'),
+                e(DiffListItem, { title: 'von Willebrand Disease', tags: ['Most common inherited bleeding disorder', 'vWF stabilises VIII'] },
+                  'Confirm with appropriate factor and/or von Willebrand assays and interpret alongside bleeding history. Severity and management are specialist-led and vary by subtype and clinical context.'),
+                e(DiffListItem, { title: 'Factor XI Deficiency', tags: ['Ashkenazi Jewish', 'Variable bleeding risk'] },
+                  'Common in Ashkenazi Jewish populations. Bleeding risk poorly correlates with factor level.'),
+                e(DiffListItem, {
+                  title: 'Factor XII Deficiency',
+                  tags: ['NO bleeding risk', 'APTT prolongation only']
+                }, 'Factor XII deficiency can markedly prolong APTT but is not typically associated with clinical bleeding. Consider this when interpreting an isolated prolonged APTT with no bleeding history.'),
+                e(DiffListItem, {
+                  title: 'Lupus Anticoagulant',
+                  tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
+                }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo — the clinical risk is clotting, not bleeding.'),
+                e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
+                  'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.'),
+                e(DiffListItem, {
+                  title: 'Acquired Factor VIII Inhibitor',
+                  tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
+                  defaultOpen: true,
+                  warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
+                }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. APTT does not correct on mixing study. Contact haematology immediately.')
               )
             ),
 
