@@ -93,6 +93,28 @@
       padding: 0 20px 20px;
       padding-bottom: calc(20px + env(safe-area-inset-bottom));
     }
+
+    /* Improved scrollbars for better visibility */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--sep);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--label3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--label2);
+    }
+    /* Firefox scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--label3) var(--sep);
+    }
   </style>
 </head>
 <body>
@@ -455,6 +477,22 @@
 
     // 6b. InfoModal - Pull-up modal for detailed information
     function InfoModal({ title, children, isOpen, onClose }) {
+      const [showScrollHint, setShowScrollHint] = useState(true);
+      const contentRef = useRef(null);
+
+      useEffect(() => {
+        if (isOpen && contentRef.current) {
+          const el = contentRef.current;
+          const checkScroll = () => {
+            const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 20;
+            setShowScrollHint(!isAtBottom && el.scrollHeight > el.clientHeight);
+          };
+          checkScroll();
+          el.addEventListener('scroll', checkScroll);
+          return () => el.removeEventListener('scroll', checkScroll);
+        }
+      }, [isOpen]);
+
       if (!isOpen) return null;
       return e('div', {
         style: {
@@ -493,18 +531,40 @@
           e('div', { style: { padding: '0 20px 16px', borderBottom: '1px solid var(--sep)', flexShrink: 0 } },
             e('div', { style: { fontSize: '18px', fontWeight: 700, color: 'var(--label)' } }, title)
           ),
-          // Content
-          e('div', {
-            style: {
-              padding: '20px',
-              overflowY: 'auto',
-              flex: 1,
-              minHeight: 0,
-              fontSize: '14px',
-              lineHeight: 1.7,
-              color: 'var(--label2)'
-            }
-          }, children),
+          // Content wrapper with scroll indicator
+          e('div', { style: { position: 'relative', flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' } },
+            // Scrollable content
+            e('div', {
+              ref: contentRef,
+              style: {
+                padding: '20px',
+                overflowY: 'auto',
+                flex: 1,
+                minHeight: 0,
+                fontSize: '14px',
+                lineHeight: 1.7,
+                color: 'var(--label2)'
+              }
+            }, children),
+            // Scroll fade indicator
+            showScrollHint && e('div', {
+              style: {
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '40px',
+                background: 'linear-gradient(transparent, var(--bg))',
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                paddingBottom: '4px'
+              }
+            },
+              e('span', { style: { fontSize: '10px', color: 'var(--label3)', animation: 'fadeIn 0.3s ease' } }, '↓ scroll for more')
+            )
+          ),
           // Close button
           e('div', { style: { padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', flexShrink: 0 } },
             e('button', {
@@ -1257,25 +1317,43 @@
           )
         ),
 
-        // Footer
+        // Footer - compact version (full disclaimer on gate screen)
         e('div', {
-          style: { textAlign: 'center', padding: '24px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', marginTop: 'auto' }
+          style: { textAlign: 'center', padding: '16px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', marginTop: 'auto' }
         },
-          e('div', { style: { fontSize: '11px', color: 'var(--label3)', fontWeight: 600, marginBottom: '6px' } }, 'For healthcare professionals only'),
-          e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool. Interpretation support only. Not a substitute for clinical judgement. Verify reference ranges against your laboratory.'),
-          e('button', {
-            onClick: () => onSelectModule('terms'),
-            style: {
-              background: 'none',
-              border: 'none',
-              color: 'var(--accent)',
-              fontSize: '11px',
-              fontWeight: 500,
-              marginTop: '12px',
-              cursor: 'pointer',
-              fontFamily: 'var(--font)'
-            }
-          }, 'Terms of Use'),
+          e('div', { style: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', fontSize: '11px' } },
+            e('button', {
+              onClick: () => onSelectModule('terms'),
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--label3)',
+                fontSize: '11px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                fontFamily: 'var(--font)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }
+            },
+              e('span', { style: { fontSize: '12px' } }, 'ⓘ'),
+              'Disclaimer'
+            ),
+            e('span', { style: { color: 'var(--label4)' } }, '•'),
+            e('button', {
+              onClick: () => onSelectModule('terms'),
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--label3)',
+                fontSize: '11px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, 'Terms')
+          ),
           e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '8px' } }, '© 2026 Critical Condition Pty Ltd')
         )
       );
@@ -2709,13 +2787,22 @@
               });
             })(),
 
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+            // Only show Differential heading when there are multiple possible diagnoses
+            // (Skip for ferritinResult === 'veryLow' since diagnosis is definitive)
+            ferritinResult !== 'veryLow' && e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
-            // Pattern: Ferritin very low (any TSAT) - diagnostic of iron deficiency
-            ferritinResult === 'veryLow' && e(DiffListItem, {
-              title: 'Iron Deficiency',
-              defaultOpen: true
-            }, 'Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts. Investigate the underlying cause (blood loss, malabsorption, inadequate intake).'),
+            // Pattern: Ferritin very low - Show investigation prompt instead of redundant differential
+            ferritinResult === 'veryLow' && e('div', {
+              style: { background: 'rgba(0,113,227,0.06)', borderRadius: '12px', padding: '14px', marginBottom: '12px' }
+            },
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '8px' } }, 'Investigate the cause'),
+              e('ul', { style: { margin: 0, paddingLeft: '18px', fontSize: '13px', lineHeight: 1.7, color: 'var(--label2)' } },
+                e('li', null, 'GI blood loss (occult bleeding, menstruation)'),
+                e('li', null, 'Malabsorption (coeliac, gastric surgery)'),
+                e('li', null, 'Inadequate dietary intake'),
+                e('li', null, 'Increased demand (pregnancy, growth)')
+              )
+            ),
 
             // Pattern: Ferritin low-normal + TSAT low
             ferritinResult === 'lowNormal' && tsatResult === 'low' && e(DiffListItem, {
@@ -3293,24 +3380,83 @@
             e(InfoModalTrigger, { title: 'Is it the DOAC or a real problem?' },
               e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem.'),
 
-              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Dabigatran (direct thrombin inhibitor)'),
-              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                e('li', null, 'Prolongs APTT and thrombin time'),
-                e('li', null, e('strong', null, 'Thrombin time is very sensitive'), ' — if normal, dabigatran effect is excluded'),
-                e('li', null, 'For quantification: dilute thrombin time (Hemoclot)')
+              // Dabigatran card
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', padding: '14px', marginBottom: '12px' } },
+                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' } },
+                  e('div', { style: { width: '4px', height: '20px', background: 'var(--accent)', borderRadius: '2px' } }),
+                  e('div', { style: { fontWeight: 700, fontSize: '14px', color: 'var(--label)' } }, 'Dabigatran'),
+                  e('span', { style: { fontSize: '11px', color: 'var(--label3)', background: 'rgba(142,142,147,0.1)', padding: '2px 8px', borderRadius: '4px' } }, 'Direct thrombin inhibitor')
+                ),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' } },
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Effect on tests'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Prolongs APTT, TT')
+                  ),
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Quantification'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Dilute thrombin time')
+                  )
+                ),
+                e('div', { style: { fontSize: '11px', color: 'var(--accent)', marginTop: '8px', fontWeight: 500 } }, '✓ Normal TT excludes dabigatran effect')
               ),
 
-              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Rivaroxaban / Apixaban / Edoxaban (anti-Xa)'),
-              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                e('li', null, 'Routine PT/APTT are variably sensitive and may be normal at trough'),
-                e('li', null, 'PT may be prolonged (especially rivaroxaban) but this is not reliable for quantification'),
-                e('li', null, 'Use a ', e('strong', null, 'drug-calibrated anti-Xa assay'), ' for quantification')
+              // Anti-Xa agents card
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', padding: '14px', marginBottom: '12px' } },
+                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' } },
+                  e('div', { style: { width: '4px', height: '20px', background: 'var(--orange)', borderRadius: '2px' } }),
+                  e('div', { style: { fontWeight: 700, fontSize: '14px', color: 'var(--label)' } }, 'Rivaroxaban / Apixaban / Edoxaban'),
+                  e('span', { style: { fontSize: '11px', color: 'var(--label3)', background: 'rgba(142,142,147,0.1)', padding: '2px 8px', borderRadius: '4px' } }, 'Anti-Xa')
+                ),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' } },
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Effect on tests'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Variable; may be normal at trough')
+                  ),
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Quantification'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Drug-calibrated anti-Xa')
+                  )
+                ),
+                e('div', { style: { fontSize: '11px', color: 'var(--orange)', marginTop: '8px', fontWeight: 500 } }, '⚠ PT/APTT unreliable for quantification')
               ),
 
-              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Warfarin'),
-              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                e('li', null, 'Prolongs PT/INR (primary monitoring test)'),
-                e('li', null, 'If APTT is also very prolonged → consider supratherapeutic dosing or concomitant problem')
+              // Warfarin card
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', padding: '14px', marginBottom: '12px' } },
+                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' } },
+                  e('div', { style: { width: '4px', height: '20px', background: 'var(--green)', borderRadius: '2px' } }),
+                  e('div', { style: { fontWeight: 700, fontSize: '14px', color: 'var(--label)' } }, 'Warfarin'),
+                  e('span', { style: { fontSize: '11px', color: 'var(--label3)', background: 'rgba(142,142,147,0.1)', padding: '2px 8px', borderRadius: '4px' } }, 'VKA')
+                ),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' } },
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Effect on tests'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Prolongs PT/INR')
+                  ),
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Monitoring'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'INR')
+                  )
+                ),
+                e('div', { style: { fontSize: '11px', color: 'var(--label3)', marginTop: '8px' } }, 'Very prolonged APTT → supratherapeutic or concurrent problem')
+              ),
+
+              // Heparin card
+              e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', padding: '14px', marginBottom: '16px' } },
+                e('div', { style: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' } },
+                  e('div', { style: { width: '4px', height: '20px', background: 'var(--red)', borderRadius: '2px' } }),
+                  e('div', { style: { fontWeight: 700, fontSize: '14px', color: 'var(--label)' } }, 'Heparin (UFH / LMWH)'),
+                  e('span', { style: { fontSize: '11px', color: 'var(--label3)', background: 'rgba(142,142,147,0.1)', padding: '2px 8px', borderRadius: '4px' } }, 'Indirect')
+                ),
+                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' } },
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Effect on tests'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'UFH: prolongs APTT. LMWH: variable')
+                  ),
+                  e('div', null,
+                    e('div', { style: { fontWeight: 600, color: 'var(--label3)', marginBottom: '4px' } }, 'Monitoring'),
+                    e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'UFH: APTT or anti-Xa. LMWH: anti-Xa')
+                  )
+                )
               ),
 
               e('div', { style: { background: 'rgba(0,113,227,0.06)', borderRadius: '10px', padding: '12px' } },
