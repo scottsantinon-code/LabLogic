@@ -2003,6 +2003,7 @@
           step === 3 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine osmolality?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney diluting appropriately?'),
+            e(WarningBanner, null, 'If the patient is on diuretics, vasopressin, or DDAVP, urine biochemistry may not reflect true physiology. Interpret with caution.'),
             e(ChoiceButton, {
               label: 'Low  ‹ 100 mOsm/kg',
               selected: urineOsmResult === 'low',
@@ -2019,11 +2020,10 @@
               onClick: () => {
                 clearAutoAdvance();
                 setUrineOsmResult('high');
-                // No auto-advance — warning gates progression
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--accent)'
-            }),
-            urineOsmResult === 'high' && e(WarningBanner, { onContinue: () => goToStep(4) }, 'Urinary biochemistry is confounded by diuretics, vasopressin, and DDAVP. Interpret with caution.')
+            })
           ),
 
           // SCREEN 4: Path-dependent
@@ -2059,6 +2059,7 @@
           step === 4 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine sodium?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney conserving sodium?'),
+            e(WarningBanner, null, 'If the patient is on diuretics, vasopressin, or DDAVP, urine biochemistry may not reflect true physiology. Interpret with caution.'),
             e(ChoiceButton, {
               label: 'Low  ‹ 30 mmol/L',
               selected: urineNaResult === 'low',
