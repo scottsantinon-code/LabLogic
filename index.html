@@ -449,16 +449,18 @@
     }
 
     // 7. Warning Banner
-    function WarningBanner({ children, onContinue }) {
+    function WarningBanner({ children, onContinue, subtle }) {
       // Gating warnings (with Continue) get stronger styling; informational warnings are softer
+      // subtle: gating but without orange styling (keeps emoji)
       const isGating = !!onContinue;
+      const useOrange = isGating && !subtle;
       return e('div', {
         style: {
           display: 'flex',
           flexDirection: 'column',
           padding: '14px 16px',
-          background: isGating ? 'rgba(255,149,0,0.12)' : 'rgba(142,142,147,0.08)',
-          border: isGating ? '1px solid rgba(255,149,0,0.3)' : '1px solid var(--sep)',
+          background: useOrange ? 'rgba(255,149,0,0.12)' : 'rgba(142,142,147,0.08)',
+          border: useOrange ? '1px solid rgba(255,149,0,0.3)' : '1px solid var(--sep)',
           borderRadius: '14px',
           marginBottom: '12px'
         }
@@ -466,17 +468,17 @@
         e('div', { style: { display: 'flex', gap: '10px' } },
           e('span', { style: { fontSize: '16px', flexShrink: 0 } }, isGating ? '⚠️' : 'ℹ️'),
           e('div', {
-            style: { fontSize: '13px', lineHeight: 1.55, color: isGating ? 'var(--orange)' : 'var(--label2)', fontWeight: 500 }
+            style: { fontSize: '13px', lineHeight: 1.55, color: useOrange ? 'var(--orange)' : 'var(--label2)', fontWeight: 500 }
           }, children)
         ),
         onContinue && e('button', {
           onClick: onContinue,
           style: {
             alignSelf: 'flex-end',
-            background: 'rgba(255,149,0,0.15)',
-            border: '1px solid rgba(255,149,0,0.35)',
+            background: subtle ? 'rgba(142,142,147,0.12)' : 'rgba(255,149,0,0.15)',
+            border: subtle ? '1px solid var(--sep)' : '1px solid rgba(255,149,0,0.35)',
             borderRadius: '8px',
-            color: 'var(--orange)',
+            color: subtle ? 'var(--label2)' : 'var(--orange)',
             fontSize: '15px',
             fontWeight: 700,
             padding: '10px 16px',
@@ -1758,7 +1760,6 @@
             e('div', { style: STYLES.screenSubtitle }, 'If the duration is >48 hours or unknown, it is generally classified as chronic for risk stratification.'),
             e(ChoiceButton, {
               label: 'Acute  ‹ 48 hours',
-              sublabel: 'Less time for cerebral adaptation',
               selected: chronicity === 'acute',
               onClick: () => {
                 clearAutoAdvance();
@@ -1769,7 +1770,6 @@
             }),
             e(ChoiceButton, {
               label: 'Chronic  › 48 hours',
-              sublabel: 'Cerebral adaptation likely; rapid change can be harmful',
               selected: chronicity === 'chronic',
               onClick: () => {
                 clearAutoAdvance();
@@ -1789,7 +1789,7 @@
               },
               color: 'var(--accent)'
             }),
-            chronicity === 'chronic' && e(WarningBanner, { onContinue: () => goToStep(2) }, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
+            chronicity === 'chronic' && e(WarningBanner, { onContinue: () => goToStep(2), subtle: true }, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
           ),
 
           // SCREEN 2: Serum osmolality (ChoiceButtons, auto-advance, branches)
@@ -1983,19 +1983,6 @@
           // SCREEN 5: Hypotonic Results (full differential)
           step === 5 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-            e('div', { style: STYLES.screenSubtitle }, 'Hypotonic hyponatraemia'),
-
-            // Compact input summary
-            e(InputSummaryStrip, { items: [
-              { label: 'Na', ...getNaDisplay() },
-              { label: 'Serum Osm', ...getSerumOsmDisplay() },
-              { label: 'Urine Osm', ...getUrineOsmDisplay() },
-              { label: 'Urine Na', ...getUrineNaDisplay() }
-            ] }),
-
-            e('div', {
-              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
-            }, 'Differential'),
 
             // PATH A: Low Urine Osm + Low Urine Na
             urineOsmResult === 'low' && urineNaResult === 'low' && e(React.Fragment, null,
@@ -2003,6 +1990,9 @@
                 title: 'Excess Water Intake',
                 description: 'Kidneys are diluting maximally but water intake exceeds their capacity to defend tonicity.'
               }),
+              e('div', {
+                style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
+              }, 'Differential'),
               e(DiffCard, { title: 'Excess IV fluid', description: 'Iatrogenic. Excess hypotonic fluid can contribute.' }),
               e(DiffCard, { title: 'Primary polydipsia', description: 'Psychiatric or medication-related. Water intake often >10L/day.' }),
               e(DiffCard, { title: 'Beer potomania', description: 'Very low solute diet limits renal free water excretion capacity.' }),
@@ -2015,6 +2005,9 @@
                 title: 'Renal Salt & Water Wasting',
                 description: 'Kidneys are wasting both salt and water — unable to concentrate or conserve sodium.'
               }),
+              e('div', {
+                style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
+              }, 'Differential'),
               e(DiffCard, { title: 'AKI (GFR <15)', description: 'Severely reduced GFR impairs all tubular function.' }),
               e(DiffCard, { title: 'Post-obstructive diuresis', description: 'After relief of urinary obstruction. Can be massive.' }),
               e(DiffCard, { title: 'Polyuric phase of ATN', description: 'Recovery phase of acute tubular necrosis.' })
@@ -2029,6 +2022,9 @@
                   e('p', null, 'The baroreceptor reflex is a stronger stimulus for ADH release than the osmoreceptor reflex. When intravascular volume is low (or perceived as low — heart failure, liver failure), the body will retain water even at the expense of worsening hyponatraemia. This is because volume depletion kills faster than low sodium.')
                 )
               }),
+              e('div', {
+                style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
+              }, 'Differential'),
               e(DiffCard, { title: 'True hypovolaemia', description: 'Bleeding, GI losses, third-spacing. Look for tachycardia, orthostatic hypotension, poor skin turgor.' }),
               e(DiffCard, { title: 'Heart failure', description: 'Effective hypovolaemia despite total body fluid overload. Poor cardiac output → RAAS activation.' }),
               e(DiffCard, { title: 'Liver failure / cirrhosis', description: 'Splanchnic vasodilation → effective hypovolaemia. Ascites present.' }),
@@ -2041,6 +2037,10 @@
                 title: 'Water Retention with Sodium Wasting',
                 description: 'ADH is active (water retention) AND kidneys are wasting sodium. This is the broadest differential — clinical context is critical.'
               }),
+
+              e('div', {
+                style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' }
+              }, 'Differential'),
 
               e(DiffListItem, {
                 title: 'SIADH',
@@ -2074,6 +2074,17 @@
                 e('p', null, e('strong', null, 'Distinguishing these matters:'), ' management differs significantly and misdiagnosis can worsen outcomes.')
               )
             ),
+
+            // Based on section (input summary)
+            e('div', {
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px', marginTop: '16px' }
+            }, 'Based on'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Na', ...getNaDisplay() },
+              { label: 'Serum Osm', ...getSerumOsmDisplay() },
+              { label: 'Urine Osm', ...getUrineOsmDisplay() },
+              { label: 'Urine Na', ...getUrineNaDisplay() }
+            ] }),
 
             e(LearnMoreDivider),
 
