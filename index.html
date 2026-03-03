@@ -1020,7 +1020,6 @@
       const [latestNa, setLatestNa] = useState('');
       const [startDateTime, setStartDateTime] = useState('');
       const [latestDateTime, setLatestDateTime] = useState('');
-      const [targetRate, setTargetRate] = useState(10);
 
       // Calculate hours elapsed from date/time inputs
       const calculateHoursElapsed = () => {
@@ -1045,16 +1044,10 @@
 
         const naChange = latest - start;
         const ratePerHour = naChange / hoursElapsed;
-        const remainingHours = Math.max(0, 24 - hoursElapsed);
-        const remainingBudget = targetRate - naChange;
 
         return {
           naChange: naChange.toFixed(1),
           ratePerHour: ratePerHour.toFixed(2),
-          remainingHours: remainingHours.toFixed(1),
-          remainingBudget: remainingBudget.toFixed(1),
-          exceeds: naChange > targetRate,
-          beyondWindow: hoursElapsed > 24,
           hoursElapsed: hoursElapsed.toFixed(1)
         };
       };
@@ -2740,7 +2733,6 @@
               title: 'Iron Deficiency Masked by Inflammation',
               infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
-                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. Not universally available but useful when accessible.'),
                 e('p', null, 'When ferritin is low-normal and transferrin saturation is low, possibilities include early iron deficiency, inflammation-driven iron sequestration, mixed aetiology, or analytical variation. Trends over time, inflammatory markers, and the clinical scenario can help clarify the most likely explanation.')
               )
             }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
@@ -3224,8 +3216,8 @@
                       )
                     ),
                     e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
-                    e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
-                      'Prolongation calculated from baseline of 12 sec.'
+                    e('div', { style: { fontSize: '11px', color: 'var(--orange)', marginTop: '-8px', marginBottom: '8px', background: 'rgba(255,149,0,0.08)', padding: '8px 10px', borderRadius: '8px', lineHeight: 1.5 } },
+                      '⚠️ This calculator uses a PT baseline of 12 sec. The ISTH DIC score uses prolongation above your institutional normal. Verify this matches your local laboratory reference midpoint.'
                     ),
                     e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
                     calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
