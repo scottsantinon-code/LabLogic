@@ -856,12 +856,7 @@
           e('div', { style: { flex: 1 } },
             e('div', {
               style: { fontSize: '15px', fontWeight: 700, color: 'var(--label)', letterSpacing: '-0.02em' }
-            }, title),
-            tags.length > 0 && e('div', {
-              style: { display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '8px' }
-            },
-              tags.map((tag, i) => renderTag(tag, i))
-            )
+            }, title)
           ),
           e('span', {
             style: {
@@ -1272,8 +1267,7 @@
           style: { textAlign: 'center', padding: '24px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', marginTop: 'auto' }
         },
           e('div', { style: { fontSize: '11px', color: 'var(--label3)', fontWeight: 600, marginBottom: '6px' } }, 'For healthcare professionals only'),
-          e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool. Interpretation support only. Not a substitute for clinical judgement.'),
-          e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginTop: '4px' } }, 'Verify reference ranges against your laboratory'),
+          e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool. Interpretation support only. Not a substitute for clinical judgement. Verify reference ranges against your laboratory.'),
           e('button', {
             onClick: () => onSelectModule('terms'),
             style: {
@@ -1912,12 +1906,8 @@
               e(PrimaryButton, {
                 label: 'New Analysis',
                 color: 'var(--accent)',
-                onClick: resetModule
-              }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
+                onClick: onBack
+              })
             ),
 
             e(LearnMoreDivider),
@@ -2181,11 +2171,7 @@
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
-            e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
-            e('button', {
-              onClick: onBack,
-              style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-            }, '← All modules')
+            e(PrimaryButton, { label: 'New Analysis', onClick: onBack })
           ),
 
           // If hyper-osmolar → Results
@@ -2207,11 +2193,7 @@
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
-            e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
-            e('button', {
-              onClick: onBack,
-              style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-            }, '← All modules')
+            e(PrimaryButton, { label: 'New Analysis', onClick: onBack })
           ),
 
           // If hypotonic → Urine Osmolality
@@ -2427,11 +2409,7 @@
 
             // Bottom buttons (for all result paths)
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
+              e(PrimaryButton, { label: 'New Analysis', onClick: onBack })
             )
           )
         )
@@ -2494,7 +2472,7 @@
                 setHasInflammation(true);
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'No',
@@ -2504,7 +2482,7 @@
                 setHasInflammation(false);
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1), subtle: true }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
@@ -2522,7 +2500,7 @@
                 setClinicalContext('ckd');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Heart failure',
@@ -2532,7 +2510,7 @@
                 setClinicalContext('heartFailure');
                 scheduleAdvance(() => goToStep(2), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'None of the above',
@@ -2558,7 +2536,7 @@
                 setFerritinResult('veryLow');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Low-normal  30–100 µg/L',
@@ -2568,7 +2546,7 @@
                 setFerritinResult('lowNormal');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  100–300 µg/L',
@@ -2578,7 +2556,7 @@
                 setFerritinResult('normal');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  300–1000 µg/L',
@@ -2588,7 +2566,7 @@
                 setFerritinResult('high');
                 scheduleAdvance(() => goToStep(3), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Very high  › 1000 µg/L',
@@ -2598,7 +2576,7 @@
                 setFerritinResult('veryHigh');
                 // No auto-advance — warning gates progression
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin <30 µg/L indicates iron deficiency regardless of other values.'),
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
@@ -2616,7 +2594,7 @@
                 setTsatResult('low');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Normal  16–45%',
@@ -2626,7 +2604,7 @@
                 setTsatResult('normal');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'High  › 45%',
@@ -2636,7 +2614,7 @@
                 setTsatResult('high');
                 scheduleAdvance(() => goToStep(4), false);
               },
-              color: 'var(--red)'
+              color: 'var(--accent)'
             }),
             (clinicalContext === 'ckd' || clinicalContext === 'heartFailure') && e('div', {
               style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' }
@@ -2874,11 +2852,7 @@
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
+              e(PrimaryButton, { label: 'New Analysis', onClick: onBack })
             )
           )
         )
@@ -3365,11 +3339,7 @@
             ),
 
             e('div', { style: { marginTop: '20px' } },
-              e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
-              e('button', {
-                onClick: onBack,
-                style: { width: '100%', padding: '12px', background: 'none', border: 'none', color: 'var(--label3)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', fontFamily: 'var(--font)', marginTop: '4px' }
-              }, '← All modules')
+              e(PrimaryButton, { label: 'New Analysis', onClick: onBack })
             )
           )
         )
