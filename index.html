@@ -891,14 +891,21 @@
       return e('button', {
         onClick: onClick,
         style: {
-          background: 'none',
-          border: 'none',
-          padding: '8px',
+          position: 'fixed',
+          top: 'calc(16px + env(safe-area-inset-top))',
+          right: '16px',
+          zIndex: 200,
+          background: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          border: '1px solid rgba(60,60,67,0.1)',
+          padding: '10px',
           cursor: 'pointer',
-          borderRadius: '8px',
+          borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
         }
       },
         e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
@@ -979,7 +986,7 @@
                 width: '32px',
                 height: '32px',
                 borderRadius: '8px',
-                background: 'linear-gradient(135deg, #818CF8 0%, #6366F1 40%, #5E5CE6 70%, #4F46E5 100%)',
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -1095,7 +1102,7 @@
               fontWeight: 800,
               letterSpacing: '-0.04em',
               fontFamily: 'var(--font-heading)',
-              background: 'linear-gradient(135deg, #A78BFA 0%, #8B5CF6 30%, #7C3AED 60%, #6366F1 100%)',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -1133,11 +1140,11 @@
                     width: '48px',
                     height: '48px',
                     borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #A78BFA 0%, #8B5CF6 35%, #7C3AED 70%, #6D28D9 100%)',
+                    background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 3px 10px rgba(139,92,246,0.2)',
+                    boxShadow: '0 3px 10px rgba(6,182,212,0.25)',
                     flexShrink: 0
                   }
                 }, moduleIcons[mod.icon] || moduleIcons.default || null),
@@ -1278,7 +1285,8 @@
 
       // Main TFT flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Thyroid Function', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e(NavBar, { title: 'Thyroid Function', onBack: handleBack }),
+        e(HomeButton, { onClick: onBack }),
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens() }),
 
@@ -1933,7 +1941,8 @@
 
       // Main flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Hyponatraemia', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e(NavBar, { title: 'Hyponatraemia', onBack: handleBack }),
+        e(HomeButton, { onClick: onBack }),
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens() }),
 
@@ -2382,7 +2391,8 @@
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Iron Studies', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e(NavBar, { title: 'Iron Studies', onBack: handleBack }),
+        e(HomeButton, { onClick: onBack }),
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens() }),
 
@@ -2391,7 +2401,7 @@
             e('div', { style: STYLES.screenTitle }, 'Is the patient inflamed?'),
             e('div', { style: STYLES.screenSubtitle }, 'Check if CRP is elevated — inflammation changes ferritin thresholds'),
             e(ChoiceButton, {
-              label: 'Yes — CRP elevated',
+              label: 'Yes',
               selected: hasInflammation === true,
               onClick: () => {
                 clearAutoAdvance();
@@ -2401,7 +2411,7 @@
               color: 'var(--red)'
             }),
             e(ChoiceButton, {
-              label: 'No — stable outpatient',
+              label: 'No',
               selected: hasInflammation === false,
               onClick: () => {
                 clearAutoAdvance();
@@ -2410,7 +2420,7 @@
               },
               color: 'var(--red)'
             }),
-            hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1) }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
+            hasInflammation === true && e(WarningBanner, { onContinue: () => goToStep(1), subtle: true }, e('strong', null, 'Ferritin is an acute phase reactant.'), ' A "normal" ferritin does NOT exclude iron deficiency when CRP is elevated.'),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
@@ -2887,7 +2897,8 @@
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
-        e(NavBar, { title: 'Coagulation', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e(NavBar, { title: 'Coagulation', onBack: handleBack }),
+        e(HomeButton, { onClick: onBack }),
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens() }),
 
