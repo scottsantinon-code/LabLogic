@@ -914,23 +914,34 @@
       const [isOpen, setIsOpen] = useState(false);
       const [startNa, setStartNa] = useState('');
       const [latestNa, setLatestNa] = useState('');
-      const [hoursElapsed, setHoursElapsed] = useState('');
+      const [startDateTime, setStartDateTime] = useState('');
+      const [latestDateTime, setLatestDateTime] = useState('');
       const [targetRate, setTargetRate] = useState(10);
+
+      // Calculate hours elapsed from date/time inputs
+      const calculateHoursElapsed = () => {
+        if (!startDateTime || !latestDateTime) return null;
+        const start = new Date(startDateTime);
+        const latest = new Date(latestDateTime);
+        if (isNaN(start.getTime()) || isNaN(latest.getTime())) return null;
+        const diffMs = latest - start;
+        if (diffMs <= 0) return null; // Latest must be after start
+        return diffMs / (1000 * 60 * 60); // Convert ms to hours
+      };
+
+      const hoursElapsed = calculateHoursElapsed();
 
       const calculateCorrection = () => {
         const start = parseFloat(startNa);
         const latest = parseFloat(latestNa);
-        const hours = parseFloat(hoursElapsed);
         // Reject zero hours - rate calculation requires elapsed time > 0
-        if (isNaN(start) || isNaN(latest) || isNaN(hours) || hours <= 0) return null;
+        if (isNaN(start) || isNaN(latest) || !hoursElapsed || hoursElapsed <= 0) return null;
         // Bounds checking for sodium values (physiologically plausible range: 100-180 mEq/L)
         if (start < 100 || start > 180 || latest < 100 || latest > 180) return null;
-        // Reject negative hours
-        if (hours < 0) return null;
 
         const naChange = latest - start;
-        const ratePerHour = naChange / hours;
-        const remainingHours = Math.max(0, 24 - hours);
+        const ratePerHour = naChange / hoursElapsed;
+        const remainingHours = Math.max(0, 24 - hoursElapsed);
         const remainingBudget = targetRate - naChange;
 
         return {
@@ -939,7 +950,8 @@
           remainingHours: remainingHours.toFixed(1),
           remainingBudget: remainingBudget.toFixed(1),
           exceeds: naChange > targetRate,
-          beyondWindow: hours > 24
+          beyondWindow: hoursElapsed > 24,
+          hoursElapsed: hoursElapsed.toFixed(1)
         };
       };
 
@@ -986,16 +998,60 @@
         isOpen && e('div', {
           style: { background: 'rgba(142,142,147,0.06)', borderRadius: '0 0 14px 14px', padding: '16px', marginTop: '-14px', paddingTop: '28px', border: '1px solid var(--sep)', borderTop: 'none' }
         },
-          // Three ValueInputs
+          // Na value inputs
           e(ValueInput, { label: 'Starting Na', unit: 'mmol/L', value: startNa, onChange: setStartNa, placeholder: 'e.g. 118' }),
           e(ValueInput, { label: 'Latest Na', unit: 'mmol/L', value: latestNa, onChange: setLatestNa, placeholder: 'e.g. 122' }),
-          e(ValueInput, { label: 'Hours since first Na', unit: 'hours', value: hoursElapsed, onChange: setHoursElapsed, placeholder: 'e.g. 8' }),
+
+          // Date/time inputs
+          e('div', { style: { marginBottom: '12px' } },
+            e('label', { style: { fontSize: '12px', color: 'var(--label3)', display: 'block', marginBottom: '6px' } }, 'Time of first Na'),
+            e('input', {
+              type: 'datetime-local',
+              value: startDateTime,
+              onChange: (ev) => setStartDateTime(ev.target.value),
+              style: {
+                width: '100%',
+                padding: '10px 12px',
+                fontSize: '15px',
+                fontFamily: 'var(--font)',
+                border: '1px solid var(--sep)',
+                borderRadius: '10px',
+                background: 'var(--card)',
+                color: 'var(--label)',
+                boxSizing: 'border-box'
+              }
+            })
+          ),
+          e('div', { style: { marginBottom: '12px' } },
+            e('label', { style: { fontSize: '12px', color: 'var(--label3)', display: 'block', marginBottom: '6px' } }, 'Time of latest Na'),
+            e('input', {
+              type: 'datetime-local',
+              value: latestDateTime,
+              onChange: (ev) => setLatestDateTime(ev.target.value),
+              style: {
+                width: '100%',
+                padding: '10px 12px',
+                fontSize: '15px',
+                fontFamily: 'var(--font)',
+                border: '1px solid var(--sep)',
+                borderRadius: '10px',
+                background: 'var(--card)',
+                color: 'var(--label)',
+                boxSizing: 'border-box'
+              }
+            })
+          ),
+
+          // Show calculated hours if valid
+          hoursElapsed && e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginBottom: '12px', textAlign: 'center' } },
+            `Time elapsed: ${hoursElapsed.toFixed(1)} hours`
+          ),
 
           // Results display
           result && e('div', null,
             // Na change and rate summary
             e('div', { style: { fontSize: '13px', color: 'var(--label)', marginBottom: '8px' } },
-              `Na change: ${result.naChange > 0 ? '+' : ''}${result.naChange} mmol/L in ${hoursElapsed} hours`
+              `Na change: ${result.naChange > 0 ? '+' : ''}${result.naChange} mmol/L in ${result.hoursElapsed} hours`
             ),
             e('div', { style: { fontSize: '13px', color: 'var(--label)', marginBottom: '12px' } },
               `Rate: ${result.ratePerHour} mmol/L/hr`
@@ -1251,7 +1307,7 @@
               },
               color: 'var(--accent)'
             }),
-            acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
+            acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1), subtle: true },
               e('strong', null, 'Non-thyroidal illness syndrome'), ' (sick euthyroid) can cause TFT patterns that mimic thyroid disease — commonly low T3, sometimes low T4, and variable TSH. In most cases, repeat testing once stable is appropriate.',
               e('div', { style: { marginTop: '10px' } },
                 e('strong', null, 'Parameters that may still warrant treatment:'),
@@ -2442,21 +2498,77 @@
 
           // SCREEN 4: Results
           step === 4 && e(FadeIn, null,
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
-                (() => {
-                  const ferr = { veryLow: 'Ferritin ↓↓', lowNormal: 'Ferritin low-normal', normal: 'Ferritin normal', high: 'Ferritin ↑', veryHigh: 'Ferritin ↑↑' }[ferritinResult] || '';
-                  const ts = { low: ' · TSAT ↓', normal: ' · TSAT normal', high: ' · TSAT ↑' }[tsatResult] || '';
-                  return ferr + ts;
-                })()
-              )
-            ),
-            e(InputSummaryStrip, { items: [
-              { label: 'Inflammation', ...getInflammationDisplay() },
-              { label: 'Ferritin', ...getFerritinDisplay() },
-              { label: 'TSAT', ...getTsatDisplay() }
-            ] }),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // DiagnosisHeader based on pattern
+            (() => {
+              // Determine primary interpretation based on ferritin and TSAT pattern
+              if (ferritinResult === 'veryLow') {
+                return e(DiagnosisHeader, {
+                  title: 'Iron Deficiency',
+                  description: 'Ferritin <30 µg/L is diagnostic of iron deficiency regardless of other values. Investigate the underlying cause.'
+                });
+              }
+              if ((ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low') {
+                return e(DiagnosisHeader, {
+                  title: 'Iron Deficiency',
+                  description: 'Low ferritin with low TSAT confirms iron deficiency. Stores are depleted and iron delivery to erythroid precursors is inadequate.'
+                });
+              }
+              if (ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation) {
+                return e(DiagnosisHeader, {
+                  title: 'Iron Deficiency Masked by Inflammation',
+                  description: 'Ferritin is elevated by inflammation but low TSAT reveals true iron deficiency. The most common diagnostic trap.'
+                });
+              }
+              if (ferritinResult === 'normal' && tsatResult === 'low' && !hasInflammation) {
+                return e(DiagnosisHeader, {
+                  title: 'Functional Iron Deficiency',
+                  description: 'Iron stores are present but delivery to erythroid precursors is inadequate. May also represent early true iron deficiency.'
+                });
+              }
+              if (ferritinResult === 'lowNormal' && tsatResult === 'normal') {
+                return e(DiagnosisHeader, {
+                  title: 'Borderline Iron Stores',
+                  description: 'Ferritin 30–100 µg/L with normal TSAT suggests early depletion not yet affecting erythropoiesis.'
+                });
+              }
+              if (ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation) {
+                return e(DiagnosisHeader, {
+                  title: 'Anaemia of Chronic Disease',
+                  description: 'Iron sequestered in macrophages due to inflammation. Stores adequate, supply maintained, but iron unavailable for erythropoiesis.'
+                });
+              }
+              if ((ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high') {
+                return e(DiagnosisHeader, {
+                  title: 'Iron Overload',
+                  description: 'Elevated ferritin with elevated TSAT indicates true iron overload. Consider hereditary haemochromatosis.'
+                });
+              }
+              if ((ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'normal') {
+                return e(DiagnosisHeader, {
+                  title: 'Elevated Ferritin — Likely Acute Phase',
+                  description: 'Elevated ferritin with normal TSAT most likely reflects inflammation or liver disease rather than true iron overload.'
+                });
+              }
+              if ((ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'low') {
+                return e(DiagnosisHeader, {
+                  title: 'Anaemia of Chronic Disease (Severe)',
+                  description: 'High ferritin with low TSAT. Iron is present in stores but trapped by hepcidin-mediated sequestration.'
+                });
+              }
+              if (ferritinResult === 'veryHigh') {
+                return e(DiagnosisHeader, {
+                  title: 'Markedly Elevated Ferritin',
+                  description: 'Ferritin >1000 µg/L requires urgent evaluation. Consider HLH, Still\'s disease, hepatic necrosis, or massive iron overload.'
+                });
+              }
+              // Default fallback
+              return e(DiagnosisHeader, {
+                title: 'Iron Studies Pattern',
+                description: 'Interpret ferritin and TSAT together in clinical context.'
+              });
+            })(),
 
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
@@ -2532,6 +2644,22 @@
               title: 'Urgent Evaluation Required',
               defaultOpen: true
             }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, or massive iron overload. Check triglycerides, fibrinogen, LDH.'),
+
+            // Based on section (input summary)
+            e('div', {
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px', marginTop: '16px' }
+            }, 'Based on'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Inflammation', ...getInflammationDisplay() },
+              { label: 'Context', value: clinicalContext === 'ckd' ? 'CKD' : clinicalContext === 'heartFailure' ? 'Heart failure' : 'General', interpretation: '' },
+              { label: 'Ferritin', ...getFerritinDisplay() },
+              { label: 'TSAT', ...getTsatDisplay() }
+            ] }),
+
+            e('div', {
+              style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
+            }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center' } }, 'Reference ranges vary by laboratory. Verify against your local reference ranges.'),
 
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
