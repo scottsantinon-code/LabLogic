@@ -1887,14 +1887,14 @@
         }
       };
 
-      // Severity assessment
+      // Severity assessment — note: clinical severity depends on rate of decline, not just absolute value
       const getSeverity = () => {
         const na = parseFloat(naValue);
         if (isNaN(na)) return null;
-        if (na > 130) return { color: 'var(--green)', interp: 'Mild — usually asymptomatic' };
-        if (na >= 125) return { color: 'var(--orange)', interp: 'Moderate — confusion, nausea, headache likely' };
-        if (na >= 120) return { color: 'var(--orange)', interp: 'Significant — high risk of symptoms' };
-        return { color: 'var(--red)', interp: 'Severe — seizures, coma, cerebral oedema risk' };
+        if (na > 130) return { color: 'var(--green)', interp: 'Often asymptomatic — assess clinically' };
+        if (na >= 125) return { color: 'var(--orange)', interp: 'May cause confusion, nausea, headache' };
+        if (na >= 120) return { color: 'var(--orange)', interp: 'Increased symptom risk — assess clinically' };
+        return { color: 'var(--red)', interp: 'High risk of severe symptoms — urgent assessment' };
       };
 
       // Corrected Na calculation (Katz formula)
@@ -1949,7 +1949,7 @@
           // SCREEN 0: Serum sodium (ValueInput, Next button)
           step === 0 && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the serum sodium?'),
-            e('div', { style: STYLES.screenSubtitle }, 'This determines the severity'),
+            e('div', { style: STYLES.screenSubtitle }, 'Clinical severity depends on rate of decline, not just absolute value'),
             e(ValueInput, {
               label: 'Serum Sodium',
               unit: 'mmol/L',
@@ -1999,11 +1999,11 @@
               onClick: () => {
                 clearAutoAdvance();
                 setChronicity('unknown');
-                scheduleAdvance(() => goToStep(2), false);
+                // No auto-advance — warning gates progression (same as chronic)
               },
               color: 'var(--accent)'
             }),
-            chronicity === 'chronic' && e(WarningBanner, { onContinue: () => goToStep(2), subtle: true }, 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
+            (chronicity === 'chronic' || chronicity === 'unknown') && e(WarningBanner, { onContinue: () => goToStep(2), subtle: true }, chronicity === 'unknown' ? 'If in doubt, assume chronic and correct slowly. Rapid correction risks osmotic demyelination syndrome (ODS).' : 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
           ),
 
           // SCREEN 2: Serum osmolality (ChoiceButtons, auto-advance, branches)
@@ -2052,6 +2052,11 @@
             }),
             serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(3) },
               'If glucose is significantly elevated (>15 mmol/L), serum osmolality may be high — check glucose before assuming hypotonic.'
+            ),
+            e(InfoPanel, { title: 'Urea and Effective Osmolality' },
+              e('p', { style: { marginBottom: '8px' } }, 'Measured osmolality includes urea, but urea crosses cell membranes freely and does not contribute to tonicity.'),
+              e('p', { style: { marginBottom: '8px' } }, 'If urea is markedly elevated (common in ICU/renal patients), do not classify as hypertonic based on measured osmolality alone.'),
+              e('p', { style: { fontWeight: 600 } }, 'Effective osmolality ≈ 2 × Na + glucose (mmol/L)')
             )
           ),
 
@@ -2266,7 +2271,7 @@
 
               e(DiffCard, { title: 'Hypothyroidism', description: 'Mechanism unclear but well-recognised association. Check TFTs.' }),
 
-              e(DiffCard, { title: 'Cerebral salt wasting', description: 'Polyuric (unlike SIADH which is oliguric). Related to ↑BNP/ANP → natriuresis → hypovolaemia. Appropriate ADH secretion to compensate.' }),
+              e(DiffCard, { title: 'Cerebral salt wasting', description: 'Hypovolaemic with polyuria. Related to ↑BNP/ANP → natriuresis → hypovolaemia. Appropriate ADH secretion to compensate.' }),
 
               e(DiffCard, { title: 'Thiazide diuretic', description: 'Common and frequently overlooked. Thiazides impair diluting capacity in the distal tubule. Loop diuretics are LESS likely to cause hyponatraemia (they impair concentrating ability).' }),
 
@@ -2279,14 +2284,15 @@
                 e('div', { style: { display: 'flex', gap: '8px', marginBottom: '12px' } },
                   e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
                     e('strong', null, 'SIADH:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic or mildly hypervolaemic. Oliguric (low urine output). Urine osm typically >300.')
+                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Euvolaemic. Urine output variable. Urine osm usually >100 (often > serum), reflecting inappropriate ADH effect. Diagnosis requires exclusion of adrenal insufficiency, hypothyroidism, and renal failure.')
                   ),
                   e('div', { style: { flex: 1, background: 'rgba(142,142,147,0.06)', borderRadius: '10px', padding: '10px 12px' } },
                     e('strong', null, 'CSW:'),
-                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric (high urine output). Signs of volume depletion (tachycardia, orthostatic hypotension).')
+                    e('div', { style: { fontSize: '12px', marginTop: '4px' } }, 'Hypovolaemic. Polyuric (high urine output). Signs of volume depletion (tachycardia, orthostatic hypotension, negative fluid balance).')
                   )
                 ),
-                e('p', null, e('strong', null, 'Distinguishing these matters:'), ' management differs significantly and misdiagnosis can worsen outcomes.')
+                e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Distinguishing these matters:'), ' management differs significantly and misdiagnosis can worsen outcomes.'),
+                e('p', { style: { fontSize: '12px', color: 'var(--orange)' } }, '⚠️ Do not use urine output alone to distinguish SIADH from CSW. Assess volume status, fluid balance trajectory, and consider specialist input.')
               )
             ),
 
