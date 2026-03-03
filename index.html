@@ -3055,11 +3055,6 @@
               }),
               e(DiffListItem, { title: 'Massive Transfusion / Dilution', tags: ['Dilution of factors + platelets'] },
                 'After large-volume resuscitation and transfusion, dilutional coagulopathy can cause prolonged PT/APTT with low fibrinogen and thrombocytopenia. Interpret coagulation results in the clinical context and alongside transfusion history.'),
-              e(DiffListItem, {
-                title: 'TTP / HUS',
-                tags: ['ADAMTS13', 'Schistocytes', 'Fibrinogen NORMAL', 'Haematology emergency'],
-                warning: 'If thrombocytopenia, haemolysis (eg, schistocytes) and organ involvement are present, consider TTP in the differential. This is time-critical and requires urgent haematology involvement and local escalation pathways.'
-              }, 'Microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen typically NORMAL.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] },
                 'Severe vitamin K deficiency affects all K-dependent factors (II, VII, IX, X), prolonging both PT and APTT. Earlier or milder deficiency may affect PT alone. Consider malabsorption, poor intake, antibiotics, or obstructive jaundice.'),
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Therapeutic target context'] },
@@ -3083,6 +3078,11 @@
                 title: 'Thrombocytopenia or Platelet Dysfunction',
                 tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
               }, 'PT and APTT only test the coagulation cascade, not primary haemostasis. Check platelet count and function.'),
+              e(DiffListItem, {
+                title: 'TTP / HUS (Thrombotic Microangiopathy)',
+                tags: ['PT/APTT usually NORMAL', 'ADAMTS13', 'Schistocytes', 'Haematology emergency'],
+                warning: 'If thrombocytopenia + MAHA (schistocytes, haemolysis) + organ dysfunction, consider TTP/HUS even with normal PT/APTT. This is time-critical — urgent haematology input required.'
+              }, 'PT/APTT usually normal in TTP/HUS; fibrinogen typically normal; D-dimer may be mildly elevated. If PT/APTT are prolonged in a patient with suspected TMA, look for DIC, anticoagulants, or liver failure as a concurrent cause.'),
               e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
                 'Mild vWD may not prolong APTT. Always check vWF antigen, activity, and Factor VIII if suspected.'),
               e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] },
