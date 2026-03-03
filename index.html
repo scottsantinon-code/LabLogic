@@ -2698,7 +2698,7 @@
               title: 'Iron Deficiency Masked by Inflammation',
               infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
                 e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
-                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. sTfR/log ferritin ratio >2 strongly supports iron deficiency. Not universally available but very useful.'),
+                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Soluble transferrin receptor (sTfR):'), ' Not affected by inflammation. ↑ sTfR suggests true iron deficiency. Not universally available but useful when accessible.'),
                 e('p', null, 'When ferritin is low-normal and transferrin saturation is low, possibilities include early iron deficiency, inflammation-driven iron sequestration, mixed aetiology, or analytical variation. Trends over time, inflammatory markers, and the clinical scenario can help clarify the most likely explanation.')
               )
             }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
@@ -3179,9 +3179,9 @@
             pattern === 'D' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Antiplatelet Drug Effect',
-                tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor', 'Most common cause'],
+                tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor'],
                 defaultOpen: true
-              }, 'Most common cause of \'normal coags but bleeding\'. Always check medication history including OTC aspirin and NSAIDs.'),
+              }, 'Common cause, especially with recent antiplatelet exposure. Always check medication history including OTC aspirin and NSAIDs.'),
               e(DiffListItem, {
                 title: 'Thrombocytopenia or Platelet Dysfunction',
                 tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
