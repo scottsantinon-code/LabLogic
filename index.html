@@ -1157,7 +1157,7 @@
 
             e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Epidemiology'),
             e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-              e('li', null, 'Overall risk ~0.05% (Toronto cohort, 22,858 hyponatraemia admissions)'),
+              e('li', null, 'Overall risk ~0.05% (Shah et al., AJKD 2018 — Toronto cohort, 22,858 hyponatraemia admissions)'),
               e('li', null, e('strong', null, 'If Na <110 mmol/L, risk rises to ~3%')),
               e('li', null, 'Notably, many ODS cases did not have documented rapid correction')
             ),
@@ -1177,7 +1177,7 @@
             e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
               e('li', null, 'Evidence on safe rate is mixed'),
               e('li', null, 'Some studies: 4× higher relative risk if rise >10–12 mmol/L/24h'),
-              e('li', null, '2025 JAMA meta-analysis: increased mortality risk with ', e('em', null, 'slow'), ' correction'),
+              e('li', null, '2025 JAMA meta-analysis: suggested increased mortality risk with ', e('em', null, 'slow'), ' correction (debated — does not replace guideline recommendations for safe correction rates)'),
               e('li', null, 'Risk of ODS tracks to the ', e('strong', null, 'fastest'), ' sodium rises — the highest 24-hour increment matters most')
             ),
 
@@ -2350,8 +2350,12 @@
                 e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'SIADH is a diagnosis of exclusion'),
                 e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'Must exclude: adrenal insufficiency, hypothyroidism, renal failure, diuretics, and hypovolaemia (including CSW).'),
 
-                e('div', { style: { background: 'rgba(255,149,0,0.1)', borderRadius: '10px', padding: '12px' } },
+                e('div', { style: { background: 'rgba(255,149,0,0.1)', borderRadius: '10px', padding: '12px', marginBottom: '12px' } },
                   e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '⚠️ Do not use urine output alone to distinguish SIADH from CSW. Assess volume status clinically, track fluid balance trajectory, and consider specialist input when uncertain.')
+                ),
+
+                e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '10px', padding: '12px' } },
+                  e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6, fontStyle: 'italic' } }, 'CSW is a controversial diagnosis. Some experts question whether it exists as a distinct entity separate from SIADH. The key clinical distinction is volume status, but this is notoriously difficult to assess accurately.')
                 )
               )
             ),
@@ -2368,7 +2372,7 @@
 
               e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Epidemiology'),
               e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                e('li', null, 'Overall risk ~0.05% (Toronto cohort, 22,858 hyponatraemia admissions)'),
+                e('li', null, 'Overall risk ~0.05% (Shah et al., AJKD 2018 — Toronto cohort, 22,858 hyponatraemia admissions)'),
                 e('li', null, e('strong', null, 'If Na <110 mmol/L, risk rises to ~3%')),
                 e('li', null, 'Notably, many ODS cases did not have documented rapid correction')
               ),
@@ -2388,7 +2392,7 @@
               e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
                 e('li', null, 'Evidence on safe rate is mixed'),
                 e('li', null, 'Some studies: 4× higher relative risk if rise >10–12 mmol/L/24h'),
-                e('li', null, '2025 JAMA meta-analysis: increased mortality risk with ', e('em', null, 'slow'), ' correction'),
+                e('li', null, '2025 JAMA meta-analysis: suggested increased mortality risk with ', e('em', null, 'slow'), ' correction (debated — does not replace guideline recommendations for safe correction rates)'),
                 e('li', null, 'Risk of ODS tracks to the ', e('strong', null, 'fastest'), ' sodium rises — the highest 24-hour increment matters most')
               ),
 
@@ -2566,7 +2570,7 @@
               },
               color: 'var(--accent)'
             }),
-            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin <30 µg/L indicates iron deficiency regardless of other values.'),
+            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts.'),
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
           ),
 
@@ -2622,7 +2626,7 @@
               if (ferritinResult === 'veryLow') {
                 return e(DiagnosisHeader, {
                   title: 'Iron Deficiency',
-                  description: 'Ferritin <30 µg/L is diagnostic of iron deficiency regardless of other values. Investigate the underlying cause.'
+                  description: 'Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts. Investigate the underlying cause.'
                 });
               }
               if ((ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low') {
@@ -2718,7 +2722,7 @@
             ferritinResult === 'veryLow' && e(DiffListItem, {
               title: 'Iron Deficiency',
               defaultOpen: true
-            }, 'Ferritin <30 µg/L is diagnostic of iron deficiency regardless of TSAT. Investigate the underlying cause (blood loss, malabsorption, inadequate intake).'),
+            }, 'Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts. Investigate the underlying cause (blood loss, malabsorption, inadequate intake).'),
 
             // Pattern: Ferritin low-normal + TSAT low
             ferritinResult === 'lowNormal' && tsatResult === 'low' && e(DiffListItem, {
