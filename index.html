@@ -2826,7 +2826,7 @@
               e('p', { style: { marginBottom: '10px' } }, 'When APTT is prolonged, mixing 1:1 with normal plasma helps distinguish factor deficiency from inhibitors.'),
               e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Corrects → Factor deficiency.'), ' Normal plasma provides the missing factor.'),
               e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Does not correct → Inhibitor present.'), ' Immediate non-correction suggests lupus anticoagulant or heparin. Time-dependent non-correction (prolonged again after 2 hour incubation) suggests acquired Factor VIII inhibitor.'),
-              e('p', null, 'If the patient is on heparin, the mixing study cannot be reliably interpreted.')
+              e('p', null, 'Do not interpret mixing studies if the patient is on DOACs or heparin unless the lab has neutralised or verified absence of these agents.')
             )
           ),
 
@@ -2856,7 +2856,7 @@
               e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] },
                 'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
               e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] },
-                'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding. Recombinant Factor VIIa (NovoSeven) available for severe bleeding.')
+                'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding.')
             ),
 
             // Pattern B: Isolated prolonged APTT (filtered by mixing study result)
@@ -2995,10 +2995,10 @@
               ),
               e(DiffListItem, {
                 title: 'Severe Liver Disease',
-                tags: ['Impaired synthesis', 'Factor VIII normal/↑ (distinguishes from DIC)'],
+                tags: ['Impaired synthesis', 'Factor VIII often normal/↑'],
                 infoPanel: e(InfoPanel, { title: 'Liver vs DIC' },
                   e('p', { style: { marginBottom: '8px' } }, 'Both: prolonged PT + APTT, low fibrinogen, low platelets, elevated D-dimer.'),
-                  e('p', { style: { marginBottom: '8px' } }, e('strong', null, 'Factor VIII is the key.'), ' Normal/high in liver disease (Factor VIII made by endothelium). Low in DIC (consumed).'),
+                  e('p', { style: { marginBottom: '8px' } }, 'Factor VIII may be helpful in some contexts (often normal/high in liver disease, low in DIC) but is an acute phase reactant and not definitive. Interpret alongside clinical context, fibrinogen trend, and underlying condition.'),
                   e('p', null, 'Blood film: schistocytes = DIC. Target cells, acanthocytes = liver.')
                 )
               }),
@@ -3034,8 +3034,8 @@
               }, 'PT/APTT usually normal in TTP/HUS; fibrinogen typically normal; D-dimer may be mildly elevated. If PT/APTT are prolonged in a patient with suspected TMA, look for DIC, anticoagulants, or liver failure as a concurrent cause.'),
               e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
                 'Mild vWD may not prolong APTT. Always check vWF antigen, activity, and Factor VIII if suspected.'),
-              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'Urea clot lysis test'] },
-                'Factor XIII cross-links fibrin after clot formation. Classic: delayed bleeding 24–48h post-surgery. Diagnose with urea clot lysis test.'),
+              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'FXIII activity assay'] },
+                'Factor XIII cross-links fibrin after clot formation. Classic: delayed bleeding 24–48h post-surgery. Requires specific FXIII activity assay for diagnosis.'),
               e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
                 'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.')
             ),
@@ -3046,7 +3046,7 @@
                 e('strong', null, 'Dabigatran (direct thrombin inhibitor):'), ' Prolongs APTT and thrombin time. Thrombin time is very sensitive — if normal, dabigatran effect is excluded. For quantification: dilute thrombin time (Hemoclot).'
               ),
               e('p', { style: { marginBottom: '10px' } },
-                e('strong', null, 'Rivaroxaban / Apixaban (anti-Xa):'), ' May prolong PT (rivaroxaban > apixaban). Standard PT/APTT are unreliable for measuring effect. Use calibrated anti-Xa level.'
+                e('strong', null, 'Rivaroxaban / Apixaban (anti-Xa):'), ' Routine PT/APTT are variably sensitive and may be normal at trough. Use a drug-calibrated anti-Xa assay for quantification (if available) or lab-advised method.'
               ),
               e('p', null,
                 e('strong', null, 'Warfarin:'), ' Prolongs PT/INR. If APTT is also very prolonged, consider supratherapeutic dosing or concomitant problem.'
