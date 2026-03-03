@@ -1483,6 +1483,44 @@
               )
             ),
 
+            // TSH LOW + fT4 NORMAL + fT3 LOW: Non-Thyroidal Illness (Low T3 Syndrome)
+            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'low' && e(React.Fragment, null,
+              acutelyUnwell === true ? e(React.Fragment, null,
+                e(DiagnosisHeader, {
+                  title: 'Non-Thyroidal Illness (Low T3 Syndrome)',
+                  description: 'Low T3 with suppressed TSH and normal fT4 is the most common TFT abnormality in hospitalised patients. Cytokines inhibit peripheral T4→T3 conversion.'
+                }),
+                e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Also consider'),
+                e(DiffCard, {
+                  title: 'Central hypothyroidism',
+                  description: 'If pattern persists after recovery, consider pituitary dysfunction. Repeat TFTs when clinically stable.'
+                })
+              ) : e(React.Fragment, null,
+                e(DiagnosisHeader, {
+                  title: 'Low T3 Pattern',
+                  description: 'Low fT3 with suppressed TSH and normal fT4. In the absence of acute illness, this pattern warrants further evaluation.',
+                  warning: 'If the patient is or has recently been unwell, this most likely represents non-thyroidal illness. Repeat TFTs when clinically stable before pursuing further workup.'
+                }),
+                e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+                e(DiffCard, {
+                  title: 'Non-thyroidal illness (sick euthyroid)',
+                  description: 'Most common cause. Can occur with any acute illness. Repeat when stable.'
+                }),
+                e(DiffCard, {
+                  title: 'Early central hypothyroidism',
+                  description: 'Consider if pattern persists or if other pituitary hormone deficiencies are present.'
+                }),
+                e(DiffCard, {
+                  title: 'Medication effect',
+                  description: 'Amiodarone inhibits T4→T3 conversion. Glucocorticoids and dopamine can suppress TSH.'
+                })
+              ),
+              e(InfoPanel, { title: 'Low T3 Syndrome — Why It Matters' },
+                e('p', { style: { marginBottom: '10px' } }, 'Low T3 is the earliest and most common TFT change in acute illness. Cytokines (IL-6, TNF-α) suppress deiodinase activity, reducing peripheral T4→T3 conversion.'),
+                e('p', null, 'In most cases, this is adaptive and does NOT require thyroid hormone replacement. The key clinical question is whether there is underlying thyroid or pituitary disease that has been unmasked by the illness. Repeat testing after recovery is the recommended approach.')
+              )
+            ),
+
             // TSH LOW + fT4 LOW: Central Hypothyroidism or NTI Recovery (order depends on acutelyUnwell)
             tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
               // If acutely unwell, show NTI first as more likely explanation
@@ -2341,7 +2379,7 @@
       const getTsatDisplay = () => {
         if (tsatResult === 'low') return { value: '< 16%', interpretation: 'Low — iron deficient erythropoiesis' };
         if (tsatResult === 'high') return { value: '> 45%', interpretation: 'High — iron overload' };
-        return { value: '16–45%', interpretation: 'Normal' };
+        return { value: '16–45%', interpretation: (clinicalContext === 'ckd' || clinicalContext === 'heartFailure') ? 'Normal (note: trial threshold is <20%)' : 'Normal' };
       };
 
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
@@ -2504,7 +2542,13 @@
                 scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--red)'
-            })
+            }),
+            (clinicalContext === 'ckd' || clinicalContext === 'heartFailure') && e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' }
+            }, clinicalContext === 'heartFailure'
+              ? '💡 Major heart failure trials (FAIR-HF, AFFIRM-AHF) defined iron deficiency as TSAT <20% (not <16%). Values of 16–20% may represent clinically significant iron deficiency in heart failure.'
+              : '💡 KDIGO guidelines for CKD use TSAT <20% as part of the threshold for considering iron supplementation. Values of 16–20% may represent clinically significant iron deficiency in CKD.'
+            )
           ),
 
           // SCREEN 4: Results
@@ -2550,6 +2594,32 @@
                   description: 'Iron sequestered in macrophages due to inflammation. Stores adequate, supply maintained, but iron unavailable for erythropoiesis.'
                 });
               }
+              if (ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && (clinicalContext === 'ckd' || clinicalContext === 'heartFailure')) {
+                return e(DiagnosisHeader, {
+                  title: 'Iron Studies — Interpret in Context',
+                  description: clinicalContext === 'heartFailure'
+                    ? 'Standard thresholds suggest adequate iron. However, major heart failure trials defined iron deficiency as ferritin <100 or ferritin 100–300 with TSAT <20%. If TSAT is 16–20%, iron deficiency by trial criteria cannot be excluded. Consider local heart failure iron supplementation guidance.'
+                    : 'Standard thresholds suggest adequate iron. However, KDIGO CKD guidelines use different thresholds and values close to the threshold may still warrant iron supplementation, particularly in patients on ESAs. Refer to local renal guidance.'
+                });
+              }
+              if (ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && clinicalContext === 'none') {
+                return e(DiagnosisHeader, {
+                  title: 'Normal Iron Studies',
+                  description: 'Iron stores are adequate and iron delivery to erythroid precursors is maintained. If anaemia is present, iron deficiency is unlikely — investigate other causes.'
+                });
+              }
+              if (ferritinResult === 'normal' && tsatResult === 'high') {
+                return e(DiagnosisHeader, {
+                  title: 'Elevated TSAT with Normal Stores',
+                  description: 'May represent recent iron supplementation, fasting sample, or early iron loading. Consider repeat testing.'
+                });
+              }
+              if (ferritinResult === 'lowNormal' && tsatResult === 'high') {
+                return e(DiagnosisHeader, {
+                  title: 'Discordant Pattern',
+                  description: 'Low-normal ferritin with high TSAT is unusual. Consider recent iron therapy, sample timing, or repeat testing.'
+                });
+              }
               if ((ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high') {
                 return e(DiagnosisHeader, {
                   title: 'Iron Overload',
@@ -2583,8 +2653,14 @@
 
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
-            // Pattern: Ferritin low/low-normal + TSAT low
-            (ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low' && e(DiffListItem, {
+            // Pattern: Ferritin very low (any TSAT) - diagnostic of iron deficiency
+            ferritinResult === 'veryLow' && e(DiffListItem, {
+              title: 'Iron Deficiency',
+              defaultOpen: true
+            }, 'Ferritin <30 µg/L is diagnostic of iron deficiency regardless of TSAT. Investigate the underlying cause (blood loss, malabsorption, inadequate intake).'),
+
+            // Pattern: Ferritin low-normal + TSAT low
+            ferritinResult === 'lowNormal' && tsatResult === 'low' && e(DiffListItem, {
               title: 'Iron Deficiency',
               defaultOpen: true,
               infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD' },
@@ -2592,7 +2668,7 @@
               ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure' },
                 e('p', null, 'In heart failure, iron deficiency is common and definitions used in trials may differ from general population reference ranges. Interpretation in this context often considers ferritin and transferrin saturation together and should be aligned with local heart failure guidance.')
               ) : null
-            }, 'Low ferritin + low TSAT confirms iron deficiency. Investigate the underlying cause.'),
+            }, 'Low-normal ferritin + low TSAT confirms iron deficiency. Investigate the underlying cause.'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
@@ -2623,6 +2699,47 @@
             ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
               title: 'Anaemia of Chronic Disease'
             }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
+
+            // Pattern: Ferritin normal + TSAT normal (no inflammation, CKD/HF context)
+            ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && (clinicalContext === 'ckd' || clinicalContext === 'heartFailure') && e(DiffListItem, {
+              title: 'Interpret in Clinical Context',
+              infoPanel: e(InfoPanel, { title: 'Iron Deficiency Thresholds in CKD and Heart Failure' },
+                e('p', { style: { marginBottom: '10px' } }, 'Standard laboratory reference ranges for TSAT (<16% = low) differ from thresholds used in major clinical trials and guidelines for CKD and heart failure.'),
+                e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'Heart failure trials (FAIR-HF, AFFIRM-AHF):'), ' Iron deficiency defined as ferritin <100 µg/L OR ferritin 100–300 µg/L with TSAT <20%.'),
+                e('p', null, e('strong', null, 'KDIGO CKD guidelines:'), ' Consider iron supplementation when TSAT <20% and ferritin <100–500 µg/L depending on dialysis status and ESA use.')
+              )
+            }, clinicalContext === 'heartFailure'
+              ? 'Standard thresholds suggest adequate iron, but heart failure trial definitions use TSAT <20%. If TSAT is 16–20%, consider local heart failure iron guidance.'
+              : 'Standard thresholds suggest adequate iron, but KDIGO uses TSAT <20% for CKD. If TSAT is 16–20%, consider local renal iron guidance.'
+            ),
+
+            // Pattern: Ferritin normal + TSAT normal (no inflammation, general context)
+            ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && clinicalContext === 'none' && e(DiffListItem, {
+              title: 'Normal Iron Studies'
+            }, 'No evidence of iron deficiency or overload. If anaemia persists, consider other causes: B12/folate deficiency, chronic disease, renal impairment, haemolysis, bone marrow pathology.'),
+
+            // Pattern: Ferritin normal + TSAT high
+            ferritinResult === 'normal' && tsatResult === 'high' && e(DiffListItem, {
+              title: 'Elevated TSAT with Normal Stores',
+              infoPanel: e(InfoPanel, { title: 'Isolated Elevated TSAT' },
+                e('p', { style: { marginBottom: '10px' } }, 'TSAT can be transiently elevated by recent oral iron, iron infusion, or fasting state at time of collection.'),
+                e('p', null, 'If persistent on repeat testing, consider early iron loading state or ineffective erythropoiesis (thalassaemia, sideroblastic anaemia).')
+              )
+            }, 'May represent recent iron supplementation, fasting sample, or early iron loading. Consider repeat testing and clinical context.'),
+
+            // Pattern: Ferritin low-normal + TSAT high
+            ferritinResult === 'lowNormal' && tsatResult === 'high' && e(DiffListItem, {
+              title: 'Discordant Pattern',
+              infoPanel: e(InfoPanel, { title: 'Discordant Ferritin and TSAT' },
+                e('p', { style: { marginBottom: '10px' } }, 'Low-normal ferritin with high TSAT is unusual. Consider:'),
+                e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+                  e('li', null, 'Recent iron supplementation (oral or IV)'),
+                  e('li', null, 'Sample timing (fasting can elevate TSAT)'),
+                  e('li', null, 'Early iron loading with depleting stores'),
+                  e('li', null, 'Laboratory error — consider repeat')
+                )
+              )
+            }, 'Unusual combination. Consider recent iron therapy, sample timing, or laboratory artefact. Repeat testing may clarify.'),
 
             // Pattern: Ferritin high + TSAT high
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(React.Fragment, null,
@@ -3000,6 +3117,9 @@
                   'Thresholds assume mg/L FEU. If your lab reports in other units, convert before entering.'
                 ),
                 e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
+                e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
+                  'Prolongation calculated from baseline of 12 sec. If your lab\u2019s upper limit differs, adjust interpretation accordingly.'
+                ),
                 e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
                 calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
               ),
@@ -3020,15 +3140,15 @@
                 warning: 'If thrombocytopenia, haemolysis (eg, schistocytes) and organ involvement are present, consider TTP in the differential. This is time-critical and requires urgent haematology involvement and local escalation pathways.'
               }, 'Microangiopathic haemolytic anaemia with thrombocytopenia. Key distinction from DIC: fibrinogen typically NORMAL.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency (severe)', tags: ['All K-dependent factors'] },
-                'Can cause an isolated prolonged PT/INR due to reduced vitamin K-dependent clotting factors. Interpretation is supported by clinical context (eg, malabsorption, poor intake, antibiotics) and correction of coagulation studies after vitamin K repletion if undertaken as part of standard care.'),
+                'Severe vitamin K deficiency affects all K-dependent factors (II, VII, IX, X), prolonging both PT and APTT. Earlier or milder deficiency may affect PT alone. Consider malabsorption, poor intake, antibiotics, or obstructive jaundice.'),
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Therapeutic target context'] },
-                'A supratherapeutic INR can explain an isolated prolonged PT in a patient taking warfarin. Interpret relative to the therapeutic target for the indication and the clinical bleeding context. Management (including reversal) should follow local anticoagulation guidance.'),
+                'Significantly supratherapeutic warfarin can prolong both PT and APTT. Interpret relative to the therapeutic target for the indication and the clinical bleeding context. Management (including reversal) should follow local anticoagulation guidance.'),
               e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
                 'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
               e(DiffListItem, {
                 title: 'Isolated Hypofibrinogenaemia',
                 tags: ['Congenital', 'Acquired', 'L-asparaginase', 'Liver failure']
-              }, 'Fibrinogen <1.5 g/L with preserved PT/APTT. Congenital or acquired (L-asparaginase, liver disease, massive transfusion).')
+              }, 'Severe hypofibrinogenaemia (<1.5 g/L) can prolong both PT and APTT via the common pathway. Consider congenital or acquired causes (L-asparaginase, liver disease, massive transfusion, DIC).')
             ),
 
             // Pattern D: Both normal
@@ -3220,7 +3340,7 @@
 
           e('h3', { style: sectionStyle }, '10. EMERGENCY WARNING'),
           e('p', { style: { ...paraStyle, padding: '8px', background: 'rgba(255,69,58,0.1)', borderRadius: '6px' } },
-            e('strong', null, 'DO NOT USE IN EMERGENCIES.'), ' Call emergency services (000/911/999/112) immediately.'
+            e('strong', null, 'This app is not a substitute for emergency medical services.'), ' If you or someone near you is experiencing a medical emergency, call 000 (or your local emergency number) immediately. This tool is designed to support clinical decision-making by healthcare professionals and does not replace direct patient assessment or emergency response.'
           ),
 
           e('h3', { style: sectionStyle }, '11. INTENDED AUDIENCE'),
