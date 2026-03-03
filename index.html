@@ -1230,9 +1230,9 @@
           // SCREEN 0: Is the patient acutely unwell? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Is the patient acutely unwell?'),
-            e('div', { style: STYLES.screenSubtitle }, 'This changes how we interpret the results'),
+            e('div', { style: STYLES.screenSubtitle }, 'Acute illness changes how we interpret thyroid function tests'),
             e(ChoiceButton, {
-              label: 'Yes - acutely unwell (eg, ICU)',
+              label: 'Yes',
               selected: acutelyUnwell === true,
               onClick: () => {
                 clearAutoAdvance();
@@ -1242,7 +1242,7 @@
               color: 'var(--accent)'
             }),
             e(ChoiceButton, {
-              label: 'No - stable outpatient',
+              label: 'No',
               selected: acutelyUnwell === false,
               onClick: () => {
                 clearAutoAdvance();
@@ -1252,7 +1252,16 @@
               color: 'var(--accent)'
             }),
             acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1) },
-              e('strong', null, 'Acute illness'), ' can cause transient changes in thyroid function tests (often low T3, sometimes low T4 and/or low-normal TSH). Interpret alongside the clinical context, medications, and prior results. Repeat testing once clinically stable can help confirm whether abnormalities persist.'
+              e('strong', null, 'Non-thyroidal illness syndrome'), ' (sick euthyroid) can cause TFT patterns that mimic thyroid disease — commonly low T3, sometimes low T4, and variable TSH. In most cases, repeat testing once stable is appropriate.',
+              e('div', { style: { marginTop: '10px' } },
+                e('strong', null, 'Parameters that may still warrant treatment:'),
+                e('ul', { style: { margin: '6px 0 0 16px', fontSize: '12px', lineHeight: '1.5' } },
+                  e('li', null, 'TSH markedly elevated (>20 mU/L) suggesting true hypothyroidism'),
+                  e('li', null, 'Known history of thyroid disease or thyroidectomy'),
+                  e('li', null, 'Clinical features strongly suggestive of myxoedema'),
+                  e('li', null, 'Persistent abnormalities on repeat testing')
+                )
+              )
             ),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
@@ -1375,98 +1384,153 @@
           step === getResultsScreen() && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
 
-            // Compact input summary
-            e(InputSummaryStrip, { items: [
-              { label: 'TSH', ...getTSHDisplay() },
-              ft4Status && { label: 'fT4', ...getFT4Display() },
-              ft3Status && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
-            ].filter(Boolean) }),
+            // TSH LOW + fT4 HIGH: Overt Hyperthyroidism
+            tshResult === 'low' && ft4Status === 'high' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Overt Hyperthyroidism',
+                description: 'Thyrotoxicosis with suppressed TSH and elevated free T4. Excess circulating thyroid hormone.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Graves\' disease', description: 'Autoimmune. TRAb positive, diffuse goitre, may have eye signs.' }),
+              e(DiffCard, { title: 'Toxic multinodular goitre', description: 'Multiple autonomous nodules. Patchy uptake on scan.' }),
+              e(DiffCard, { title: 'Toxic adenoma', description: 'Single autonomous nodule. Hot nodule on scan.' }),
+              e(DiffCard, { title: 'Thyroiditis', description: 'Destructive release of preformed hormone. Low uptake on scan. Often transient.' }),
+              e(DiffCard, { title: 'Exogenous thyroid hormone', description: 'Iatrogenic or factitious. Low thyroglobulin if exogenous.' })
+            ),
 
-            e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+            // TSH LOW + fT4 NORMAL + fT3 HIGH: T3 Thyrotoxicosis
+            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'T3 Thyrotoxicosis',
+                description: 'About 5% of hyperthyroidism is T3-predominant with normal fT4. Often early or mild disease.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Early Graves\' disease', description: 'T3 rises before T4 in early disease.' }),
+              e(DiffCard, { title: 'Toxic adenoma', description: 'Autonomous nodule preferentially secreting T3.' }),
+              e(DiffCard, { title: 'Iodine deficiency', description: 'Shifts hormone production toward T3.' })
+            ),
 
-            // TSH LOW pathways
-            tshResult === 'low' && ft4Status === 'high' && e(DiffListItem, {
-              title: 'Overt Hyperthyroidism',
-              tags: ['Graves\'', 'Toxic MNG', 'Toxic adenoma']
-            }, 'Thyrotoxicosis. Most commonly Graves\', toxic MNG, or toxic adenoma.'),
-
-            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(DiffListItem, {
-              title: 'T3 Thyrotoxicosis',
-              tags: ['~5% of hyperthyroidism', 'Early Graves\'', 'Toxic adenoma']
-            }, 'About 5% of hyperthyroidism is T3-predominant. Consider early Graves\' or autonomous adenoma.'),
-
-            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'normal' && e(DiffListItem, {
-              title: 'Subclinical Hyperthyroidism',
-              tags: ['May be transient', 'Arrhythmia association', 'Bone health association'],
-              infoPanel: e(InfoPanel, { title: 'Subclinical Hyperthyroidism' },
+            // TSH LOW + fT4 NORMAL + fT3 NORMAL: Subclinical Hyperthyroidism
+            tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'normal' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Subclinical Hyperthyroidism',
+                description: 'Suppressed TSH with normal free T4 and free T3. Can be transient or persistent.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Autonomous thyroid nodule(s)', description: 'Mild autonomous hormone production.' }),
+              e(DiffCard, { title: 'Early or mild Graves\'', description: 'May progress to overt hyperthyroidism.' }),
+              e(DiffCard, { title: 'Resolving thyroiditis', description: 'Transient suppression during recovery phase.' }),
+              e(DiffCard, { title: 'Medication effect', description: 'Glucocorticoids, dopamine agonists can suppress TSH.' }),
+              e(DiffCard, { title: 'Non-thyroidal illness', description: 'Acute illness can cause transient TSH suppression.' }),
+              e(InfoPanel, { title: 'Subclinical Hyperthyroidism' },
                 e('p', null, 'Clinical significance varies with the degree and persistence of TSH suppression and the clinical context (age, comorbidities, and likely cause). Persistent or more marked suppression has been associated in some studies with higher rates of atrial arrhythmias and reduced bone density. Mild suppression is common and may be transient. Confirm discordant results and consider potential confounders (acute illness, medications, assay interference).')
               )
-            }, 'Suppressed TSH with normal free T4 and free T3. Can be transient (eg, intercurrent illness, medication effects, resolving thyroiditis). If persistent, observational data suggest associations with atrial arrhythmias and reduced bone density, particularly in higher-risk groups.'),
-
-            tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
-              e(DiffListItem, {
-                title: 'Central Hypothyroidism',
-                tags: ['Pituitary failure'],
-                defaultOpen: true,
-                warning: e(React.Fragment, null, e('strong', null, 'Safety note:'), ' central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'),
-                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
-                  e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                  e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
-                )
-              }, 'Low or inappropriately normal TSH with low free T4 suggests central hypothyroidism in the right clinical context. Correlate with pituitary symptoms, medications, intercurrent illness, and prior results; specialist review is often required.'),
-              e(DiffListItem, {
-                title: 'Non-Thyroidal Illness (Recovery Phase)',
-                tags: ['Sick euthyroid pattern', 'Transient', 'Context-dependent']
-              }, 'During recovery from acute illness, transient discordant TFT patterns can occur (including a temporarily low or low-normal TSH with low free T4). If there has been recent acute illness, interpret cautiously and consider repeat testing once clinically stable before concluding persistent pituitary pathology.')
             ),
 
-            // TSH HIGH pathways
-            tshResult === 'high' && ft4Status === 'low' && e(DiffListItem, {
-              title: 'Overt Hypothyroidism',
-              tags: ['Hashimoto\'s', 'Post-thyroidectomy', 'Post-radioiodine']
-            }, 'Primary hypothyroidism. Most commonly Hashimoto\'s — check TPO antibodies.'),
+            // TSH LOW + fT4 LOW: Central Hypothyroidism or Recovery
+            tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Central Hypothyroidism',
+                description: 'Low or inappropriately normal TSH with low free T4 suggests pituitary or hypothalamic dysfunction.',
+                warning: 'Central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Pituitary adenoma', description: 'Mass effect compressing TSH-producing cells.' }),
+              e(DiffCard, { title: 'Pituitary apoplexy', description: 'Acute haemorrhage or infarction of pituitary.' }),
+              e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
+              e(DiffCard, { title: 'Sheehan\'s syndrome', description: 'Postpartum pituitary necrosis from haemorrhage.' }),
+              e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern during recovery from acute illness. Repeat when stable.' }),
+              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
+                e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
+                e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
+              )
+            ),
 
-            tshResult === 'high' && ft4Status === 'normal' && e(DiffListItem, {
-              title: 'Subclinical Hypothyroidism',
-              tags: ['Common pattern', 'Autoimmune context', 'Persistence matters'],
-              infoPanel: e(InfoPanel, { title: 'Subclinical hypothyroidism: interpretation notes' },
+            // TSH HIGH + fT4 LOW: Overt Hypothyroidism
+            tshResult === 'high' && ft4Status === 'low' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Overt Hypothyroidism',
+                description: 'Primary hypothyroidism with elevated TSH and low free T4. Thyroid gland is failing.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Hashimoto\'s thyroiditis', description: 'Autoimmune. Most common cause. Check TPO antibodies.' }),
+              e(DiffCard, { title: 'Post-thyroidectomy', description: 'Surgical removal of thyroid tissue.' }),
+              e(DiffCard, { title: 'Post-radioiodine', description: 'Ablation therapy for hyperthyroidism or thyroid cancer.' }),
+              e(DiffCard, { title: 'Drug-induced', description: 'Lithium, amiodarone, immune checkpoint inhibitors.' }),
+              e(DiffCard, { title: 'Iodine deficiency', description: 'Rare in Australia but consider in recent migrants.' })
+            ),
+
+            // TSH HIGH + fT4 NORMAL: Subclinical Hypothyroidism
+            tshResult === 'high' && ft4Status === 'normal' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Subclinical Hypothyroidism',
+                description: 'Elevated TSH with normal free T4. Common finding that can be transient or persistent.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Early Hashimoto\'s', description: 'Autoimmune thyroiditis. Check TPO antibodies.' }),
+              e(DiffCard, { title: 'Recovery from illness', description: 'TSH can transiently rise during recovery phase.' }),
+              e(DiffCard, { title: 'Medication effect', description: 'Lithium, amiodarone, iodine excess.' }),
+              e(DiffCard, { title: 'Assay variation', description: 'Biological and analytical variation. Confirm on repeat.' }),
+              e(InfoPanel, { title: 'Subclinical hypothyroidism: interpretation notes' },
                 e('p', null, 'Subclinical hypothyroidism is defined by elevated TSH with normal free T4. It can reflect early autoimmune thyroid disease, recovery from intercurrent illness, medication effects, or biological and analytical variation. Confirming persistence on repeat testing and assessing thyroid autoimmunity (where clinically relevant) can help with aetiology and risk of progression. Management approaches vary across guidelines and depend on patient factors; where uncertainty exists, follow local guidance and consider senior or endocrine input.')
               )
-            }, 'Elevated TSH with normal free T4. Common finding that can be transient. Interpretation depends on persistence, degree of TSH elevation, symptoms, pregnancy status, and thyroid autoimmunity.'),
-
-            tshResult === 'high' && ft4Status === 'high' && e(DiffListItem, {
-              title: 'Assay Interference or TSH-oma',
-              tags: ['Biotin interference', 'Heterophile antibodies', 'Refer endocrinology']
-            }, 'Discordant result — TSH should be suppressed. Consider biotin interference, heterophile antibodies, or TSH-oma.'),
-
-            // TSH NORMAL pathways
-            tshResult === 'normal' && ft4Status === 'normal' && e(DiffListItem, {
-              title: 'Euthyroid',
-              tags: ['Normal thyroid function'],
-              defaultOpen: true
-            }, 'TSH and fT4 both normal. Symptoms unlikely to be thyroid-related.'),
-
-            tshResult === 'normal' && ft4Status === 'low' && e(React.Fragment, null,
-              e(DiffListItem, {
-                title: 'Central Hypothyroidism',
-                tags: ['Pituitary failure'],
-                defaultOpen: true,
-                warning: e(React.Fragment, null, e('strong', null, 'Safety note:'), ' central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'),
-                infoPanel: e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
-                  e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
-                  e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
-                )
-              }, 'Low or inappropriately normal TSH with low free T4 suggests central hypothyroidism in the right clinical context. Correlate with pituitary symptoms, medications, intercurrent illness, and prior results; specialist review is often required.'),
-              e(DiffListItem, {
-                title: 'Also Consider',
-                tags: ['Alternative explanations']
-              }, 'Recent levothyroxine dose change (TSH lags fT4 by several weeks) · Recovery from non-thyroidal illness · Assay interference (heterophile antibodies, biotin).')
             ),
 
-            tshResult === 'normal' && ft4Status === 'high' && e(DiffListItem, {
-              title: 'Assay Interference',
-              tags: ['Biotin supplements', 'Heterophile antibodies', 'Recheck']
-            }, 'Normal TSH with high free T4 is discordant. Common causes include assay interference (eg, biotin supplements) and interfering antibodies. If results are discordant with the clinical picture, confirm with repeat testing using an approach agreed with the laboratory (eg, repeat after withholding non-essential supplements, or test on a different platform).'),
+            // TSH HIGH + fT4 HIGH: Assay Interference or TSH-oma
+            tshResult === 'high' && ft4Status === 'high' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Discordant Result',
+                description: 'High TSH with high fT4 is unexpected — TSH should be suppressed by elevated thyroid hormones.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Assay interference (biotin)', description: 'High-dose biotin supplements interfere with immunoassays.' }),
+              e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
+              e(DiffCard, { title: 'TSH-secreting pituitary adenoma', description: 'Rare. Autonomous TSH production. Refer endocrinology.' }),
+              e(DiffCard, { title: 'Thyroid hormone resistance', description: 'Rare genetic condition. Tissue insensitivity to thyroid hormone.' })
+            ),
+
+            // TSH NORMAL + fT4 NORMAL: Euthyroid
+            tshResult === 'normal' && ft4Status === 'normal' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Euthyroid',
+                description: 'TSH and fT4 both normal. Thyroid function is intact.'
+              }),
+              e('div', { style: { fontSize: '13px', color: 'var(--label2)', lineHeight: '1.5', marginBottom: '12px' } },
+                'Symptoms are unlikely to be thyroid-related. Consider other causes if clinical suspicion remains.'
+              )
+            ),
+
+            // TSH NORMAL + fT4 LOW: Central Hypothyroidism
+            tshResult === 'normal' && ft4Status === 'low' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Central Hypothyroidism',
+                description: 'Inappropriately normal TSH with low free T4 suggests pituitary or hypothalamic dysfunction.',
+                warning: 'Central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Pituitary adenoma', description: 'Mass effect compressing TSH-producing cells.' }),
+              e(DiffCard, { title: 'Pituitary apoplexy', description: 'Acute haemorrhage or infarction of pituitary.' }),
+              e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
+              e(DiffCard, { title: 'Recent levothyroxine dose change', description: 'TSH lags fT4 by several weeks after dose adjustment.' }),
+              e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern. Repeat when stable.' }),
+              e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies, biotin.' }),
+              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
+                e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
+                e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
+              )
+            ),
+
+            // TSH NORMAL + fT4 HIGH: Assay Interference
+            tshResult === 'normal' && ft4Status === 'high' && e(React.Fragment, null,
+              e(DiagnosisHeader, {
+                title: 'Discordant Result',
+                description: 'Normal TSH with high fT4 is unexpected — TSH should be suppressed by elevated thyroid hormones.'
+              }),
+              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+              e(DiffCard, { title: 'Assay interference (biotin)', description: 'High-dose biotin supplements interfere with immunoassays.' }),
+              e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
+              e(DiffCard, { title: 'Familial dysalbuminaemic hyperthyroxinaemia', description: 'Abnormal albumin binds T4. Free T4 spuriously elevated on some assays.' })
+            ),
 
             // Urgent pattern recognition - thyroid emergencies
             (tshResult === 'low' && ft4Status === 'high') && e('div', {
@@ -1509,6 +1573,16 @@
                 e('div', null, '• Repeat TFTs after an interval if recent illness or uncertain chronicity')
               )
             ),
+
+            // Based on section (input summary)
+            e('div', {
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px', marginTop: '16px' }
+            }, 'Based on'),
+            e(InputSummaryStrip, { items: [
+              { label: 'TSH', ...getTSHDisplay() },
+              ft4Status && { label: 'fT4', ...getFT4Display() },
+              ft3Status && tshResult === 'low' && { label: 'fT3', ...getFT3Display() }
+            ].filter(Boolean) }),
 
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, {
@@ -2085,6 +2159,11 @@
               { label: 'Urine Osm', ...getUrineOsmDisplay() },
               { label: 'Urine Na', ...getUrineNaDisplay() }
             ] }),
+
+            // Na Correction Calculator
+            e('div', { style: { marginTop: '16px' } },
+              e(NaCorrectionCalculator)
+            ),
 
             e(LearnMoreDivider),
 
