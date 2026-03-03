@@ -1698,6 +1698,17 @@
 
             e(LearnMoreDivider),
 
+            // Based on section (input summary)
+            e('div', {
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px', marginTop: '16px' }
+            }, 'Based on'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Context', value: acutelyUnwell === true ? 'Acutely unwell' : acutelyUnwell === false ? 'Stable' : 'Unknown', interpretation: acutelyUnwell === true ? 'Consider non-thyroidal illness' : '' },
+              { label: 'TSH', value: tshResult === 'low' ? 'Low' : tshResult === 'normal' ? 'Normal' : tshResult === 'high' ? 'High' : '', interpretation: '' },
+              { label: 'fT4', value: ft4Status === 'low' ? 'Low' : ft4Status === 'normal' ? 'Normal' : ft4Status === 'high' ? 'High' : '', interpretation: '' },
+              tshResult === 'low' && { label: 'fT3', value: ft3Status === 'low' ? 'Low' : ft3Status === 'normal' ? 'Normal' : ft3Status === 'high' ? 'High' : '', interpretation: '' }
+            ].filter(Boolean) }),
+
             // Causes of Hyperthyroidism InfoPanel (when hyperthyroid)
             (tshResult === 'low' && (ft4Status === 'high' || (ft4Status === 'normal' && ft3Status === 'high'))) && e(InfoPanel, { title: 'Causes of Hyperthyroidism' },
               e('p', { style: { fontWeight: 700, marginBottom: '10px' } }, 'High uptake on thyroid scan (↑ synthesis):'),
@@ -2859,15 +2870,17 @@
 
           // RESULTS SCREEN (step 1 for A/C/D, step 2 for B)
           step === getResultsStep() && e(FadeIn, null,
-            e('div', { style: { marginBottom: '20px' } },
-              e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-              e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginTop: '4px' } },
-                pattern === 'A' ? 'Isolated prolonged PT' : pattern === 'B' ? 'Isolated prolonged APTT' : pattern === 'C' ? 'Both PT and APTT prolonged' : 'Both normal'
-              )
-            ),
-            e(InputSummaryStrip, { items: [
-              { label: 'Pattern', value: pattern === 'A' ? 'PT ↑' : pattern === 'B' ? 'APTT ↑' : pattern === 'C' ? 'Both ↑' : 'Both normal', color: pattern === 'C' ? 'var(--orange)' : 'var(--green)' }
-            ] }),
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // DiagnosisHeader based on pattern
+            e(DiagnosisHeader, {
+              title: pattern === 'A' ? 'Isolated Prolonged PT' : pattern === 'B' ? 'Isolated Prolonged APTT' : pattern === 'C' ? 'Both PT and APTT Prolonged' : 'Both PT and APTT Normal',
+              description: pattern === 'A' ? 'Extrinsic pathway affected. Factor VII deficiency, warfarin, early liver disease, or vitamin K deficiency.' :
+                pattern === 'B' ? 'Intrinsic pathway affected. Consider factor deficiencies (VIII, IX, XI, XII), inhibitors (lupus anticoagulant, acquired inhibitors), or anticoagulants (heparin, dabigatran).' :
+                pattern === 'C' ? 'Common pathway or multiple factors affected. Consider DIC, severe liver disease, massive transfusion, or supratherapeutic anticoagulation.' :
+                'Normal coagulation cascade. If bleeding, consider platelet disorders, vWD, Factor XIII deficiency, or vascular causes.'
+            }),
+
             e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
 
             // Pattern A: Isolated prolonged PT
@@ -2886,11 +2899,6 @@
 
             // Pattern B: Isolated prolonged APTT (filtered by mixing study result)
             pattern === 'B' && e(React.Fragment, null,
-              // Show mixing study result in input summary if performed
-              mixingResult && mixingResult !== 'notDone' && e(InputSummaryStrip, { items: [
-                { label: 'Mixing', value: mixingResult === 'corrects' ? 'Corrects' : 'Does not correct', color: 'var(--accent)' }
-              ] }),
-
               // If corrects: factor deficiencies only
               (mixingResult === 'corrects') && e(React.Fragment, null,
                 e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
@@ -3041,6 +3049,15 @@
               e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
                 'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.')
             ),
+
+            // Based on section (input summary)
+            e('div', {
+              style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px', marginTop: '16px' }
+            }, 'Based on'),
+            e(InputSummaryStrip, { items: [
+              { label: 'Pattern', value: pattern === 'A' ? 'PT ↑ only' : pattern === 'B' ? 'APTT ↑ only' : pattern === 'C' ? 'Both ↑' : 'Both normal', interpretation: '' },
+              pattern === 'B' && mixingResult && mixingResult !== 'notDone' && { label: 'Mixing', value: mixingResult === 'corrects' ? 'Corrects' : 'Does not correct', interpretation: mixingResult === 'corrects' ? 'Factor deficiency' : 'Inhibitor present' }
+            ].filter(Boolean) }),
 
             e(InfoPanel, { title: 'Is It the DOAC or a Real Problem?' },
               e('p', { style: { marginBottom: '10px' } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem:'),
