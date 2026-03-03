@@ -1427,22 +1427,57 @@
               )
             ),
 
-            // TSH LOW + fT4 LOW: Central Hypothyroidism or Recovery
+            // TSH LOW + fT4 LOW: Central Hypothyroidism or NTI Recovery (order depends on acutelyUnwell)
             tshResult === 'low' && ft4Status === 'low' && e(React.Fragment, null,
-              e(DiagnosisHeader, {
-                title: 'Central Hypothyroidism',
-                description: 'Low or inappropriately normal TSH with low free T4 suggests pituitary or hypothalamic dysfunction.',
-                warning: 'Central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'
-              }),
-              e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
-              e(DiffCard, { title: 'Pituitary adenoma', description: 'Mass effect compressing TSH-producing cells.' }),
-              e(DiffCard, { title: 'Pituitary apoplexy', description: 'Acute haemorrhage or infarction of pituitary.' }),
-              e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
-              e(DiffCard, { title: 'Sheehan\'s syndrome', description: 'Postpartum pituitary necrosis from haemorrhage.' }),
-              e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern during recovery from acute illness. Repeat when stable.' }),
+              // If acutely unwell, show NTI first as more likely explanation
+              acutelyUnwell === true ? e(React.Fragment, null,
+                e(DiagnosisHeader, {
+                  title: 'Non-Thyroidal Illness (Recovery Phase)',
+                  description: 'During recovery from acute illness, transient discordant TFT patterns can occur including low TSH with low free T4. Repeat testing once clinically stable is recommended.'
+                }),
+                e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Also consider'),
+                e(DiffCard, {
+                  title: 'Central Hypothyroidism',
+                  description: 'Low or inappropriately normal TSH with low free T4 suggests pituitary or hypothalamic dysfunction. Consider if pattern persists after recovery.'
+                }),
+                e('div', {
+                  style: {
+                    display: 'flex',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    background: 'rgba(255,69,58,0.06)',
+                    border: '1px solid rgba(255,69,58,0.15)',
+                    borderRadius: '10px',
+                    marginBottom: '12px'
+                  }
+                },
+                  e('span', { style: { fontSize: '14px', flexShrink: 0 } }, '⚠️'),
+                  e('div', { style: { fontSize: '12px', lineHeight: 1.5, fontWeight: 500 } }, 'Central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.')
+                )
+              ) : e(React.Fragment, null,
+                // If not acutely unwell, show Central Hypothyroidism first
+                e(DiagnosisHeader, {
+                  title: 'Central Hypothyroidism',
+                  description: 'Low or inappropriately normal TSH with low free T4 suggests pituitary or hypothalamic dysfunction.',
+                  warning: 'Central hypothyroidism can coexist with adrenal insufficiency and other pituitary hormone deficiencies. If pituitary disease is suspected, interpret TFTs in the broader pituitary context and seek senior or endocrine advice.'
+                }),
+                e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
+                e(DiffCard, { title: 'Pituitary adenoma', description: 'Mass effect compressing TSH-producing cells.' }),
+                e(DiffCard, { title: 'Pituitary apoplexy', description: 'Acute haemorrhage or infarction of pituitary.' }),
+                e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
+                e(DiffCard, { title: 'Sheehan\'s syndrome', description: 'Postpartum pituitary necrosis from haemorrhage.' }),
+                e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern during recovery from acute illness. Repeat when stable.' })
+              ),
               e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                 e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
+                e('p', { style: { fontWeight: 600, marginBottom: '8px' } }, 'Causes of central hypothyroidism:'),
+                e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+                  e('li', null, 'Pituitary adenoma (mass effect)'),
+                  e('li', null, 'Pituitary apoplexy'),
+                  e('li', null, 'Post-surgical / post-radiation'),
+                  e('li', null, 'Sheehan\'s syndrome'),
+                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)')
+                )
               )
             ),
 
