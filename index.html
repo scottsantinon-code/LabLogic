@@ -68,6 +68,11 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
@@ -418,7 +423,11 @@
               justifyContent: 'center',
               flexShrink: 0
             }
-          }, e('svg', { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2.5, strokeLinecap: 'round', strokeLinejoin: 'round' }, e('circle', { cx: 12, cy: 12, r: 10 }), e('line', { x1: 12, y1: 16, x2: 12, y2: 12 }), e('line', { x1: 12, y1: 8, x2: 12.01, y2: 8 }))),
+          }, e('svg', { width: 14, height: 14, viewBox: '0 0 512 512', fill: 'var(--label3)' },
+            e('path', { d: 'M290.211,360.727c-5.234,0.488-10.489-0.693-15.011-3.375c-3.304-3.392-4.888-8.101-4.305-12.8c0.122-3.912,0.589-7.806,1.396-11.636c0.781-4.394,1.79-8.744,3.025-13.033l13.731-47.244c1.416-4.663,2.352-9.459,2.793-14.313c0-5.236,0.698-8.844,0.698-10.938c0.292-9.333-3.693-18.289-10.822-24.32c-8.769-6.732-19.689-10.041-30.72-9.309c-7.905,0.119-15.749,1.413-23.273,3.84c-8.223,2.56-16.873,5.624-25.949,9.193l-3.956,15.36c2.676-0.931,5.935-1.978,9.658-3.142c3.552-1.052,7.234-1.601,10.938-1.629c5.196-0.563,10.426,0.713,14.778,3.607c2.956,3.527,4.343,8.109,3.84,12.684c-0.013,3.913-0.442,7.814-1.28,11.636c-0.815,4.073-1.862,8.378-3.142,12.916l-13.847,47.476c-1.116,4.413-2.009,8.879-2.676,13.382c-0.544,3.855-0.816,7.743-0.815,11.636c-0.057,9.397,4.24,18.291,11.636,24.087c8.904,6.837,19.98,10.226,31.185,9.542c7.89,0.162,15.753-0.978,23.273-3.375c6.594-2.25,15.399-5.469,26.415-9.658l3.724-14.662c-2.984,1.238-6.057,2.249-9.193,3.025C298.346,360.583,294.274,360.935,290.211,360.727z' }),
+            e('path', { d: 'M304.756,136.727c-6.333-5.816-14.677-8.945-23.273-8.727c-8.591-0.194-16.927,2.932-23.273,8.727c-11.632,10.03-12.931,27.591-2.9,39.224c0.894,1.037,1.863,2.006,2.9,2.9c13.252,11.853,33.294,11.853,46.545,0c11.632-10.129,12.851-27.769,2.722-39.401C306.635,138.481,305.725,137.571,304.756,136.727z' }),
+            e('path', { d: 'M256,0C114.615,0,0,114.615,0,256s114.615,256,256,256s256-114.615,256-256S397.385,0,256,0z M256,488.727C127.468,488.727,23.273,384.532,23.273,256S127.468,23.273,256,23.273S488.727,127.468,488.727,256S384.532,488.727,256,488.727z' })
+          )),
           e('span', {
             style: { flex: 1, fontSize: '14px', fontWeight: 600, color: 'var(--label2)' }
           }, title),
@@ -441,6 +450,122 @@
             animation: 'fadeIn 0.2s ease'
           }
         }, children)
+      );
+    }
+
+    // 6b. InfoModal - Pull-up modal for detailed information
+    function InfoModal({ title, children, isOpen, onClose }) {
+      if (!isOpen) return null;
+      return e('div', {
+        style: {
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease'
+        },
+        onClick: onClose
+      },
+        e('div', {
+          style: {
+            background: 'var(--bg)',
+            borderRadius: '20px 20px 0 0',
+            maxHeight: '85vh',
+            width: '100%',
+            maxWidth: '500px',
+            overflow: 'hidden',
+            animation: 'slideUp 0.3s ease'
+          },
+          onClick: (ev) => ev.stopPropagation()
+        },
+          // Handle bar
+          e('div', { style: { display: 'flex', justifyContent: 'center', padding: '12px' } },
+            e('div', { style: { width: '36px', height: '4px', background: 'var(--sep)', borderRadius: '2px' } })
+          ),
+          // Header
+          e('div', { style: { padding: '0 20px 16px', borderBottom: '1px solid var(--sep)' } },
+            e('div', { style: { fontSize: '18px', fontWeight: 700, color: 'var(--label)' } }, title)
+          ),
+          // Content
+          e('div', {
+            style: {
+              padding: '20px',
+              overflowY: 'auto',
+              maxHeight: 'calc(85vh - 100px)',
+              fontSize: '14px',
+              lineHeight: 1.7,
+              color: 'var(--label2)'
+            }
+          }, children),
+          // Close button
+          e('div', { style: { padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))' } },
+            e('button', {
+              onClick: onClose,
+              style: {
+                width: '100%',
+                padding: '14px',
+                background: 'var(--accent)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, 'Close')
+          )
+        )
+      );
+    }
+
+    // 6c. InfoModalTrigger - Button to open InfoModal
+    function InfoModalTrigger({ title, children }) {
+      const [isOpen, setIsOpen] = useState(false);
+      return e(React.Fragment, null,
+        e('button', {
+          onClick: () => setIsOpen(true),
+          style: {
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '14px 16px',
+            background: 'var(--card)',
+            border: '1px solid var(--sep)',
+            borderRadius: '14px',
+            marginBottom: '12px',
+            cursor: 'pointer',
+            fontFamily: 'var(--font)',
+            textAlign: 'left'
+          }
+        },
+          e('div', {
+            style: {
+              width: '26px',
+              height: '26px',
+              borderRadius: '50%',
+              background: 'rgba(142,142,147,0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }
+          }, e('svg', { width: 14, height: 14, viewBox: '0 0 512 512', fill: 'var(--label3)' },
+            e('path', { d: 'M290.211,360.727c-5.234,0.488-10.489-0.693-15.011-3.375c-3.304-3.392-4.888-8.101-4.305-12.8c0.122-3.912,0.589-7.806,1.396-11.636c0.781-4.394,1.79-8.744,3.025-13.033l13.731-47.244c1.416-4.663,2.352-9.459,2.793-14.313c0-5.236,0.698-8.844,0.698-10.938c0.292-9.333-3.693-18.289-10.822-24.32c-8.769-6.732-19.689-10.041-30.72-9.309c-7.905,0.119-15.749,1.413-23.273,3.84c-8.223,2.56-16.873,5.624-25.949,9.193l-3.956,15.36c2.676-0.931,5.935-1.978,9.658-3.142c3.552-1.052,7.234-1.601,10.938-1.629c5.196-0.563,10.426,0.713,14.778,3.607c2.956,3.527,4.343,8.109,3.84,12.684c-0.013,3.913-0.442,7.814-1.28,11.636c-0.815,4.073-1.862,8.378-3.142,12.916l-13.847,47.476c-1.116,4.413-2.009,8.879-2.676,13.382c-0.544,3.855-0.816,7.743-0.815,11.636c-0.057,9.397,4.24,18.291,11.636,24.087c8.904,6.837,19.98,10.226,31.185,9.542c7.89,0.162,15.753-0.978,23.273-3.375c6.594-2.25,15.399-5.469,26.415-9.658l3.724-14.662c-2.984,1.238-6.057,2.249-9.193,3.025C298.346,360.583,294.274,360.935,290.211,360.727z' }),
+            e('path', { d: 'M304.756,136.727c-6.333-5.816-14.677-8.945-23.273-8.727c-8.591-0.194-16.927,2.932-23.273,8.727c-11.632,10.03-12.931,27.591-2.9,39.224c0.894,1.037,1.863,2.006,2.9,2.9c13.252,11.853,33.294,11.853,46.545,0c11.632-10.129,12.851-27.769,2.722-39.401C306.635,138.481,305.725,137.571,304.756,136.727z' }),
+            e('path', { d: 'M256,0C114.615,0,0,114.615,0,256s114.615,256,256,256s256-114.615,256-256S397.385,0,256,0z M256,488.727C127.468,488.727,23.273,384.532,23.273,256S127.468,23.273,256,23.273S488.727,127.468,488.727,256S384.532,488.727,256,488.727z' })
+          )),
+          e('span', { style: { flex: 1, fontSize: '14px', fontWeight: 600, color: 'var(--label2)' } }, title),
+          e('span', { style: { fontSize: '16px', color: 'var(--label3)' } }, '›')
+        ),
+        e(InfoModal, { title, isOpen, onClose: () => setIsOpen(false) }, children)
       );
     }
 
@@ -1029,18 +1154,37 @@
             )
           ),
 
-          // ODS InfoPanel
-          e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)' },
-            e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
-            e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
-            e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
-            e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
-              e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
-              e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+          // ODS InfoModalTrigger
+          e(InfoModalTrigger, { title: 'Osmotic Demyelination Syndrome (ODS)' },
+            e('p', { style: { marginBottom: '12px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia. The brain adapts by losing organic osmolytes; rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+
+            e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Epidemiology'),
+            e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+              e('li', null, 'Overall risk ~0.05% (Toronto cohort, 22,858 hyponatraemia admissions)'),
+              e('li', null, e('strong', null, 'If Na <110 mmol/L, risk rises to ~3%')),
+              e('li', null, 'Notably, many ODS cases did not have documented rapid correction')
+            ),
+
+            e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'High-risk patients'),
+            e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+              e('li', null, 'Severe hyponatraemia (Na <110 mmol/L)'),
+              e('li', null, 'Alcohol use disorder / beer potomania'),
+              e('li', null, 'Malnutrition'),
+              e('li', null, 'Advanced liver disease'),
               e('li', null, 'Hypokalaemia'),
-              e('li', null, 'Malnutrition or alcoholism'),
-              e('li', null, 'Advanced liver disease')
-            )
+              e('li', null, 'Post-transplant'),
+              e('li', null, 'Elderly')
+            ),
+
+            e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Rate of correction'),
+            e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+              e('li', null, 'Evidence on safe rate is mixed'),
+              e('li', null, 'Some studies: 4× higher relative risk if rise >10–12 mmol/L/24h'),
+              e('li', null, '2025 JAMA meta-analysis: increased mortality risk with ', e('em', null, 'slow'), ' correction'),
+              e('li', null, 'Risk of ODS tracks to the ', e('strong', null, 'fastest'), ' sodium rises — the highest 24-hour increment matters most')
+            ),
+
+            e('p', { style: { fontSize: '12px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Consult local protocols and seek senior/specialist advice for correction targets in high-risk patients.')
           )
         )
       );
@@ -1189,9 +1333,24 @@
       // Auto-advance for ChoiceButton-only screens
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
 
-      // Dynamic screen count: 5 screens if TSH low (need fT3), else 4 screens
-      const getTotalScreens = () => tshResult === 'low' ? 5 : 4;
-      const getResultsScreen = () => tshResult === 'low' ? 4 : 3;
+      // Dynamic screen count: add 1 if acutely unwell (NTIS screen), add 1 if TSH low (fT3 screen)
+      const hasNTISScreen = acutelyUnwell === true;
+      const getTotalScreens = () => {
+        let screens = 4; // Base: AcutelyUnwell, TSH, fT4, Results
+        if (hasNTISScreen) screens += 1; // Add NTIS screen
+        if (tshResult === 'low') screens += 1; // Add fT3 screen
+        return screens;
+      };
+      const getNTISScreen = () => hasNTISScreen ? 1 : -1;
+      const getTSHScreen = () => hasNTISScreen ? 2 : 1;
+      const getFT4Screen = () => hasNTISScreen ? 3 : 2;
+      const getFT3Screen = () => hasNTISScreen ? 4 : 3;
+      const getResultsScreen = () => {
+        let screen = 3; // Base results screen
+        if (hasNTISScreen) screen += 1;
+        if (tshResult === 'low') screen += 1;
+        return screen;
+      };
 
       const handleBack = () => {
         clearAutoAdvance();
@@ -1199,7 +1358,7 @@
           onBack();
         } else if (step === getResultsScreen()) {
           // From results, go back to fT3 (if TSH low) or fT4
-          setStep(tshResult === 'low' ? 3 : 2);
+          setStep(tshResult === 'low' ? getFT3Screen() : getFT4Screen());
         } else {
           setStep(step - 1);
         }
@@ -1236,7 +1395,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setAcutelyUnwell(true);
-                // No auto-advance — warning gates progression
+                scheduleAdvance(() => goToStep(1), false); // Go to NTIS screen
               },
               color: 'var(--accent)'
             }),
@@ -1246,27 +1405,77 @@
               onClick: () => {
                 clearAutoAdvance();
                 setAcutelyUnwell(false);
-                scheduleAdvance(() => goToStep(1), false); // 300ms delay
+                scheduleAdvance(() => goToStep(1), false); // Go directly to TSH screen (becomes step 1 when not unwell)
               },
               color: 'var(--accent)'
             }),
-            acutelyUnwell === true && e(WarningBanner, { onContinue: () => goToStep(1), subtle: true },
-              e('strong', null, 'Non-thyroidal illness syndrome'), ' (sick euthyroid) can cause TFT patterns that mimic thyroid disease — commonly low T3, sometimes low T4, and variable TSH. In most cases, repeat testing once stable is appropriate.',
-              e('div', { style: { marginTop: '10px' } },
-                e('strong', null, 'Parameters that may still warrant treatment:'),
-                e('ul', { style: { margin: '6px 0 0 16px', fontSize: '12px', lineHeight: '1.5' } },
-                  e('li', null, 'TSH markedly elevated (>20 mU/L) suggesting true hypothyroidism'),
-                  e('li', null, 'Known history of thyroid disease or thyroidectomy'),
-                  e('li', null, 'Clinical features strongly suggestive of myxoedema'),
-                  e('li', null, 'Persistent abnormalities on repeat testing')
-                )
-              )
-            ),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
 
-          // SCREEN 1: What is the TSH? (ChoiceButtons, auto-advance)
-          step === 1 && e(FadeIn, null,
+          // SCREEN 1 (if acutely unwell): Non-Thyroidal Illness Syndrome
+          step === getNTISScreen() && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Non-Thyroidal Illness Syndrome'),
+            e('div', { style: STYLES.screenSubtitle }, 'Also known as "sick euthyroid syndrome"'),
+
+            e('div', {
+              style: {
+                background: 'rgba(255,149,0,0.08)',
+                border: '1px solid rgba(255,149,0,0.2)',
+                borderRadius: '14px',
+                padding: '16px',
+                marginBottom: '16px'
+              }
+            },
+              e('p', { style: { marginBottom: '12px', lineHeight: 1.6 } },
+                'Acute illness can cause TFT patterns that mimic thyroid disease. This is ', e('strong', null, 'not'), ' a thyroid disorder — it\'s a physiological adaptation to illness.'
+              ),
+              e('p', { style: { marginBottom: '0', lineHeight: 1.6, fontWeight: 500 } },
+                'Common patterns: low T3, sometimes low T4, variable TSH (often suppressed).'
+              )
+            ),
+
+            e('div', { style: { marginBottom: '16px' } },
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'What causes it?'),
+              e('ul', { style: { margin: 0, paddingLeft: '18px', fontSize: '13px', lineHeight: 1.7, color: 'var(--label2)' } },
+                e('li', null, 'Cytokines inhibit peripheral T4→T3 conversion'),
+                e('li', null, 'Reduced TSH secretion and pulsatility'),
+                e('li', null, 'Changes in thyroid hormone binding proteins'),
+                e('li', null, 'Altered hypothalamic-pituitary setpoint')
+              )
+            ),
+
+            e('div', { style: { marginBottom: '16px' } },
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'When might treatment still be needed?'),
+              e('ul', { style: { margin: 0, paddingLeft: '18px', fontSize: '13px', lineHeight: 1.7, color: 'var(--label2)' } },
+                e('li', null, 'TSH markedly elevated (>20 mU/L) — suggests true hypothyroidism'),
+                e('li', null, 'Known history of thyroid disease or thyroidectomy'),
+                e('li', null, 'Clinical features strongly suggestive of myxoedema'),
+                e('li', null, 'Persistent abnormalities on repeat testing after recovery')
+              )
+            ),
+
+            e('div', {
+              style: {
+                background: 'rgba(0,113,227,0.06)',
+                borderRadius: '12px',
+                padding: '14px',
+                marginBottom: '20px'
+              }
+            },
+              e('p', { style: { fontSize: '13px', color: 'var(--label2)', margin: 0, lineHeight: 1.6 } },
+                e('strong', null, 'Recommendation: '), 'In most cases, repeat TFTs once the patient is clinically stable. Avoid initiating thyroid treatment based solely on TFTs during acute illness unless there is strong clinical suspicion.'
+              )
+            ),
+
+            e(PrimaryButton, {
+              label: 'I understand, continue',
+              color: 'var(--accent)',
+              onClick: () => goToStep(getTSHScreen())
+            })
+          ),
+
+          // SCREEN: What is the TSH? (ChoiceButtons, auto-advance)
+          step === getTSHScreen() && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the TSH?'),
             e('div', { style: STYLES.screenSubtitle }, 'Normal: 0.4–4.0 mU/L'),
             e(ChoiceButton, {
@@ -1275,7 +1484,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setTshResult('low');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(getFT4Screen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1285,7 +1494,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setTshResult('normal');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(getFT4Screen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1295,7 +1504,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setTshResult('high');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(getFT4Screen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1304,8 +1513,8 @@
             }, '💡 In first trimester pregnancy, TSH as low as 0.1 can be physiological due to hCG cross-reactivity. Use trimester-specific reference ranges.')
           ),
 
-          // SCREEN 2: What is the fT4? (ChoiceButtons, auto-advance)
-          step === 2 && e(FadeIn, null,
+          // SCREEN: What is the fT4? (ChoiceButtons, auto-advance)
+          step === getFT4Screen() && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the fT4?'),
             e('div', { style: STYLES.screenSubtitle }, 'Normal: 12–22 pmol/L'),
             e(ChoiceButton, {
@@ -1314,7 +1523,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt4Result('low');
-                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? getFT3Screen() : getResultsScreen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1324,7 +1533,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt4Result('normal');
-                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? getFT3Screen() : getResultsScreen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1334,14 +1543,14 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt4Result('high');
-                scheduleAdvance(() => goToStep(tshResult === 'low' ? 3 : getResultsScreen()), false);
+                scheduleAdvance(() => goToStep(tshResult === 'low' ? getFT3Screen() : getResultsScreen()), false);
               },
               color: 'var(--accent)'
             })
           ),
 
-          // SCREEN 3: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
-          step === 3 && tshResult === 'low' && e(FadeIn, null,
+          // SCREEN: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
+          step === getFT3Screen() && tshResult === 'low' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the fT3?'),
             e('div', { style: STYLES.screenSubtitle }, 'Normal: 3.1–6.8 pmol/L'),
             e(ChoiceButton, {
@@ -1350,7 +1559,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt3Result('low');
-                scheduleAdvance(() => goToStep(4), false);
+                scheduleAdvance(() => goToStep(getResultsScreen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1360,7 +1569,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt3Result('normal');
-                scheduleAdvance(() => goToStep(4), false);
+                scheduleAdvance(() => goToStep(getResultsScreen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1370,7 +1579,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setFt3Result('high');
-                scheduleAdvance(() => goToStep(4), false);
+                scheduleAdvance(() => goToStep(getResultsScreen()), false);
               },
               color: 'var(--accent)'
             }),
@@ -1421,8 +1630,21 @@
               e(DiffCard, { title: 'Resolving thyroiditis', description: 'Transient suppression during recovery phase.' }),
               e(DiffCard, { title: 'Medication effect', description: 'Glucocorticoids, dopamine agonists can suppress TSH.' }),
               e(DiffCard, { title: 'Non-thyroidal illness', description: 'Acute illness can cause transient TSH suppression.' }),
-              e(InfoPanel, { title: 'Subclinical Hyperthyroidism' },
-                e('p', null, 'Clinical significance varies with the degree and persistence of TSH suppression and the clinical context (age, comorbidities, and likely cause). Persistent or more marked suppression has been associated in some studies with higher rates of atrial arrhythmias and reduced bone density. Mild suppression is common and may be transient.')
+              e(InfoModalTrigger, { title: 'Subclinical Hyperthyroidism' },
+                e('p', { style: { marginBottom: '12px' } }, 'Subclinical hyperthyroidism = low TSH with normal fT4 and fT3. The thyroid axis is mildly overactive, but not enough to elevate circulating hormone levels.'),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Clinical significance depends on:'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Degree of TSH suppression (undetectable vs low-normal)'),
+                  e('li', null, 'Persistence — is it still suppressed at 3–6 months?'),
+                  e('li', null, 'Patient age and comorbidities')
+                ),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Potential consequences (if persistent):'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Increased risk of atrial fibrillation (especially age >65)'),
+                  e('li', null, 'Reduced bone density (especially postmenopausal women)'),
+                  e('li', null, 'May progress to overt hyperthyroidism')
+                ),
+                e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Treatment decisions depend on the cause, degree of suppression, and patient risk factors. Mild transient suppression often resolves without intervention.')
               )
             ),
 
@@ -1458,9 +1680,21 @@
                   description: 'Amiodarone inhibits T4→T3 conversion. Glucocorticoids and dopamine can suppress TSH.'
                 })
               ),
-              e(InfoPanel, { title: 'Low T3 Syndrome — Why It Matters' },
-                e('p', { style: { marginBottom: '10px' } }, 'Low T3 is the earliest and most common TFT change in acute illness. Cytokines (IL-6, TNF-α) suppress deiodinase activity, reducing peripheral T4→T3 conversion.'),
-                e('p', null, 'In most cases, this is adaptive and does NOT require thyroid hormone replacement. The key clinical question is whether there is underlying thyroid or pituitary disease that has been unmasked by the illness. Repeat testing after recovery is the recommended approach.')
+              e(InfoModalTrigger, { title: 'Low T3 Syndrome — Why It Matters' },
+                e('p', { style: { marginBottom: '12px' } }, 'Low T3 is the earliest and most common TFT change in acute illness. Cytokines (IL-6, TNF-α) suppress deiodinase activity, reducing peripheral T4→T3 conversion.'),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Pathophysiology:'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Cytokines inhibit type 1 deiodinase (T4→T3 conversion)'),
+                  e('li', null, 'Increased type 3 deiodinase (T4→rT3 conversion)'),
+                  e('li', null, 'May represent protective metabolic adaptation')
+                ),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'This is ', e('strong', null, 'NOT'), ' a thyroid disorder and usually does not require treatment'),
+                  e('li', null, 'Thyroid hormone replacement in critical illness has not shown benefit and may be harmful'),
+                  e('li', null, 'Severity of T3 depression correlates with illness severity and prognosis')
+                ),
+                e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'The key clinical question is whether there is underlying thyroid or pituitary disease that has been unmasked by the illness. Repeat testing after recovery is the recommended approach.')
               )
             ),
 
@@ -1505,15 +1739,23 @@
                 e(DiffCard, { title: 'Sheehan\'s syndrome', description: 'Postpartum pituitary necrosis from haemorrhage.' }),
                 e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern during recovery from acute illness. Repeat when stable.' })
               ),
-              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
-                e('p', { style: { marginBottom: '10px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease.'),
-                e('p', { style: { fontWeight: 600, marginBottom: '8px' } }, 'Causes of central hypothyroidism:'),
-                e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
+              e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
+                e('p', { style: { marginBottom: '12px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
                   e('li', null, 'Pituitary adenoma (mass effect)'),
                   e('li', null, 'Pituitary apoplexy'),
                   e('li', null, 'Post-surgical / post-radiation'),
-                  e('li', null, 'Sheehan\'s syndrome'),
-                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)')
+                  e('li', null, 'Sheehan\'s syndrome (postpartum pituitary necrosis)'),
+                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)'),
+                  e('li', null, 'Hypothalamic lesions')
+                ),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
+                e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Central hypothyroidism can coexist with other pituitary hormone deficiencies'),
+                  e('li', null, e('strong', null, 'Check for adrenal insufficiency'), ' before starting levothyroxine — treating hypothyroidism can precipitate adrenal crisis'),
+                  e('li', null, 'TSH cannot be used to monitor replacement therapy; follow fT4 instead'),
+                  e('li', null, 'Consider pituitary imaging if no obvious cause')
                 )
               )
             ),
@@ -1587,9 +1829,24 @@
               e(DiffCard, { title: 'Recent levothyroxine dose change', description: 'TSH lags fT4 by several weeks after dose adjustment.' }),
               e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern. Repeat when stable.' }),
               e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies. (Note: Biotin typically causes low TSH + high fT4, not this pattern.)' }),
-              e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
-                e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
-                e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
+              e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
+                e('p', { style: { marginBottom: '12px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
+                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Pituitary adenoma (mass effect)'),
+                  e('li', null, 'Pituitary apoplexy'),
+                  e('li', null, 'Post-surgical / post-radiation'),
+                  e('li', null, 'Sheehan\'s syndrome (postpartum pituitary necrosis)'),
+                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)'),
+                  e('li', null, 'Hypothalamic lesions')
+                ),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
+                e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
+                  e('li', null, 'Central hypothyroidism can coexist with other pituitary hormone deficiencies'),
+                  e('li', null, e('strong', null, 'Check for adrenal insufficiency'), ' before starting levothyroxine — treating hypothyroidism can precipitate adrenal crisis'),
+                  e('li', null, 'TSH cannot be used to monitor replacement therapy; follow fT4 instead'),
+                  e('li', null, 'Consider pituitary imaging if no obvious cause')
+                )
               )
             ),
 
@@ -1878,10 +2135,13 @@
             serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(2) },
               'If glucose is significantly elevated (>15 mmol/L), serum osmolality may be high — check glucose before assuming hypotonic.'
             ),
-            e(InfoPanel, { title: 'Urea and Effective Osmolality' },
+            // Info panel at bottom with clear separation
+            e('div', { style: { marginTop: '32px', paddingTop: '16px', borderTop: '1px solid var(--sep)' } },
+              e(InfoPanel, { title: 'Urea and Effective Osmolality' },
               e('p', { style: { marginBottom: '8px' } }, 'Measured osmolality includes urea, but urea crosses cell membranes freely and does not contribute to tonicity.'),
               e('p', { style: { marginBottom: '8px' } }, 'If urea is markedly elevated (common in ICU/renal patients), do not classify as hypertonic based on measured osmolality alone.'),
               e('p', { style: { fontWeight: 600 } }, 'Effective osmolality ≈ 2 × Na + glucose (mmol/L)')
+              )
             )
           ),
 
@@ -2096,17 +2356,36 @@
 
             e(LearnMoreDivider),
 
-            e(InfoPanel, { title: 'Osmotic Demyelination Syndrome (ODS)' },
-              e('p', { style: { marginBottom: '8px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia.'),
-              e('p', { style: { marginBottom: '8px' } }, 'The brain adapts to chronic hyponatraemia by losing organic osmolytes. Rapid correction causes water to shift out of brain cells, leading to demyelination.'),
-              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Higher risk patients:'),
-              e('ul', { style: { margin: '0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
-                e('li', null, 'Chronic hyponatraemia (>48 hours or unknown duration)'),
-                e('li', null, 'Severe hyponatraemia (<120 mmol/L)'),
+            e(InfoModalTrigger, { title: 'Osmotic Demyelination Syndrome (ODS)' },
+              e('p', { style: { marginBottom: '12px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia. The brain adapts by losing organic osmolytes; rapid correction causes water to shift out of brain cells, leading to demyelination.'),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Epidemiology'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Overall risk ~0.05% (Toronto cohort, 22,858 hyponatraemia admissions)'),
+                e('li', null, e('strong', null, 'If Na <110 mmol/L, risk rises to ~3%')),
+                e('li', null, 'Notably, many ODS cases did not have documented rapid correction')
+              ),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'High-risk patients'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Severe hyponatraemia (Na <110 mmol/L)'),
+                e('li', null, 'Alcohol use disorder / beer potomania'),
+                e('li', null, 'Malnutrition'),
+                e('li', null, 'Advanced liver disease'),
                 e('li', null, 'Hypokalaemia'),
-                e('li', null, 'Malnutrition or alcoholism'),
-                e('li', null, 'Advanced liver disease')
-              )
+                e('li', null, 'Post-transplant'),
+                e('li', null, 'Elderly')
+              ),
+
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Rate of correction'),
+              e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+                e('li', null, 'Evidence on safe rate is mixed'),
+                e('li', null, 'Some studies: 4× higher relative risk if rise >10–12 mmol/L/24h'),
+                e('li', null, '2025 JAMA meta-analysis: increased mortality risk with ', e('em', null, 'slow'), ' correction'),
+                e('li', null, 'Risk of ODS tracks to the ', e('strong', null, 'fastest'), ' sodium rises — the highest 24-hour increment matters most')
+              ),
+
+              e('p', { style: { fontSize: '12px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Consult local protocols and seek senior/specialist advice for correction targets in high-risk patients.')
             ),
 
             // Bottom buttons (for all result paths)
