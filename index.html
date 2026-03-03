@@ -2003,7 +2003,7 @@
           step === 3 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine osmolality?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney diluting appropriately?'),
-            e(WarningBanner, null, 'If the patient is on diuretics, vasopressin, or DDAVP, urine biochemistry may not reflect true physiology. Interpret with caution.'),
+            e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
             e(ChoiceButton, {
               label: 'Low  ‹ 100 mOsm/kg',
               selected: urineOsmResult === 'low',
@@ -2059,7 +2059,7 @@
           step === 4 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine sodium?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney conserving sodium?'),
-            e(WarningBanner, null, 'If the patient is on diuretics, vasopressin, or DDAVP, urine biochemistry may not reflect true physiology. Interpret with caution.'),
+            e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
             e(ChoiceButton, {
               label: 'Low  ‹ 30 mmol/L',
               selected: urineNaResult === 'low',
