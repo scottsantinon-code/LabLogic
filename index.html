@@ -1379,7 +1379,7 @@
             }),
             e('div', {
               style: STYLES.hintBox
-            }, '💡 fT3 not available? If clinical suspicion of hyperthyroidism is high but fT4 is normal, consider requesting fT3 — about 5% of hyperthyroidism is T3-predominant.')
+            }, '💡 fT3 not available? If clinical suspicion of hyperthyroidism is high but fT4 is normal, consider requesting fT3 — T3-predominant thyrotoxicosis occurs in a minority of cases.')
           ),
 
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
@@ -1404,7 +1404,7 @@
             tshResult === 'low' && ft4Status === 'normal' && ft3Status === 'high' && e(React.Fragment, null,
               e(DiagnosisHeader, {
                 title: 'T3 Thyrotoxicosis',
-                description: 'About 5% of hyperthyroidism is T3-predominant with normal fT4. Often early or mild disease.'
+                description: 'T3-predominant thyrotoxicosis with normal fT4. Often early or mild disease.'
               }),
               e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
               e(DiffCard, { title: 'Early Graves\' disease', description: 'T3 rises before T4 in early disease.' }),
@@ -3147,8 +3147,8 @@
             e('strong', null, 'Last Updated:'), ' February 2026'
           ),
 
-          e('h3', { style: sectionStyle }, '1. NOT A MEDICAL DEVICE'),
-          e('p', { style: paraStyle }, 'This application is NOT a medical device. It has not been cleared, approved, or certified by the TGA, FDA, or any regulatory body.'),
+          e('h3', { style: sectionStyle }, '1. INTENDED USE & REGULATORY STATUS'),
+          e('p', { style: paraStyle }, 'This application is intended for education and clinical reasoning support. It is not intended to diagnose, treat, or replace clinical judgement. Regulatory status has not been determined; users must not rely on this tool for clinical decisions without independent verification.'),
 
           e('h3', { style: sectionStyle }, '2. EDUCATIONAL PURPOSES ONLY'),
           e('p', { style: paraStyle }, 'This application is designed solely for educational and informational purposes as a learning tool for understanding laboratory investigations.'),
@@ -3192,7 +3192,7 @@
           e('div', { style: { marginBottom: '12px', padding: '10px', background: 'var(--sep)', borderRadius: '8px', fontSize: '12px', lineHeight: '1.6' } },
             e('p', null, e('strong', null, 'Data Collection:'), ' This application does not collect, store, transmit, or share any personal data or usage analytics.'),
             e('p', { style: { marginTop: '6px' } }, e('strong', null, 'Local Storage:'), ' All data is stored locally on your device only.'),
-            e('p', { style: { marginTop: '6px' } }, e('strong', null, 'Network Access:'), ' This application functions entirely offline.')
+            e('p', { style: { marginTop: '6px' } }, e('strong', null, 'Network Access:'), ' This application loads fonts from Google Fonts and Fontshare, and framework libraries (React, Babel) from unpkg.com. These third-party services may receive your IP address and browser user agent. No personal or clinical data is transmitted.')
           ),
 
           e('h3', { style: sectionStyle }, '15. GOVERNING LAW'),
