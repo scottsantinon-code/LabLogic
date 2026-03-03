@@ -2533,26 +2533,6 @@
               defaultOpen: true
             }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, or massive iron overload. Check triglycerides, fibrinogen, LDH.'),
 
-            // Causes of iron deficiency
-            (tsatResult === 'low' || ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && e(InfoPanel, { title: 'Causes of Iron Deficiency' },
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Blood loss:'),
-              e('p', { style: { marginBottom: '10px' } }, 'GI (occult or overt) · Menstrual · Urinary (rare) · Blood donation · Surgical'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Reduced absorption:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Coeliac disease · Post-gastrectomy/bariatric · IBD · H. pylori · PPI/H2-blocker use'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Increased demand:'),
-              e('p', { style: { marginBottom: '10px' } }, 'Pregnancy · Adolescent growth · ESA therapy · Chronic haemolysis'),
-              e('p', { style: { fontWeight: 700, marginBottom: '8px' } }, 'Dietary insufficiency:'),
-              e('p', null, 'Vegetarian/vegan diet · Elderly · Eating disorders')
-            ),
-
-            // Haemochromatosis detail
-            (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(InfoPanel, { title: 'Hereditary Haemochromatosis' },
-              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'When to check HFE gene:'), ' TSAT >45% on two separate occasions warrants HFE genotyping.'),
-              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y homozygosity:'), ' Diagnostic for hereditary haemochromatosis. ~30% penetrance — not all homozygotes develop clinical iron overload.'),
-              e('p', { style: { marginBottom: '10px' } }, e('strong', null, 'C282Y/H63D compound heterozygotes:'), ' Lower risk of iron overload. Usually only significant if other liver insults present.'),
-              e('p', null, e('strong', null, 'Family screening:'), ' First-degree relatives of confirmed cases should have iron studies and HFE genotyping.')
-            ),
-
             e('div', { style: { marginTop: '20px' } },
               e(PrimaryButton, { label: 'New Analysis', onClick: resetModule }),
               e('button', {
