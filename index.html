@@ -1628,10 +1628,14 @@
                 description: 'High TSH with high fT4 is unexpected — TSH should be suppressed by elevated thyroid hormones.'
               }),
               e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
-              e(DiffCard, { title: 'Assay interference (biotin)', description: 'High-dose biotin supplements interfere with immunoassays.' }),
-              e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
+              e(DiffCard, { title: 'Recent levothyroxine dose or poor adherence', description: 'Taking levothyroxine shortly before blood draw or intermittent adherence can cause transiently high fT4 with persistently elevated TSH.' }),
+              e(DiffCard, { title: 'Heparin effect (ICU/hospital)', description: 'Heparin (sample or therapy) can artefactually raise free T4 in some assays via in vitro free fatty acid effects.' }),
               e(DiffCard, { title: 'TSH-secreting pituitary adenoma', description: 'Rare. Autonomous TSH production. Refer endocrinology.' }),
-              e(DiffCard, { title: 'Thyroid hormone resistance', description: 'Rare genetic condition. Tissue insensitivity to thyroid hormone.' })
+              e(DiffCard, { title: 'Thyroid hormone resistance', description: 'Rare genetic condition. Tissue insensitivity to thyroid hormone.' }),
+              e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' } },
+                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists. Note: Biotin typically causes the opposite pattern (low TSH + high fT4).'
+              )
             ),
 
             // TSH NORMAL + fT4 NORMAL: Euthyroid
@@ -1658,7 +1662,7 @@
               e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
               e(DiffCard, { title: 'Recent levothyroxine dose change', description: 'TSH lags fT4 by several weeks after dose adjustment.' }),
               e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern. Repeat when stable.' }),
-              e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies, biotin.' }),
+              e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies. (Note: Biotin typically causes low TSH + high fT4, not this pattern.)' }),
               e(InfoPanel, { title: 'Central Hypothyroidism — Why It Matters' },
                 e('p', { style: { marginBottom: '10px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease.'),
                 e('p', null, 'Pituitary adenoma (mass effect) · Pituitary apoplexy · Post-surgical/radiation · Sheehan\'s syndrome · Infiltrative disease (sarcoid, haemochromatosis)')
@@ -1672,9 +1676,13 @@
                 description: 'Normal TSH with high fT4 is unexpected — TSH should be suppressed by elevated thyroid hormones.'
               }),
               e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
-              e(DiffCard, { title: 'Assay interference (biotin)', description: 'High-dose biotin supplements interfere with immunoassays.' }),
+              e(DiffCard, { title: 'Heparin effect (ICU/hospital)', description: 'Heparin (sample or therapy) can artefactually raise free T4 in some assays via in vitro free fatty acid effects.' }),
+              e(DiffCard, { title: 'Recent levothyroxine dose', description: 'Taking levothyroxine shortly before blood draw can cause transiently high fT4.' }),
+              e(DiffCard, { title: 'Familial dysalbuminaemic hyperthyroxinaemia', description: 'Abnormal albumin binds T4. Free T4 spuriously elevated on some assays.' }),
               e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
-              e(DiffCard, { title: 'Familial dysalbuminaemic hyperthyroxinaemia', description: 'Abnormal albumin binds T4. Free T4 spuriously elevated on some assays.' })
+              e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' } },
+                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists. Note: Biotin typically causes low TSH + high fT4, not this pattern.'
+              )
             ),
 
             // Urgent pattern recognition - thyroid emergencies
