@@ -2438,7 +2438,8 @@
 
             e(LearnMoreDivider),
 
-            e(InfoModalTrigger, { title: 'Osmotic Demyelination Syndrome (ODS)' },
+            // ODS info only shown for acute cases (chronic/unknown get it via NaCorrectionCalculator above)
+            chronicity === 'acute' && e(InfoModalTrigger, { title: 'Osmotic Demyelination Syndrome (ODS)' },
               e('p', { style: { marginBottom: '12px' } }, 'ODS (formerly central pontine myelinolysis) is a serious complication of overly rapid sodium correction in chronic hyponatraemia. The brain adapts by losing organic osmolytes; rapid correction causes water to shift out of brain cells, leading to demyelination.'),
 
               e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Epidemiology'),
