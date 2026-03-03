@@ -2220,7 +2220,7 @@
             e(DiffListItem, {
               title: 'Pseudohyponatraemia',
               tags: ['Measurement artefact', 'Check Na on VBG'],
-              defaultOpen: true,
+              defaultOpen: false,
               infoPanel: e(InfoPanel, { title: 'Tonicity vs Osmolality' },
                 e('p', { style: { marginBottom: '10px' } }, 'Urea and ethanol contribute to measured osmolality but are ineffective osmoles (cross cell membranes freely).'),
                 e('p', null, 'Tonicity = Osmolality − Urea. If in doubt, calculate tonicity or check Na on VBG.')
@@ -2243,7 +2243,7 @@
             e(DiffListItem, {
               title: 'Hyper-osmolar Hyponatraemia',
               tags: ['Hyperglycaemia', 'Mannitol', 'IVIg'],
-              defaultOpen: true,
+              defaultOpen: false,
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
 
@@ -2807,7 +2807,7 @@
             // Pattern: Ferritin low-normal + TSAT low
             ferritinResult === 'lowNormal' && tsatResult === 'low' && e(DiffListItem, {
               title: 'Iron Deficiency',
-              defaultOpen: true,
+              defaultOpen: false,
               infoPanel: clinicalContext === 'ckd' ? e(InfoPanel, { title: 'Iron Deficiency in CKD' },
                 e('p', null, 'In CKD and other inflammatory states, ferritin can be elevated despite iron-restricted erythropoiesis. Different thresholds are sometimes used to define absolute versus functional iron deficiency in CKD. Interpret ferritin and transferrin saturation alongside inflammation markers and clinical context, and refer to local renal/haematology guidance for management.')
               ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure' },
@@ -2889,7 +2889,7 @@
             (ferritinResult === 'high' || ferritinResult === 'veryHigh') && tsatResult === 'high' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'Iron Overload',
-                defaultOpen: true
+                defaultOpen: false
               }, 'True iron overload. Check HFE gene for hereditary haemochromatosis.'),
               e(DiffListItem, {
                 title: 'Liver Disease'
@@ -2914,7 +2914,7 @@
             // Ferritin very high
             ferritinResult === 'veryHigh' && e(DiffListItem, {
               title: 'Urgent Evaluation Required',
-              defaultOpen: true
+              defaultOpen: false
             }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, or massive iron overload. Check triglycerides, fibrinogen, LDH.'),
 
             e('div', {
@@ -2947,10 +2947,7 @@
       const [pt, setPt] = useState('');
       const [inr, setInr] = useState('');
       const [aptt, setAptt] = useState('');
-      const [fibrinogen, setFibrinogen] = useState('');
-      const [dDimer, setDDimer] = useState(''); // 'none', 'moderate', 'strong'
-      const [platelets, setPlatelets] = useState('');
-
+      
       // Pattern B has 3 screens (pattern → mixing → results), others have 2
       const getTotalScreens = () => pattern === 'B' ? 3 : 2;
       const getResultsStep = () => pattern === 'B' ? 2 : 1;
@@ -2966,9 +2963,6 @@
         setPt('');
         setInr('');
         setAptt('');
-        setFibrinogen('');
-        setDDimer('');
-        setPlatelets('');
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
 
@@ -2980,29 +2974,6 @@
 
       const isPtProlonged = pt && parseFloat(pt) > 13.5;
       const isApttProlonged = aptt && parseFloat(aptt) > 38;
-
-      // ISTH DIC Score calculation with bounds validation
-      const calcDICScore = () => {
-        if (!platelets || !dDimer || !pt || !fibrinogen) return null;
-        const plt = parseFloat(platelets);
-        const ptVal = parseFloat(pt);
-        const fib = parseFloat(fibrinogen);
-        // Reject negative or physiologically impossible values
-        if (isNaN(plt) || isNaN(ptVal) || isNaN(fib)) return null;
-        if (plt < 0 || ptVal < 0 || fib < 0) return null;
-        // Sensible upper bounds (platelets > 1000, PT > 200, fibrinogen > 20 unlikely)
-        if (plt > 1000 || ptVal > 200 || fib > 20) return null;
-        let score = 0;
-        if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
-        // D-dimer: ISTH uses qualitative categories as assays/units vary
-        if (dDimer === 'none') score += 0; else if (dDimer === 'moderate') score += 2; else if (dDimer === 'strong') score += 3;
-        // PT baseline assumed to be 12 seconds (standard reference range 11-13s)
-        // ISTH DIC scoring uses prolongation above institutional normal
-        const ptProlongation = ptVal - 12;
-        if (ptProlongation < 3) score += 0; else if (ptProlongation <= 6) score += 1; else score += 2;
-        if (fib >= 1.0) score += 0; else score += 1;
-        return score;
-      };
 
       const getLabDisplay = (name, value, unit, normal) => {
         if (!value) return null;
@@ -3034,7 +3005,7 @@
                 setPattern('A');
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--green)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Isolated prolonged APTT',
@@ -3045,7 +3016,7 @@
                 setPattern('B');
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--green)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Both PT and APTT prolonged',
@@ -3056,7 +3027,7 @@
                 setPattern('C');
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--green)'
+              color: 'var(--accent)'
             }),
             e(ChoiceButton, {
               label: 'Both normal',
@@ -3067,7 +3038,7 @@
                 setPattern('D');
                 scheduleAdvance(() => goToStep(1), false);
               },
-              color: 'var(--green)'
+              color: 'var(--accent)'
             }),
             e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
           ),
@@ -3188,7 +3159,7 @@
                 e(DiffListItem, {
                   title: 'Acquired Factor VIII Inhibitor',
                   tags: ['Haematology EMERGENCY', 'Elderly', 'Time-dependent'],
-                  defaultOpen: true,
+                  defaultOpen: false,
                   warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
                 }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. Time-dependent non-correction (prolonged again after 2h incubation). Contact haematology immediately.'),
                 e(DiffListItem, {
@@ -3256,7 +3227,7 @@
                 e(DiffListItem, {
                   title: 'Acquired Factor VIII Inhibitor',
                   tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
-                  defaultOpen: true,
+                  defaultOpen: false,
                   warning: 'Acquired haemophilia A — suspect in elderly patients with new spontaneous bruising/bleeding and dramatically prolonged APTT. ~20% mortality. Contact haematology immediately.'
                 }, 'Autoantibody against Factor VIII. Characteristically elderly or postpartum. APTT does not correct on mixing study. Contact haematology immediately.')
               )
@@ -3266,48 +3237,32 @@
             pattern === 'C' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'DIC',
-                defaultOpen: true
+                defaultOpen: false
               },
                 e('div', null,
                   e('p', { style: { marginBottom: '12px' } }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
-                  e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'ISTH DIC Score Calculator'),
-                  e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '12px', padding: '14px' } },
-                    e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400' }),
-                    e('div', { style: { marginBottom: '12px' } },
-                      e('div', { style: { fontSize: '12px', fontWeight: 500, color: 'var(--label)', marginBottom: '8px' } }, 'D-dimer (relative to local lab upper limit)'),
-                      e('div', { style: { display: 'flex', gap: '8px' } },
-                        e('button', {
-                          onClick: () => setDDimer('none'),
-                          style: {
-                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                            background: dDimer === 'none' ? 'var(--green)' : 'rgba(142,142,147,0.12)',
-                            color: dDimer === 'none' ? '#fff' : 'var(--label)'
-                          }
-                        }, 'No increase'),
-                        e('button', {
-                          onClick: () => setDDimer('moderate'),
-                          style: {
-                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                            background: dDimer === 'moderate' ? 'var(--orange)' : 'rgba(142,142,147,0.12)',
-                            color: dDimer === 'moderate' ? '#fff' : 'var(--label)'
-                          }
-                        }, 'Moderate'),
-                        e('button', {
-                          onClick: () => setDDimer('strong'),
-                          style: {
-                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                            background: dDimer === 'strong' ? 'var(--red)' : 'rgba(142,142,147,0.12)',
-                            color: dDimer === 'strong' ? '#fff' : 'var(--label)'
-                          }
-                        }, 'Strong')
-                      )
-                    ),
-                    e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
-                    e('div', { style: { fontSize: '11px', color: 'var(--orange)', marginTop: '-8px', marginBottom: '8px', background: 'rgba(255,149,0,0.08)', padding: '8px 10px', borderRadius: '8px', lineHeight: 1.5 } },
-                      '⚠️ This calculator uses a PT baseline of 12 sec. The ISTH DIC score uses prolongation above your institutional normal. Verify this matches your local laboratory reference midpoint.'
-                    ),
-                    e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
-                    calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
+                  e('a', {
+                    href: 'https://www.mdcalc.com/calc/10049/isth-criteria-disseminated-intravascular-coagulation-dic',
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                    style: {
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '12px 16px',
+                      background: 'var(--accent-light)',
+                      border: '1px solid var(--accent-border)',
+                      borderRadius: '12px',
+                      color: 'var(--accent)',
+                      fontSize: '14px',
+                      fontWeight: 600,
+                      textDecoration: 'none',
+                      marginTop: '8px'
+                    }
+                  },
+                    e('span', null, '📊'),
+                    'ISTH DIC Score Calculator (MDCalc)',
+                    e('span', { style: { marginLeft: 'auto', fontSize: '12px' } }, '↗')
                   )
                 )
               ),
@@ -3358,7 +3313,7 @@
               e(DiffListItem, {
                 title: 'Antiplatelet Drug Effect',
                 tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor'],
-                defaultOpen: true
+                defaultOpen: false
               }, 'Common cause, especially with recent antiplatelet exposure. Always check medication history including OTC aspirin and NSAIDs.'),
               e(DiffListItem, {
                 title: 'Thrombocytopenia or Platelet Dysfunction',
