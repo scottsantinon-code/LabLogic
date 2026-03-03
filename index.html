@@ -476,20 +476,21 @@
           style: {
             background: 'var(--bg)',
             borderRadius: '20px 20px 0 0',
-            maxHeight: '85vh',
+            maxHeight: '80vh',
             width: '100%',
             maxWidth: '500px',
-            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             animation: 'slideUp 0.3s ease'
           },
           onClick: (ev) => ev.stopPropagation()
         },
           // Handle bar
-          e('div', { style: { display: 'flex', justifyContent: 'center', padding: '12px' } },
+          e('div', { style: { display: 'flex', justifyContent: 'center', padding: '12px', flexShrink: 0 } },
             e('div', { style: { width: '36px', height: '4px', background: 'var(--sep)', borderRadius: '2px' } })
           ),
           // Header
-          e('div', { style: { padding: '0 20px 16px', borderBottom: '1px solid var(--sep)' } },
+          e('div', { style: { padding: '0 20px 16px', borderBottom: '1px solid var(--sep)', flexShrink: 0 } },
             e('div', { style: { fontSize: '18px', fontWeight: 700, color: 'var(--label)' } }, title)
           ),
           // Content
@@ -497,14 +498,15 @@
             style: {
               padding: '20px',
               overflowY: 'auto',
-              maxHeight: 'calc(85vh - 100px)',
+              flex: 1,
+              minHeight: 0,
               fontSize: '14px',
               lineHeight: 1.7,
               color: 'var(--label2)'
             }
           }, children),
           // Close button
-          e('div', { style: { padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))' } },
+          e('div', { style: { padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', flexShrink: 0 } },
             e('button', {
               onClick: onClose,
               style: {
@@ -1420,9 +1422,6 @@
                 marginBottom: '16px'
               }
             },
-              e('p', { style: { marginBottom: '12px', lineHeight: 1.6 } },
-                'Acute illness can cause TFT patterns that mimic thyroid disease. This is ', e('strong', null, 'not'), ' a thyroid disorder — it\'s a physiological adaptation to illness.'
-              ),
               e('p', { style: { marginBottom: '0', lineHeight: 1.6, fontWeight: 500 } },
                 'Common patterns: low T3, sometimes low T4, variable TSH (often suppressed).'
               )
@@ -1445,19 +1444,6 @@
                 e('li', null, 'Known history of thyroid disease or thyroidectomy'),
                 e('li', null, 'Clinical features strongly suggestive of myxoedema'),
                 e('li', null, 'Persistent abnormalities on repeat testing after recovery')
-              )
-            ),
-
-            e('div', {
-              style: {
-                background: 'rgba(0,113,227,0.06)',
-                borderRadius: '12px',
-                padding: '14px',
-                marginBottom: '20px'
-              }
-            },
-              e('p', { style: { fontSize: '13px', color: 'var(--label2)', margin: 0, lineHeight: 1.6 } },
-                e('strong', null, 'Recommendation: '), 'In most cases, repeat TFTs once the patient is clinically stable. Avoid initiating thyroid treatment based solely on TFTs during acute illness unless there is strong clinical suspicion.'
               )
             ),
 
@@ -1794,7 +1780,7 @@
               e(DiffCard, { title: 'Thyroid hormone resistance', description: 'Rare genetic condition. Tissue insensitivity to thyroid hormone.' }),
               e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
               e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' } },
-                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists. Note: Biotin typically causes the opposite pattern (low TSH + high fT4).'
+                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists.'
               )
             ),
 
@@ -1822,7 +1808,7 @@
               e(DiffCard, { title: 'Post-surgical / post-radiation', description: 'Damage to pituitary from prior treatment.' }),
               e(DiffCard, { title: 'Recent levothyroxine dose change', description: 'TSH lags fT4 by several weeks after dose adjustment.' }),
               e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern. Repeat when stable.' }),
-              e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies. (Note: Biotin typically causes low TSH + high fT4, not this pattern.)' }),
+              e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies can cause spurious results.' }),
               e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
                 e('p', { style: { marginBottom: '12px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
                 e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
@@ -1853,10 +1839,9 @@
               e('div', { style: { fontSize: '12px', fontWeight: 600, color: 'var(--label3)', letterSpacing: '0.03em', marginBottom: '10px' } }, 'Differential'),
               e(DiffCard, { title: 'Heparin effect (ICU/hospital)', description: 'Heparin (sample or therapy) can artefactually raise free T4 in some assays via in vitro free fatty acid effects.' }),
               e(DiffCard, { title: 'Recent levothyroxine dose', description: 'Taking levothyroxine shortly before blood draw can cause transiently high fT4.' }),
-              e(DiffCard, { title: 'Familial dysalbuminaemic hyperthyroxinaemia', description: 'Abnormal albumin binds T4. Free T4 spuriously elevated on some assays.' }),
               e(DiffCard, { title: 'Heterophile antibodies', description: 'Interfering antibodies causing spurious results.' }),
               e('div', { style: { fontSize: '12px', color: 'var(--label3)', marginTop: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px', lineHeight: '1.5' } },
-                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists. Note: Biotin typically causes low TSH + high fT4, not this pattern.'
+                '💡 Re-check with consistent timing (fasting, before levothyroxine dose). Consider total T4 and discuss with lab/endocrinology if discordance persists.'
               )
             ),
 
@@ -3195,54 +3180,50 @@
             pattern === 'C' && e(React.Fragment, null,
               e(DiffListItem, {
                 title: 'DIC',
-                tags: ['Consumption', '↓Fibrinogen', '↓Platelets', '↑D-dimer', 'Schistocytes'],
                 defaultOpen: true
-              }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
-              // Collapsible DIC Score Calculator
-              e('button', {
-                onClick: () => setShowLabs(!showLabs),
-                style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', cursor: 'pointer', fontFamily: 'var(--font)', marginBottom: '12px' }
               },
-                e('span', { style: { fontSize: '14px', fontWeight: 600, color: 'var(--label)' } }, 'Calculate ISTH DIC Score'),
-                e('span', { style: { fontSize: '12px', color: 'var(--label3)' } }, showLabs ? '▲' : '▼')
-              ),
-              showLabs && e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '16px' } },
-                e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400' }),
-                e('div', { style: { marginBottom: '12px' } },
-                  e('div', { style: { fontSize: '12px', fontWeight: 500, color: 'var(--label)', marginBottom: '8px' } }, 'D-dimer (relative to local lab upper limit)'),
-                  e('div', { style: { display: 'flex', gap: '8px' } },
-                    e('button', {
-                      onClick: () => setDDimer('none'),
-                      style: {
-                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                        background: dDimer === 'none' ? 'var(--green)' : 'rgba(142,142,147,0.12)',
-                        color: dDimer === 'none' ? '#fff' : 'var(--label)'
-                      }
-                    }, 'No increase'),
-                    e('button', {
-                      onClick: () => setDDimer('moderate'),
-                      style: {
-                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                        background: dDimer === 'moderate' ? 'var(--orange)' : 'rgba(142,142,147,0.12)',
-                        color: dDimer === 'moderate' ? '#fff' : 'var(--label)'
-                      }
-                    }, 'Moderate'),
-                    e('button', {
-                      onClick: () => setDDimer('strong'),
-                      style: {
-                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
-                        background: dDimer === 'strong' ? 'var(--red)' : 'rgba(142,142,147,0.12)',
-                        color: dDimer === 'strong' ? '#fff' : 'var(--label)'
-                      }
-                    }, 'Strong')
+                e('div', null,
+                  e('p', { style: { marginBottom: '12px' } }, 'Consumption of all factors + platelets. Check blood film for schistocytes.'),
+                  e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'ISTH DIC Score Calculator'),
+                  e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '12px', padding: '14px' } },
+                    e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400' }),
+                    e('div', { style: { marginBottom: '12px' } },
+                      e('div', { style: { fontSize: '12px', fontWeight: 500, color: 'var(--label)', marginBottom: '8px' } }, 'D-dimer (relative to local lab upper limit)'),
+                      e('div', { style: { display: 'flex', gap: '8px' } },
+                        e('button', {
+                          onClick: () => setDDimer('none'),
+                          style: {
+                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                            background: dDimer === 'none' ? 'var(--green)' : 'rgba(142,142,147,0.12)',
+                            color: dDimer === 'none' ? '#fff' : 'var(--label)'
+                          }
+                        }, 'No increase'),
+                        e('button', {
+                          onClick: () => setDDimer('moderate'),
+                          style: {
+                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                            background: dDimer === 'moderate' ? 'var(--orange)' : 'rgba(142,142,147,0.12)',
+                            color: dDimer === 'moderate' ? '#fff' : 'var(--label)'
+                          }
+                        }, 'Moderate'),
+                        e('button', {
+                          onClick: () => setDDimer('strong'),
+                          style: {
+                            flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                            background: dDimer === 'strong' ? 'var(--red)' : 'rgba(142,142,147,0.12)',
+                            color: dDimer === 'strong' ? '#fff' : 'var(--label)'
+                          }
+                        }, 'Strong')
+                      )
+                    ),
+                    e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
+                    e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
+                      'Prolongation calculated from baseline of 12 sec.'
+                    ),
+                    e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
+                    calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
                   )
-                ),
-                e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
-                e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
-                  'Prolongation calculated from baseline of 12 sec. If your lab\u2019s upper limit differs, adjust interpretation accordingly.'
-                ),
-                e(ValueInput, { label: 'Fibrinogen', unit: 'g/L', value: fibrinogen, onChange: setFibrinogen, placeholder: '2.0–4.0' }),
-                calcDICScore() !== null && e(BranchCard, { label: 'ISTH DIC Score', value: `${calcDICScore()}/8`, interpretation: calcDICScore() >= 5 ? 'Compatible with overt DIC' : 'Not suggestive — repeat daily', color: calcDICScore() >= 5 ? 'var(--red)' : 'var(--orange)', useColor: true })
+                )
               ),
               e(DiffListItem, {
                 title: 'Severe Liver Disease',
