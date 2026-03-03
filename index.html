@@ -1606,19 +1606,7 @@
               e(DiffCard, { title: 'Early Hashimoto\'s', description: 'Autoimmune thyroiditis. Check TPO antibodies.' }),
               e(DiffCard, { title: 'Recovery from illness', description: 'TSH can transiently rise during recovery phase.' }),
               e(DiffCard, { title: 'Medication effect', description: 'Lithium, amiodarone, iodine excess.' }),
-              e(DiffCard, { title: 'Assay variation', description: 'Biological and analytical variation. Confirm on repeat.' }),
-              e(InfoPanel, { title: 'Subclinical hypothyroidism: interpretation notes' },
-                e('p', { style: { fontWeight: 600, marginBottom: '8px' } }, 'Factors that may prompt consideration of treatment:'),
-                e('ul', { style: { margin: '0 0 12px 0', paddingLeft: '18px', fontSize: '12px', lineHeight: '1.6' } },
-                  e('li', null, 'TSH persistently > 10 mU/L (strongest evidence for benefit)'),
-                  e('li', null, 'Positive TPO antibodies (higher risk of progression to overt hypothyroidism)'),
-                  e('li', null, 'Pregnancy or planning pregnancy (lower TSH thresholds apply)'),
-                  e('li', null, 'Symptoms compatible with hypothyroidism'),
-                  e('li', null, 'Dyslipidaemia or cardiovascular risk factors'),
-                  e('li', null, 'Goitre')
-                ),
-                e('p', null, 'The threshold for treatment varies across guidelines and depends on patient factors. Follow local guidance and consider endocrine input where uncertainty exists.')
-              )
+              e(DiffCard, { title: 'Assay variation', description: 'Biological and analytical variation. Confirm on repeat.' })
             ),
 
             // TSH HIGH + fT4 HIGH: Assay Interference or TSH-oma
