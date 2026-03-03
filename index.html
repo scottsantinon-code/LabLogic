@@ -1526,7 +1526,10 @@
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? getFT3Screen() : getResultsScreen()), false);
               },
               color: 'var(--accent)'
-            })
+            }),
+            e('div', {
+              style: STYLES.hintBox
+            }, '💡 High-dose biotin supplements can cause falsely elevated fT4 and suppressed TSH on some assays, mimicking hyperthyroidism. Ask about supplements.')
           ),
 
           // SCREEN: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
