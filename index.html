@@ -2614,7 +2614,7 @@
               if (ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation) {
                 return e(DiagnosisHeader, {
                   title: 'Anaemia of Chronic Disease',
-                  description: 'Iron sequestered in macrophages due to inflammation. Stores adequate, supply maintained, but iron unavailable for erythropoiesis.'
+                  description: 'Ferritin normal or high with TSAT often low (or low-normal) in inflammation. Iron sequestered in macrophages. Consider CRP, clinical context, and other causes of anaemia.'
                 });
               }
               if (ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && (clinicalContext === 'ckd' || clinicalContext === 'heartFailure')) {
@@ -2721,7 +2721,7 @@
             // Pattern: Ferritin normal + TSAT normal (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'normal' && hasInflammation && e(DiffListItem, {
               title: 'Anaemia of Chronic Disease'
-            }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages, unavailable for erythropoiesis. Iron stores are adequate (normal ferritin) and iron supply is maintained (normal TSAT). Low serum iron with low transferrin is typical.'),
+            }, 'Inflammatory cytokines + hepcidin → iron sequestered in macrophages. Ferritin is normal or elevated; TSAT is often low or low-normal (serum iron falls, transferrin also falls). Consider CRP trend, clinical context, and exclude coexisting iron deficiency.'),
 
             // Pattern: Ferritin normal + TSAT normal (no inflammation, CKD/HF context)
             ferritinResult === 'normal' && tsatResult === 'normal' && !hasInflammation && (clinicalContext === 'ckd' || clinicalContext === 'heartFailure') && e(DiffListItem, {
