@@ -2664,7 +2664,7 @@
       const [inr, setInr] = useState('');
       const [aptt, setAptt] = useState('');
       const [fibrinogen, setFibrinogen] = useState('');
-      const [dDimer, setDDimer] = useState('');
+      const [dDimer, setDDimer] = useState(''); // 'none', 'moderate', 'strong'
       const [platelets, setPlatelets] = useState('');
 
       // Pattern B has 3 screens (pattern → mixing → results), others have 2
@@ -2701,17 +2701,17 @@
       const calcDICScore = () => {
         if (!platelets || !dDimer || !pt || !fibrinogen) return null;
         const plt = parseFloat(platelets);
-        const dd = parseFloat(dDimer);
         const ptVal = parseFloat(pt);
         const fib = parseFloat(fibrinogen);
         // Reject negative or physiologically impossible values
-        if (isNaN(plt) || isNaN(dd) || isNaN(ptVal) || isNaN(fib)) return null;
-        if (plt < 0 || dd < 0 || ptVal < 0 || fib < 0) return null;
+        if (isNaN(plt) || isNaN(ptVal) || isNaN(fib)) return null;
+        if (plt < 0 || ptVal < 0 || fib < 0) return null;
         // Sensible upper bounds (platelets > 1000, PT > 200, fibrinogen > 20 unlikely)
-        if (plt > 1000 || ptVal > 200 || fib > 20 || dd > 100) return null;
+        if (plt > 1000 || ptVal > 200 || fib > 20) return null;
         let score = 0;
         if (plt >= 100) score += 0; else if (plt >= 50) score += 1; else score += 2;
-        if (dd <= 0.5) score += 0; else if (dd <= 5) score += 2; else score += 3;
+        // D-dimer: ISTH uses qualitative categories as assays/units vary
+        if (dDimer === 'none') score += 0; else if (dDimer === 'moderate') score += 2; else if (dDimer === 'strong') score += 3;
         // PT baseline assumed to be 12 seconds (standard reference range 11-13s)
         // ISTH DIC scoring uses prolongation above institutional normal
         const ptProlongation = ptVal - 12;
@@ -2728,7 +2728,7 @@
         if (name === 'APTT' && v > 38) { interp = 'Prolonged'; }
         if (name === 'Fibrinogen' && v < 2.0) { interp = 'Low'; }
         if (name === 'Platelets' && v < 150) { interp = 'Low'; }
-        if (name === 'D-dimer' && v > 0.5) { interp = 'Elevated'; }
+        // D-dimer handled separately as qualitative selector
         return { value: `${value} ${unit}`, interpretation: interp };
       };
 
@@ -2957,9 +2957,34 @@
               ),
               showLabs && e('div', { style: { background: 'rgba(142,142,147,0.08)', borderRadius: '14px', padding: '16px', marginBottom: '16px' } },
                 e(ValueInput, { label: 'Platelets', unit: '×10⁹/L', value: platelets, onChange: setPlatelets, placeholder: '150–400' }),
-                e(ValueInput, { label: 'D-dimer', unit: 'mg/L', value: dDimer, onChange: setDDimer, placeholder: '<0.5' }),
-                e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
-                  'Thresholds assume mg/L FEU. If your lab reports in other units, convert before entering.'
+                e('div', { style: { marginBottom: '12px' } },
+                  e('div', { style: { fontSize: '12px', fontWeight: 500, color: 'var(--label)', marginBottom: '8px' } }, 'D-dimer (relative to local lab upper limit)'),
+                  e('div', { style: { display: 'flex', gap: '8px' } },
+                    e('button', {
+                      onClick: () => setDDimer('none'),
+                      style: {
+                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                        background: dDimer === 'none' ? 'var(--green)' : 'rgba(142,142,147,0.12)',
+                        color: dDimer === 'none' ? '#fff' : 'var(--label)'
+                      }
+                    }, 'No increase'),
+                    e('button', {
+                      onClick: () => setDDimer('moderate'),
+                      style: {
+                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                        background: dDimer === 'moderate' ? 'var(--orange)' : 'rgba(142,142,147,0.12)',
+                        color: dDimer === 'moderate' ? '#fff' : 'var(--label)'
+                      }
+                    }, 'Moderate'),
+                    e('button', {
+                      onClick: () => setDDimer('strong'),
+                      style: {
+                        flex: 1, padding: '10px 8px', borderRadius: '10px', border: 'none', fontSize: '12px', fontWeight: 500, cursor: 'pointer',
+                        background: dDimer === 'strong' ? 'var(--red)' : 'rgba(142,142,147,0.12)',
+                        color: dDimer === 'strong' ? '#fff' : 'var(--label)'
+                      }
+                    }, 'Strong')
+                  )
                 ),
                 e(ValueInput, { label: 'PT', unit: 'sec', value: pt, onChange: setPt, placeholder: '11–13.5' }),
                 e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '-8px', marginBottom: '8px' } },
