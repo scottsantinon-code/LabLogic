@@ -2188,8 +2188,8 @@
               { label: 'Urine Na', ...getUrineNaDisplay() }
             ] }),
 
-            // Na Correction Calculator
-            e('div', { style: { marginTop: '16px' } },
+            // Na Correction Calculator (only for chronic/unknown — ODS risk)
+            (chronicity === 'chronic' || chronicity === 'unknown') && e('div', { style: { marginTop: '16px' } },
               e(NaCorrectionCalculator)
             ),
 
