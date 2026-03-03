@@ -22,9 +22,9 @@
       --label3: #86868b;
       --label4: #d2d2d7;
       --sep: rgba(0,0,0,0.08);
-      --accent: #8B5CF6;
-      --accent-light: rgba(139,92,246,0.08);
-      --accent-border: rgba(139,92,246,0.2);
+      --accent: #0071E3;
+      --accent-light: rgba(0,113,227,0.08);
+      --accent-border: rgba(0,113,227,0.2);
       --red: #FF453A;
       --orange: #ff9f0a;
       --green: #30D158;
@@ -47,8 +47,8 @@
         --label3: #86868b;
         --label4: #424245;
         --sep: rgba(255,255,255,0.08);
-        --accent-light: rgba(139,92,246,0.15);
-        --accent-border: rgba(139,92,246,0.3);
+        --accent-light: rgba(0,113,227,0.15);
+        --accent-border: rgba(0,113,227,0.3);
         --shadow: 0 1px 3px rgba(0,0,0,0.2), 0 8px 24px rgba(0,0,0,0.3);
         --shadow-sm: 0 1px 2px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.15);
         --nav-bg: rgba(29,29,31,0.92);
@@ -275,7 +275,7 @@
             color: 'var(--label)'
           }
         }, title),
-        e('div', { style: { width: '80px', textAlign: 'right' } }, rightAction)
+        e('div', { style: { width: '80px', display: 'flex', justifyContent: 'flex-end' } }, rightAction)
       );
     }
 
@@ -385,8 +385,8 @@
       const [expanded, setExpanded] = useState(defaultOpen);
       return e('div', {
         style: {
-          background: expanded ? 'rgba(139,92,246,0.06)' : 'var(--card)',
-          border: expanded ? '1px solid rgba(139,92,246,0.15)' : '1px solid var(--sep)',
+          background: expanded ? 'rgba(0,113,227,0.06)' : 'var(--card)',
+          border: expanded ? '1px solid rgba(0,113,227,0.15)' : '1px solid var(--sep)',
           borderRadius: '14px',
           marginBottom: '12px',
           overflow: 'hidden'
@@ -413,15 +413,12 @@
               height: '26px',
               borderRadius: '50%',
               background: 'rgba(142,142,147,0.12)',
-              color: 'var(--label3)',
-              fontWeight: 700,
-              fontSize: '14px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0
             }
-          }, 'ⓘ'),
+          }, e('svg', { width: 14, height: 14, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2.5, strokeLinecap: 'round', strokeLinejoin: 'round' }, e('circle', { cx: 12, cy: 12, r: 10 }), e('line', { x1: 12, y1: 16, x2: 12, y2: 12 }), e('line', { x1: 12, y1: 8, x2: 12.01, y2: 8 }))),
           e('span', {
             style: { flex: 1, fontSize: '14px', fontWeight: 600, color: 'var(--label2)' }
           }, title),
@@ -436,7 +433,7 @@
         ),
         expanded && e('div', {
           style: {
-            borderTop: '1px solid rgba(139,92,246,0.15)',
+            borderTop: '1px solid rgba(0,113,227,0.15)',
             padding: '16px',
             fontSize: '13px',
             lineHeight: 1.65,
@@ -465,7 +462,7 @@
         }
       },
         e('div', { style: { display: 'flex', gap: '10px' } },
-          e('span', { style: { fontSize: '16px', flexShrink: 0 } }, isGating ? '⚠️' : 'ℹ️'),
+          isGating ? e('span', { style: { fontSize: '16px', flexShrink: 0 } }, '⚠️') : e('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round', style: { flexShrink: 0 } }, e('circle', { cx: 12, cy: 12, r: 10 }), e('line', { x1: 12, y1: 16, x2: 12, y2: 12 }), e('line', { x1: 12, y1: 8, x2: 12.01, y2: 8 })),
           e('div', {
             style: { fontSize: '13px', lineHeight: 1.55, color: useOrange ? 'var(--orange)' : 'var(--label2)', fontWeight: 500 }
           }, children)
@@ -526,7 +523,7 @@
     // 9. ResultCard
     function ResultCard({ title, subtitle, tags = [], severity, children, warning, onTap }) {
       const severityStyles = {
-        likely: { color: '#8B5CF6', bg: 'rgba(139,92,246,0.08)', border: 'rgba(139,92,246,0.2)', label: 'LIKELY' },
+        likely: { color: '#0071E3', bg: 'rgba(0,113,227,0.08)', border: 'rgba(0,113,227,0.2)', label: 'LIKELY' },
         dangerous: { color: '#FF453A', bg: 'rgba(255,69,58,0.08)', border: 'rgba(255,69,58,0.2)', label: 'URGENT' },
         consider: { color: '#F59E0B', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)', label: 'CONSIDER' },
         rare: { color: '#8E8E93', bg: 'rgba(142,142,147,0.08)', border: 'rgba(142,142,147,0.2)', label: 'RARE' }
@@ -1053,7 +1050,7 @@
 
     // Home Screen
     function HomeScreen({ onSelectModule }) {
-      return e('div', null,
+      return e('div', { style: { display: 'flex', flexDirection: 'column', minHeight: '100vh' } },
         // Header
         e('div', {
           style: {
@@ -1067,7 +1064,7 @@
               fontWeight: 800,
               letterSpacing: '-0.04em',
               fontFamily: 'var(--font-heading)',
-              background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
+              background: 'linear-gradient(135deg, #0071E3 0%, #06B6D4 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
@@ -1105,7 +1102,7 @@
                     width: '48px',
                     height: '48px',
                     borderRadius: '14px',
-                    background: 'linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)',
+                    background: 'linear-gradient(135deg, #0071E3 0%, #06B6D4 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1128,7 +1125,7 @@
 
         // Footer
         e('div', {
-          style: { textAlign: 'center', padding: '24px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))' }
+          style: { textAlign: 'center', padding: '24px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', marginTop: 'auto' }
         },
           e('div', { style: { fontSize: '11px', color: 'var(--label3)', fontWeight: 600, marginBottom: '6px' } }, 'For healthcare professionals only'),
           e('div', { style: { fontSize: '11px', color: 'var(--label4)', lineHeight: '1.5' } }, 'Clinical decision support tool. Interpretation support only. Not a substitute for clinical judgement.'),
@@ -1146,7 +1143,7 @@
               fontFamily: 'var(--font)'
             }
           }, 'Terms of Use'),
-          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '8px' } }, '© 2026 Critical Condition Pty Ltd (ABN 24 695 461 057)')
+          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '8px' } }, '© 2026 Critical Condition Pty Ltd')
         )
       );
     }
@@ -1726,22 +1723,16 @@
       // Auto-advance for ChoiceButton-only screens
       const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
 
-      // Screen 0: Serum Sodium (ValueInput)
-      const [naValue, setNaValue] = useState('');
-
-      // Screen 1: Chronicity (ChoiceButtons)
+      // Screen 0: Chronicity (ChoiceButtons)
       const [chronicity, setChronicity] = useState(null);
 
-      // Screen 2: Serum Osmolality (ChoiceButtons, branches)
+      // Screen 1: Serum Osmolality (ChoiceButtons, branches)
       const [serumOsmResult, setSerumOsmResult] = useState(null);
 
-      // Screen 2a: Glucose for corrected Na (if hyper-osmolar)
-      const [glucose, setGlucose] = useState('');
-
-      // Screen 3: Urine Osmolality (if hypotonic)
+      // Screen 2: Urine Osmolality (if hypotonic)
       const [urineOsmResult, setUrineOsmResult] = useState(null);
 
-      // Screen 4: Urine Sodium (if hypotonic)
+      // Screen 3: Urine Sodium (if hypotonic)
       const [urineNaResult, setUrineNaResult] = useState(null);
 
       // Determine path based on serum osmolality
@@ -1750,18 +1741,16 @@
       const isIsoOsmolar = serumOsmResult === 'normal';
 
       // Dynamic screen count:
-      // Short path (iso/hyper): 0-Na, 1-Chronicity, 2-SerumOsm, 2a-Glucose(hyper only), 3-Results
-      // Long path (hypotonic): 0-Na, 1-Chronicity, 2-SerumOsm, 3-UrineOsm, 4-UrineNa, 5-Results
+      // Short path (iso/hyper): 0-Chronicity, 1-SerumOsm, 2-Results
+      // Long path (hypotonic): 0-Chronicity, 1-SerumOsm, 2-UrineOsm, 3-UrineNa, 4-Results
       const getTotalScreens = () => {
-        if (isIsoOsmolar) return 4; // Na, Chronicity, SerumOsm, Results
-        if (isHyperOsmolar) return 5; // Na, Chronicity, SerumOsm, Glucose, Results
-        return 6; // Na, Chronicity, SerumOsm, UrineOsm, UrineNa, Results
+        if (isShortPath) return 3; // Chronicity, SerumOsm, Results
+        return 5; // Chronicity, SerumOsm, UrineOsm, UrineNa, Results
       };
 
       const getResultsScreen = () => {
-        if (isIsoOsmolar) return 3;
-        if (isHyperOsmolar) return 4;
-        return 5;
+        if (isShortPath) return 2;
+        return 4;
       };
 
       const scrollToTop = () => {
@@ -1778,10 +1767,8 @@
 
       const resetModule = () => {
         setStep(0);
-        setNaValue('');
         setChronicity(null);
         setSerumOsmResult(null);
-        setGlucose('');
         setUrineOsmResult(null);
         setUrineNaResult(null);
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
@@ -1793,30 +1780,11 @@
           onBack();
         } else if (step === getResultsScreen()) {
           // From results, go back to previous screen based on path
-          if (isIsoOsmolar) goToStep(2);
-          else if (isHyperOsmolar) goToStep(3); // glucose screen
-          else goToStep(4); // urine na
+          if (isShortPath) goToStep(1); // serum osm screen
+          else goToStep(3); // urine na
         } else {
           goToStep(step - 1);
         }
-      };
-
-      // Severity assessment — note: clinical severity depends on rate of decline, not just absolute value
-      const getSeverity = () => {
-        const na = parseFloat(naValue);
-        if (isNaN(na)) return null;
-        if (na > 130) return { color: 'var(--green)', interp: 'Often asymptomatic — assess clinically' };
-        if (na >= 125) return { color: 'var(--orange)', interp: 'May cause confusion, nausea, headache' };
-        if (na >= 120) return { color: 'var(--orange)', interp: 'Increased symptom risk — assess clinically' };
-        return { color: 'var(--red)', interp: 'High risk of severe symptoms — urgent assessment' };
-      };
-
-      // Corrected Na calculation (Katz formula)
-      const getCorrectedNa = () => {
-        const na = parseFloat(naValue);
-        const glu = parseFloat(glucose);
-        if (isNaN(na) || isNaN(glu) || glu < 5.5) return null;
-        return (na + 0.3 * (glu - 5.5)).toFixed(1);
       };
 
       // Main flow
@@ -1825,30 +1793,8 @@
         e('div', { className: 'screen-content' },
           e(ProgressBar, { current: step, total: getTotalScreens() }),
 
-          // SCREEN 0: Serum sodium (ValueInput, Next button)
+          // SCREEN 0: How quickly did this develop? (ChoiceButtons, auto-advance)
           step === 0 && e(FadeIn, null,
-            e('div', { style: STYLES.screenTitle }, 'What is the serum sodium?'),
-            e('div', { style: STYLES.screenSubtitle }, 'Clinical severity depends on rate of decline, not just absolute value'),
-            e(ValueInput, {
-              label: 'Serum Sodium',
-              unit: 'mmol/L',
-              value: naValue,
-              onChange: setNaValue,
-              placeholder: '135 – 145',
-              hint: 'Normal: 135–145'
-            }),
-            getSeverity() && e(SeverityBadge, { text: getSeverity().interp, color: getSeverity().color }),
-            e(PrimaryButton, {
-              label: 'Next',
-              disabled: !naValue,
-              color: 'var(--accent)',
-              onClick: () => goToStep(1)
-            }),
-            e('div', { style: { fontSize: '11px', color: 'var(--label4)', textAlign: 'center', marginTop: '12px' } }, 'Reference ranges shown are typical adult examples. Always verify against your local laboratory reference ranges.')
-          ),
-
-          // SCREEN 1: How quickly did this develop? (ChoiceButtons, auto-advance)
-          step === 1 && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'How quickly did this develop?'),
             e('div', { style: STYLES.screenSubtitle }, 'If the duration is >48 hours or unknown, it is generally classified as chronic for risk stratification.'),
             e(ChoiceButton, {
@@ -1857,7 +1803,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setChronicity('acute');
-                scheduleAdvance(() => goToStep(2), false);
+                scheduleAdvance(() => goToStep(1), false);
               },
               color: 'var(--accent)'
             }),
@@ -1882,11 +1828,11 @@
               },
               color: 'var(--accent)'
             }),
-            (chronicity === 'chronic' || chronicity === 'unknown') && e(WarningBanner, { onContinue: () => goToStep(2), subtle: true }, chronicity === 'unknown' ? 'If in doubt, assume chronic and correct slowly. Rapid correction risks osmotic demyelination syndrome (ODS).' : 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
+            (chronicity === 'chronic' || chronicity === 'unknown') && e(WarningBanner, { onContinue: () => goToStep(1), subtle: true }, chronicity === 'unknown' ? 'If in doubt, assume chronic and correct slowly. Rapid correction risks osmotic demyelination syndrome (ODS).' : 'Brain has adapted. Rapid correction risks osmotic demyelination syndrome (ODS).')
           ),
 
-          // SCREEN 2: Serum osmolality (ChoiceButtons, auto-advance, branches)
-          step === 2 && e(FadeIn, null,
+          // SCREEN 1: Serum osmolality (ChoiceButtons, auto-advance, branches)
+          step === 1 && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Check serum osmolality'),
             e('div', { style: STYLES.screenSubtitle }, 'Determines whether this is true hyponatraemia'),
             e(ChoiceButton, {
@@ -1895,7 +1841,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setSerumOsmResult('low');
-                scheduleAdvance(() => goToStep(3), false); // Continue to urine osm
+                scheduleAdvance(() => goToStep(2), false); // Continue to urine osm
               },
               color: 'var(--accent)'
             }),
@@ -1905,7 +1851,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setSerumOsmResult('normal');
-                scheduleAdvance(() => goToStep(3), false); // Go to iso-osmolar results
+                scheduleAdvance(() => goToStep(2), false); // Go to iso-osmolar results
               },
               color: 'var(--accent)'
             }),
@@ -1915,7 +1861,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setSerumOsmResult('high');
-                scheduleAdvance(() => goToStep(3), false); // Go to glucose input
+                scheduleAdvance(() => goToStep(2), false); // Go to results
               },
               color: 'var(--accent)'
             }),
@@ -1929,7 +1875,7 @@
               },
               color: 'var(--label3)'
             }),
-            serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(3) },
+            serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(2) },
               'If glucose is significantly elevated (>15 mmol/L), serum osmolality may be high — check glucose before assuming hypotonic.'
             ),
             e(InfoPanel, { title: 'Urea and Effective Osmolality' },
@@ -1939,9 +1885,9 @@
             )
           ),
 
-          // SCREEN 3: Path-dependent
+          // SCREEN 2: Path-dependent
           // If iso-osmolar → Results
-          step === 3 && isIsoOsmolar && e(FadeIn, null,
+          step === 2 && isIsoOsmolar && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
             e('div', { style: STYLES.screenSubtitle }, 'Iso-osmolar hyponatraemia'),
             e('div', {
@@ -1967,63 +1913,13 @@
             }, '← All modules')
           ),
 
-          // If hyper-osmolar → Glucose input screen
-          step === 3 && isHyperOsmolar && e(FadeIn, null,
-            e('div', { style: STYLES.screenTitle }, 'Enter glucose'),
-            e('div', { style: STYLES.screenSubtitle }, 'To calculate corrected sodium'),
-            e(ValueInput, {
-              label: 'Glucose',
-              unit: 'mmol/L',
-              value: glucose,
-              onChange: setGlucose,
-              placeholder: 'Enter value',
-              hint: 'For corrected Na calculation'
-            }),
-            getCorrectedNa() && e(BranchCard, {
-              label: 'Corrected Na',
-              value: `${getCorrectedNa()} mmol/L`,
-              interpretation: 'Predicted Na once glucose normalises',
-              color: 'var(--accent)'
-            }),
-            e(PrimaryButton, {
-              label: 'See Results',
-              color: 'var(--accent)',
-              onClick: () => goToStep(4)
-            })
-          ),
-
-          // If hypotonic → Urine Osmolality
-          step === 3 && !isShortPath && e(FadeIn, null,
-            e('div', { style: STYLES.screenTitle }, 'What is the urine osmolality?'),
-            e('div', { style: STYLES.screenSubtitle }, 'Is the kidney diluting appropriately?'),
-            e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
-            e(ChoiceButton, {
-              label: 'Low  ‹ 100 mOsm/kg',
-              selected: urineOsmResult === 'low',
-              onClick: () => {
-                clearAutoAdvance();
-                setUrineOsmResult('low');
-                scheduleAdvance(() => goToStep(4), false);
-              },
-              color: 'var(--accent)'
-            }),
-            e(ChoiceButton, {
-              label: 'High  › 100 mOsm/kg',
-              selected: urineOsmResult === 'high',
-              onClick: () => {
-                clearAutoAdvance();
-                setUrineOsmResult('high');
-                scheduleAdvance(() => goToStep(4), false);
-              },
-              color: 'var(--accent)'
-            })
-          ),
-
-          // SCREEN 4: Path-dependent
           // If hyper-osmolar → Results
-          step === 4 && isHyperOsmolar && e(FadeIn, null,
+          step === 2 && isHyperOsmolar && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
             e('div', { style: STYLES.screenSubtitle }, 'Hyper-osmolar hyponatraemia'),
+            e('div', {
+              style: { fontSize: '12px', color: 'var(--label3)', marginTop: '4px', marginBottom: '12px', padding: '10px 12px', background: 'rgba(142,142,147,0.06)', borderRadius: '10px' }
+            }, '💡 This is translocation hyponatraemia, not true hypotonic hyponatraemia. Water is drawn into the intravascular space by osmotically active solutes.'),
             e(DiffListItem, {
               title: 'Hyper-osmolar Hyponatraemia',
               tags: ['Hyperglycaemia', 'Mannitol', 'IVIg'],
@@ -2043,8 +1939,35 @@
             }, '← All modules')
           ),
 
+          // If hypotonic → Urine Osmolality
+          step === 2 && !isShortPath && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'What is the urine osmolality?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Is the kidney diluting appropriately?'),
+            e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
+            e(ChoiceButton, {
+              label: 'Low  ‹ 100 mOsm/kg',
+              selected: urineOsmResult === 'low',
+              onClick: () => {
+                clearAutoAdvance();
+                setUrineOsmResult('low');
+                scheduleAdvance(() => goToStep(3), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'High  › 100 mOsm/kg',
+              selected: urineOsmResult === 'high',
+              onClick: () => {
+                clearAutoAdvance();
+                setUrineOsmResult('high');
+                scheduleAdvance(() => goToStep(3), false);
+              },
+              color: 'var(--accent)'
+            })
+          ),
+
           // If hypotonic → Urine Sodium
-          step === 4 && !isShortPath && e(FadeIn, null,
+          step === 3 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine sodium?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney conserving sodium?'),
             e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
@@ -2054,7 +1977,7 @@
               onClick: () => {
                 clearAutoAdvance();
                 setUrineNaResult('low');
-                scheduleAdvance(() => goToStep(5), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--accent)'
             }),
@@ -2064,14 +1987,14 @@
               onClick: () => {
                 clearAutoAdvance();
                 setUrineNaResult('high');
-                scheduleAdvance(() => goToStep(5), false);
+                scheduleAdvance(() => goToStep(4), false);
               },
               color: 'var(--accent)'
             })
           ),
 
           // SCREEN 5: Hypotonic Results (full differential)
-          step === 5 && !isShortPath && e(FadeIn, null,
+          step === 4 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
 
             // PATH A: Low Urine Osm + Low Urine Na
