@@ -3017,6 +3017,7 @@
           step === 1 && pattern === 'B' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Was a mixing study performed?'),
             e('div', { style: STYLES.screenSubtitle }, 'Mix 1:1 patient plasma with normal plasma and recheck APTT'),
+            e(WarningBanner, null, 'If UFH, LMWH, or DOAC exposure is possible, mixing study interpretation may be unreliable. Discuss with lab/haematology.'),
             e(ChoiceButton, {
               label: 'APTT corrects',
               selected: mixingResult === 'corrects',
