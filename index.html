@@ -1267,7 +1267,7 @@
         ),
 
         // Module Cards
-        e('div', { style: { padding: '0 20px' } },
+        e('div', { style: { padding: '0 20px', flex: 1, overflow: 'auto' } },
           modules.map((mod, i) =>
             e(FadeIn, { key: mod.id, delay: 100 + i * 60 },
               e('button', {
@@ -1317,44 +1317,23 @@
           )
         ),
 
-        // Footer - compact version (full disclaimer on gate screen)
+        // Footer
         e('div', {
-          style: { textAlign: 'center', padding: '16px 20px 12px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))', marginTop: 'auto' }
+          style: { textAlign: 'center', padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', flexShrink: 0 }
         },
-          e('div', { style: { display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', fontSize: '11px' } },
-            e('button', {
-              onClick: () => onSelectModule('terms'),
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--label3)',
-                fontSize: '11px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'var(--font)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }
-            },
-              e('span', { style: { fontSize: '12px' } }, 'ⓘ'),
-              'Disclaimer'
-            ),
-            e('span', { style: { color: 'var(--label4)' } }, '•'),
-            e('button', {
-              onClick: () => onSelectModule('terms'),
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--label3)',
-                fontSize: '11px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, 'Terms')
-          ),
-          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '8px' } }, '© 2026 Critical Condition Pty Ltd')
+          e('button', {
+            onClick: () => onSelectModule('terms'),
+            style: {
+              background: 'none',
+              border: 'none',
+              color: 'var(--label3)',
+              fontSize: '11px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              fontFamily: 'var(--font)'
+            }
+          }, 'Disclaimer & Terms'),
+          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '6px' } }, '© 2026 Critical Condition Pty Ltd')
         )
       );
     }
