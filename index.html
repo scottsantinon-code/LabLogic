@@ -2788,11 +2788,11 @@
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
               title: 'Iron Deficiency Masked by Inflammation',
-              infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
-                e('p', { style: { marginBottom: '10px' } }, 'In inflammation, ferritin can look normal even when iron stores are depleted. ', e('strong', null, 'TSAT <20% with elevated CRP strongly suggests coexisting iron deficiency'), ' regardless of ferritin level.'),
-                e('p', null, 'Trend ferritin and TSAT over time; consider the clinical scenario and inflammatory markers to clarify.')
+              infoPanel: e(InfoPanel, { title: 'Interpreting Iron Studies in Inflammation' },
+                e('p', { style: { marginBottom: '10px' } }, 'With inflammation (raised CRP), ferritin may be falsely elevated. TSAT <20% suggests low iron availability; absolute iron deficiency can still be present even if ferritin is up to ~100 µg/L.'),
+                e('p', null, 'Consider clinical context, trend ferritin and TSAT over time, and reassess when inflammation resolves if uncertain.')
               )
-            }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
+            }, 'Ferritin may appear normal due to inflammation, but low TSAT suggests reduced iron availability. Clinical context is key.'),
 
             // Pattern: Ferritin normal + TSAT low (WITHOUT inflammation) = functional or early deficiency
             ferritinResult === 'normal' && tsatResult === 'low' && !hasInflammation && e(DiffListItem, {
