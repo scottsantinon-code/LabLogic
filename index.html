@@ -3096,8 +3096,8 @@
                 'Factor VII has the shortest half-life (~6 hours) — PT rises before APTT in hepatic synthetic failure. Check albumin, bilirubin, and other LFTs.'),
               e(DiffListItem, { title: 'Vitamin K Deficiency', tags: ['Malabsorption', 'Malnutrition', 'Antibiotics', 'Obstructive jaundice'] },
                 'Can cause an isolated prolonged PT/INR due to reduced vitamin K-dependent clotting factors. Interpretation is supported by clinical context (eg, malabsorption, poor intake, antibiotics) and correction of coagulation studies after vitamin K repletion if undertaken as part of standard care.'),
-              e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'Standard coag unreliable', 'Check anti-Xa level'] },
-                'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
+              e(DiffListItem, { title: 'DOAC (Rivaroxaban/Apixaban)', tags: ['Anti-Xa agents', 'PT/APTT unreliable'] },
+                'PT/APTT are unreliable for assessing DOAC activity — normal results do NOT exclude clinically significant drug levels. Consider time of last dose, renal function, and drug-calibrated anti-Xa assays in consultation with haematology/lab.'),
               e(DiffListItem, { title: 'Factor VII Deficiency', tags: ['Congenital', 'Only extrinsic factor'] },
                 'The only factor unique to the extrinsic pathway. Congenital deficiency is rare but can present with mucocutaneous bleeding.')
             ),
@@ -3270,8 +3270,8 @@
                 'Severe vitamin K deficiency affects all K-dependent factors (II, VII, IX, X), prolonging both PT and APTT. Earlier or milder deficiency may affect PT alone. Consider malabsorption, poor intake, antibiotics, or obstructive jaundice.'),
               e(DiffListItem, { title: 'Supratherapeutic Warfarin', tags: ['Therapeutic target context'] },
                 'Significantly supratherapeutic warfarin can prolong both PT and APTT. Interpret relative to the therapeutic target for the indication and the clinical bleeding context. Management (including reversal) should follow local anticoagulation guidance.'),
-              e(DiffListItem, { title: 'Direct Thrombin Inhibitor (high dose)', tags: ['Dabigatran', 'Argatroban'] },
-                'DOACs can prolong PT/APTT variably, and standard coagulation tests are not reliable measures of drug effect. Where available, drug-calibrated assays may help quantify anticoagulant effect. Management decisions depend on clinical urgency and should follow local protocols.'),
+              e(DiffListItem, { title: 'Direct Thrombin Inhibitor', tags: ['Dabigatran', 'Argatroban', 'PT/APTT unreliable'] },
+                'PT/APTT are unreliable for assessing DOAC activity — normal results do NOT exclude clinically significant drug levels. For dabigatran, thrombin time (TT) or dilute TT is more informative. Consult haematology/lab for drug-calibrated assays.'),
               e(DiffListItem, {
                 title: 'Isolated Hypofibrinogenaemia',
                 tags: ['Congenital', 'Acquired', 'L-asparaginase', 'Liver failure']
@@ -3304,7 +3304,7 @@
             ),
 
             e(InfoModalTrigger, { title: 'Is it the DOAC or a real problem?' },
-              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'DOACs confound standard coagulation tests. If the patient is on an anticoagulant and the coag is abnormal, determine whether it\'s the drug or a new problem.'),
+              e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } }, 'PT/APTT are unreliable for assessing DOAC activity. ', e('strong', null, 'Normal PT/APTT does NOT exclude clinically significant DOAC levels.'), ' Consider time of last dose, renal function, and drug-calibrated assays.'),
 
               // Dabigatran card
               e('div', { style: { background: 'var(--card)', border: '1px solid var(--sep)', borderRadius: '12px', padding: '14px', marginBottom: '12px' } },
@@ -3343,7 +3343,7 @@
                     e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Drug-calibrated anti-Xa')
                   )
                 ),
-                e('div', { style: { fontSize: '11px', color: 'var(--orange)', marginTop: '8px', fontWeight: 500 } }, '⚠ PT/APTT unreliable for quantification')
+                e('div', { style: { fontSize: '11px', color: 'var(--orange)', marginTop: '8px', fontWeight: 500 } }, '⚠ Normal PT/APTT does NOT exclude drug effect')
               ),
 
               // Warfarin card
