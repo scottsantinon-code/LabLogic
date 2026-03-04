@@ -2631,7 +2631,7 @@
               color: 'var(--accent)'
             }),
             ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Strongly supportive.'), ' Ferritin <30 µg/L is highly specific for iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'),
-            ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
+            ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, adult-onset Still\'s disease, hepatic necrosis, massive iron overload, haematological malignancy, or chronic transfusion burden.')
           ),
 
           // SCREEN 3: TSAT (ChoiceButtons, auto-advance)
@@ -2766,7 +2766,7 @@
               if (ferritinResult === 'veryHigh') {
                 return e(DiagnosisHeader, {
                   title: 'Markedly Elevated Ferritin',
-                  description: 'Ferritin >1000 µg/L requires urgent evaluation. Consider HLH, Still\'s disease, hepatic necrosis, or massive iron overload.'
+                  description: 'Ferritin >1000 µg/L requires urgent evaluation. Consider HLH, adult-onset Still\'s disease, hepatic necrosis, massive iron overload, haematological malignancy, or chronic transfusion burden.'
                 });
               }
               // Default fallback
@@ -2808,8 +2808,8 @@
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
               title: 'Iron Deficiency Masked by Inflammation',
               infoPanel: e(InfoPanel, { title: 'The Hardest Call in Iron Studies' },
-                e('p', { style: { marginBottom: '10px' } }, 'The patient has both iron deficiency AND active inflammation (e.g. RA, IBD, CKD, malignancy). Ferritin is elevated by inflammation → looks \'normal\' even though stores are depleted. Transferrin is suppressed → TIBC doesn\'t rise as expected. TSAT becomes the most reliable discriminator: if <20% with inflammation, iron deficiency is very likely even with ferritin 100–300.'),
-                e('p', null, 'When ferritin is low-normal and transferrin saturation is low, possibilities include early iron deficiency, inflammation-driven iron sequestration, mixed aetiology, or analytical variation. Trends over time, inflammatory markers, and the clinical scenario can help clarify the most likely explanation.')
+                e('p', { style: { marginBottom: '10px' } }, 'In inflammation, ferritin can look normal even when iron stores are depleted. ', e('strong', null, 'TSAT <20% with elevated CRP strongly suggests coexisting iron deficiency'), ' regardless of ferritin level.'),
+                e('p', null, 'Trend ferritin and TSAT over time; consider the clinical scenario and inflammatory markers to clarify.')
               )
             }, 'The most common diagnostic trap — ferritin appears \'normal\' due to inflammation, but low TSAT reveals true deficiency.'),
 
@@ -2904,7 +2904,7 @@
             ferritinResult === 'veryHigh' && e(DiffListItem, {
               title: 'Urgent Evaluation Required',
               defaultOpen: false
-            }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, or massive iron overload. Check triglycerides, fibrinogen, LDH.'),
+            }, 'Consider HLH, adult-onset Still\'s disease, hepatic necrosis, massive iron overload, haematological malignancy, or chronic transfusion burden. Check triglycerides, fibrinogen, LDH, blood film, and liver function.'),
 
             e('div', {
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
@@ -3299,26 +3299,27 @@
 
             // Pattern D: Both normal
             pattern === 'D' && e(React.Fragment, null,
+              // Ordered by clinical frequency
               e(DiffListItem, {
                 title: 'Antiplatelet Drug Effect',
                 tags: ['Aspirin', 'Clopidogrel', 'Ticagrelor'],
                 defaultOpen: false
-              }, 'Common cause, especially with recent antiplatelet exposure. Always check medication history including OTC aspirin and NSAIDs.'),
+              }, 'Most common cause, especially with recent antiplatelet exposure. Always check medication history including OTC aspirin and NSAIDs.'),
               e(DiffListItem, {
                 title: 'Thrombocytopenia or Platelet Dysfunction',
                 tags: ['Check platelet count', 'Consider PFA-100', 'Uraemia']
               }, 'PT and APTT only test the coagulation cascade, not primary haemostasis. Check platelet count and function.'),
+              e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
+                'Mild vWD may not prolong APTT. Always check vWF antigen, activity, and Factor VIII if suspected.'),
+              e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
+                'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.'),
               e(DiffListItem, {
                 title: 'TTP / HUS (Thrombotic Microangiopathy)',
                 tags: ['PT/APTT usually NORMAL', 'ADAMTS13', 'Schistocytes', 'Haematology emergency'],
                 warning: 'If thrombocytopenia + MAHA (schistocytes, haemolysis) + organ dysfunction, consider TTP/HUS even with normal PT/APTT. This is time-critical — urgent haematology input required.'
               }, 'PT/APTT usually normal in TTP/HUS; fibrinogen typically normal; D-dimer may be mildly elevated. If PT/APTT are prolonged in a patient with suspected TMA, look for DIC, anticoagulants, or liver failure as a concurrent cause.'),
-              e(DiffListItem, { title: 'Mild von Willebrand Disease', tags: ['May not prolong APTT', 'Check vWF antigen + activity'] },
-                'Mild vWD may not prolong APTT. Always check vWF antigen, activity, and Factor VIII if suspected.'),
-              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['NOT detected by PT or APTT', 'Clot forms then falls apart', 'FXIII activity assay'] },
-                'Factor XIII cross-links fibrin after clot formation. Classic: delayed bleeding 24–48h post-surgery. Requires specific FXIII activity assay for diagnosis.'),
-              e(DiffListItem, { title: 'Vascular Cause', tags: ['Connective tissue disorder', 'Vasculitis', 'Scurvy'] },
-                'Connective tissue disorders (EDS, Marfan), vasculitis, or scurvy. All have normal coagulation studies.')
+              e(DiffListItem, { title: 'Factor XIII Deficiency', tags: ['Very rare', 'NOT detected by PT or APTT', 'FXIII activity assay'] },
+                'Very rare (1:2–3 million). Factor XIII cross-links fibrin after clot formation. Classic: delayed bleeding 24–48h post-surgery. Requires specific FXIII activity assay.')
             ),
 
             e(InfoModalTrigger, { title: 'Is it the DOAC or a real problem?' },
