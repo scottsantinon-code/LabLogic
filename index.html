@@ -1561,7 +1561,7 @@
             }),
             e('div', {
               style: STYLES.hintBox
-            }, '💡 In first trimester pregnancy, TSH as low as 0.1 can be physiological due to hCG cross-reactivity. Use trimester-specific reference ranges.')
+            }, '💡 In first trimester pregnancy, hCG directly stimulates the TSH receptor (structural homology), which can physiologically suppress TSH as low as 0.1 mU/L. Use trimester-specific reference ranges if available; consult local obstetric/endocrine guidance.')
           ),
 
           // SCREEN: What is the fT4? (ChoiceButtons, auto-advance)
@@ -1825,7 +1825,7 @@
               e(DiffCard, { title: 'Post-thyroidectomy', description: 'Surgical removal of thyroid tissue.' }),
               e(DiffCard, { title: 'Post-radioiodine', description: 'Ablation therapy for hyperthyroidism or thyroid cancer.' }),
               e(DiffCard, { title: 'Drug-induced', description: 'Lithium, amiodarone, immune checkpoint inhibitors.' }),
-              e(DiffCard, { title: 'Iodine deficiency', description: 'Rare in Australia but consider in recent migrants.' })
+              e(DiffCard, { title: 'Iodine deficiency', description: 'Uncommon in Australia since mandatory bread fortification (2009), but consider in pregnant/lactating women and recent migrants.' })
             ),
 
             // TSH HIGH + fT4 NORMAL: Subclinical Hypothyroidism
@@ -2412,10 +2412,10 @@
                   )
                 ),
 
-                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Why it matters'),
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Why the distinction matters'),
                 e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, e('strong', null, 'SIADH:'), ' Treat with fluid restriction ± salt tablets ± vasopressin antagonist'),
-                  e('li', null, e('strong', null, 'CSW:'), ' Treat with volume replacement (saline) — fluid restriction would be harmful')
+                  e('li', null, e('strong', null, 'SIADH:'), ' Euvolaemic — management typically involves fluid restriction'),
+                  e('li', null, e('strong', null, 'CSW:'), ' Hypovolaemic — fluid restriction would worsen volume depletion')
                 ),
 
                 e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'SIADH is a diagnosis of exclusion'),
@@ -3536,7 +3536,7 @@
           ),
 
           e('h3', { style: sectionStyle }, '1. INTENDED USE & REGULATORY STATUS'),
-          e('p', { style: paraStyle }, 'This application is intended for education and clinical reasoning support. It is not intended to diagnose, treat, or replace clinical judgement. Regulatory status has not been determined; users must not rely on this tool for clinical decisions without independent verification.'),
+          e('p', { style: paraStyle }, 'This application is an educational and clinical reasoning support tool. It is not intended to be, and has not been registered as, a therapeutic good or medical device under the Therapeutic Goods Act 1989 (Cth). It does not diagnose conditions, calculate patient-specific doses, or replace clinical judgement.'),
 
           e('h3', { style: sectionStyle }, '2. EDUCATIONAL PURPOSES ONLY'),
           e('p', { style: paraStyle }, 'This application is designed solely for educational and informational purposes as a learning tool for understanding laboratory investigations.'),
