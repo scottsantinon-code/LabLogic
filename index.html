@@ -1446,6 +1446,27 @@
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
 
+      // Shared Central Hypothyroidism modal content (used for both TSH low + fT4 low and TSH normal + fT4 low pathways)
+      const CentralHypothyroidismModal = ({ tshDescription }) => e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
+        e('p', { style: { marginBottom: '12px' } }, tshDescription, ' + low fT4 = pituitary failure, not primary thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
+        e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
+        e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
+          e('li', null, 'Pituitary adenoma (mass effect)'),
+          e('li', null, 'Pituitary apoplexy'),
+          e('li', null, 'Post-surgical / post-radiation'),
+          e('li', null, 'Sheehan\'s syndrome (postpartum pituitary necrosis)'),
+          e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)'),
+          e('li', null, 'Hypothalamic lesions')
+        ),
+        e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
+        e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
+          e('li', null, 'Central hypothyroidism can coexist with other pituitary hormone deficiencies'),
+          e('li', null, e('strong', null, 'Check for adrenal insufficiency'), ' before starting levothyroxine — treating hypothyroidism can precipitate adrenal crisis'),
+          e('li', null, 'TSH cannot be used to monitor replacement therapy; follow fT4 instead'),
+          e('li', null, 'Consider pituitary imaging if no obvious cause')
+        )
+      );
+
       // Main TFT flow
       return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
         e(NavBar, { title: 'Thyroid Function', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
@@ -1793,25 +1814,7 @@
                 e(DiffCard, { title: 'Sheehan\'s syndrome', description: 'Postpartum pituitary necrosis from haemorrhage.' }),
                 e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern during recovery from acute illness. Repeat when stable.' })
               ),
-              e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
-                e('p', { style: { marginBottom: '12px' } }, 'Low TSH + low fT4 = pituitary failure, not just thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
-                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
-                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, 'Pituitary adenoma (mass effect)'),
-                  e('li', null, 'Pituitary apoplexy'),
-                  e('li', null, 'Post-surgical / post-radiation'),
-                  e('li', null, 'Sheehan\'s syndrome (postpartum pituitary necrosis)'),
-                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)'),
-                  e('li', null, 'Hypothalamic lesions')
-                ),
-                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
-                e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, 'Central hypothyroidism can coexist with other pituitary hormone deficiencies'),
-                  e('li', null, e('strong', null, 'Check for adrenal insufficiency'), ' before starting levothyroxine — treating hypothyroidism can precipitate adrenal crisis'),
-                  e('li', null, 'TSH cannot be used to monitor replacement therapy; follow fT4 instead'),
-                  e('li', null, 'Consider pituitary imaging if no obvious cause')
-                )
-              )
+              e(CentralHypothyroidismModal, { tshDescription: 'Low TSH' })
             ),
 
             // TSH HIGH + fT4 LOW: Overt Hypothyroidism
@@ -1883,25 +1886,7 @@
               e(DiffCard, { title: 'Recent levothyroxine dose change', description: 'TSH lags fT4 by several weeks after dose adjustment.' }),
               e(DiffCard, { title: 'Non-thyroidal illness (recovery)', description: 'Transient discordant pattern. Repeat when stable.' }),
               e(DiffCard, { title: 'Assay interference', description: 'Heterophile antibodies can cause spurious results.' }),
-              e(InfoModalTrigger, { title: 'Central Hypothyroidism — Why It Matters' },
-                e('p', { style: { marginBottom: '12px' } }, 'Normal or low TSH + low fT4 = pituitary failure, not primary thyroid disease. The pituitary is not producing enough TSH to stimulate the thyroid.'),
-                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Causes of central hypothyroidism:'),
-                e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, 'Pituitary adenoma (mass effect)'),
-                  e('li', null, 'Pituitary apoplexy'),
-                  e('li', null, 'Post-surgical / post-radiation'),
-                  e('li', null, 'Sheehan\'s syndrome (postpartum pituitary necrosis)'),
-                  e('li', null, 'Infiltrative disease (sarcoid, haemochromatosis)'),
-                  e('li', null, 'Hypothalamic lesions')
-                ),
-                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
-                e('ul', { style: { margin: '0', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, 'Central hypothyroidism can coexist with other pituitary hormone deficiencies'),
-                  e('li', null, e('strong', null, 'Check for adrenal insufficiency'), ' before starting levothyroxine — treating hypothyroidism can precipitate adrenal crisis'),
-                  e('li', null, 'TSH cannot be used to monitor replacement therapy; follow fT4 instead'),
-                  e('li', null, 'Consider pituitary imaging if no obvious cause')
-                )
-              )
+              e(CentralHypothyroidismModal, { tshDescription: 'Normal or low TSH' })
             ),
 
             // TSH NORMAL + fT4 HIGH: Assay Interference
@@ -2197,7 +2182,10 @@
               color: 'var(--label3)'
             }),
             serumOsmResult === 'skip' && e(WarningBanner, { onContinue: () => goToStep(2) },
-              'If glucose is significantly elevated (>15 mmol/L), serum osmolality may be high — check glucose before assuming hypotonic.'
+              e('span', null,
+                e('strong', null, 'Without serum osmolality, pseudohyponatraemia and translocation hyponatraemia cannot be excluded.'),
+                ' Ensure glucose has been checked and proceed only if hypotonic hyponatraemia is clinically likely. The following interpretation assumes hypotonic hyponatraemia.'
+              )
             ),
             // Info panel at bottom with clear separation
             e('div', { style: { marginTop: '32px', paddingTop: '16px', borderTop: '1px solid var(--sep)' } },
@@ -2642,7 +2630,7 @@
               },
               color: 'var(--accent)'
             }),
-            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Diagnostic.'), ' Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts.'),
+            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Strongly supportive.'), ' Ferritin <30 µg/L is highly specific for iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'),
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, Still\'s disease, hepatic necrosis, massive iron overload.')
           ),
 
@@ -2698,7 +2686,7 @@
               if (ferritinResult === 'veryLow') {
                 return e(DiagnosisHeader, {
                   title: 'Iron Deficiency',
-                  description: 'Ferritin <30 µg/L is highly specific for iron deficiency and is sufficient to confirm the diagnosis in most clinical contexts. Investigate the underlying cause.'
+                  description: 'Ferritin <30 µg/L is highly specific for iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'
                 });
               }
               if ((ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low') {
