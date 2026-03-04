@@ -2186,14 +2186,6 @@
                 e('strong', null, 'Without serum osmolality, pseudohyponatraemia and translocation hyponatraemia cannot be excluded.'),
                 ' Ensure glucose has been checked and proceed only if hypotonic hyponatraemia is clinically likely. The following interpretation assumes hypotonic hyponatraemia.'
               )
-            ),
-            // Info panel at bottom with clear separation
-            e('div', { style: { marginTop: '32px', paddingTop: '16px', borderTop: '1px solid var(--sep)' } },
-              e(InfoPanel, { title: 'Urea and Effective Osmolality' },
-              e('p', { style: { marginBottom: '8px' } }, 'Measured osmolality includes urea, but urea crosses cell membranes freely and does not contribute to tonicity.'),
-              e('p', { style: { marginBottom: '8px' } }, 'If urea is markedly elevated (common in ICU/renal patients), do not classify as hypertonic based on measured osmolality alone.'),
-              e('p', { style: { fontWeight: 600 } }, 'Effective osmolality ≈ 2 × Na + glucose (mmol/L)')
-              )
             )
           ),
 
@@ -2235,6 +2227,12 @@
               warning: 'Risk of cerebral oedema if BSL is corrected without commensurate rise in Na.'
             }, 'Dilutional effect — water drawn into intravascular space by osmotically active solutes.'),
 
+            e(InfoPanel, { title: 'Urea and Effective Osmolality' },
+              e('p', { style: { marginBottom: '8px' } }, 'Measured osmolality includes urea, but urea crosses cell membranes freely and does not contribute to tonicity.'),
+              e('p', { style: { marginBottom: '8px' } }, 'If urea is markedly elevated (common in ICU/renal patients), do not classify as hypertonic based on measured osmolality alone.'),
+              e('p', { style: { fontWeight: 600 } }, 'Effective osmolality ≈ 2 × Na + glucose (mmol/L)')
+            ),
+
             e('div', {
               style: { fontSize: '11px', color: 'var(--label4)', marginTop: '20px', textAlign: 'center', lineHeight: '1.5' }
             }, 'If the clinical picture doesn\'t match the lab interpretation, re-examine the patient and repeat the tests.'),
@@ -2274,7 +2272,6 @@
           step === 3 && !isShortPath && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'What is the urine sodium?'),
             e('div', { style: STYLES.screenSubtitle }, 'Is the kidney conserving sodium?'),
-            e(WarningBanner, null, 'Diuretics, vasopressin, DDAVP, hypertonic saline, and mannitol can all confound urine biochemistry. Interpret with caution.'),
             e(ChoiceButton, {
               label: 'Low  ‹ 30 mmol/L',
               selected: urineNaResult === 'low',
