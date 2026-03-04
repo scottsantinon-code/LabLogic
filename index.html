@@ -539,8 +539,10 @@
               style: {
                 padding: '20px',
                 overflowY: 'auto',
+                WebkitOverflowScrolling: 'touch',
                 flex: 1,
                 minHeight: 0,
+                maxHeight: 'calc(80vh - 140px)',
                 fontSize: '14px',
                 lineHeight: 1.7,
                 color: 'var(--label2)'
@@ -1509,11 +1511,13 @@
             ),
 
             e('div', { style: { marginBottom: '16px' } },
-              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'When might treatment still be needed?'),
+              e('div', { style: { fontSize: '13px', fontWeight: 600, color: 'var(--label)', marginBottom: '10px' } }, 'When to suspect true thyroid disease despite illness'),
               e('ul', { style: { margin: 0, paddingLeft: '18px', fontSize: '13px', lineHeight: 1.7, color: 'var(--label2)' } },
                 e('li', null, 'TSH markedly elevated (>20 mU/L) — suggests true hypothyroidism'),
+                e('li', null, 'TSH undetectable (<0.01) with fT4 >1.5× upper limit — true hyperthyroidism likely'),
+                e('li', null, 'fT4 very high (>40 pmol/L) regardless of TSH — unlikely to be NTI alone'),
                 e('li', null, 'Known history of thyroid disease or thyroidectomy'),
-                e('li', null, 'Clinical features strongly suggestive of myxoedema'),
+                e('li', null, 'Clinical features strongly suggestive of thyroid storm or myxoedema'),
                 e('li', null, 'Persistent abnormalities on repeat testing after recovery')
               )
             ),
@@ -1597,10 +1601,7 @@
                 scheduleAdvance(() => goToStep(tshResult === 'low' ? getFT3Screen() : getResultsScreen()), false);
               },
               color: 'var(--accent)'
-            }),
-            e('div', {
-              style: STYLES.hintBox
-            }, '💡 High-dose biotin supplements can cause falsely elevated fT4 and suppressed TSH on some assays, mimicking hyperthyroidism. Ask about supplements.')
+            })
           ),
 
           // SCREEN: What is the fT3? (only if TSH low, ChoiceButtons, auto-advance)
@@ -1645,6 +1646,11 @@
           // RESULTS SCREEN (step 3 if TSH not low, step 4 if TSH low)
           step === getResultsScreen() && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // Biotin warning - only show when fT4 is high
+            ft4Status === 'high' && e('div', {
+              style: STYLES.hintBox
+            }, '💡 High-dose biotin supplements can cause falsely elevated fT4 and suppressed TSH on some assays, mimicking hyperthyroidism. Ask about supplements.'),
 
             // TSH LOW + fT4 HIGH: Overt Hyperthyroidism
             tshResult === 'low' && ft4Status === 'high' && e(React.Fragment, null,
