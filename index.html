@@ -1963,8 +1963,8 @@
               )
             ),
 
-            // Assay interference panel - only show when relevant
-            ((tshResult === 'high' && ft4Status === 'high') || (tshResult === 'normal' && ft4Status === 'high')) && e(InfoModalTrigger, { title: 'Assay Interference — the Hidden Trap' },
+            // Assay interference panel - show when fT4 is high (biotin classically causes low TSH + high fT4, mimicking hyperthyroidism)
+            ft4Status === 'high' && e(InfoModalTrigger, { title: 'Assay Interference — the Hidden Trap' },
               e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Biotin (Vitamin B7)'),
               e('p', { style: { marginBottom: '16px', lineHeight: 1.7 } },
                 'High-dose biotin supplements (common in "hair and nails" products, also MS treatment) interfere with streptavidin-biotin immunoassays. Can cause falsely ↑fT4, ↑fT3, ↓TSH — ', e('strong', null, 'mimicking hyperthyroidism'), '.'
