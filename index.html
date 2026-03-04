@@ -3438,7 +3438,7 @@
               e('strong', { style: { color: 'var(--label)' } }, 'educational reference tool'),
               ' for qualified healthcare professionals.'
             ),
-            e('p', null, 'Always verify against your local laboratory reference ranges. This tool is an interpretation aid only and does not provide treatment recommendations. It supports clinical judgement but does not replace it.')
+            e('p', null, 'Reference ranges and interpretations are for ', e('strong', { style: { color: 'var(--label)' } }, 'adult patients'), '. Always verify against your local laboratory reference ranges. This tool supports clinical judgement but does not replace it.')
           ),
           e('div', {
             onClick: () => setHasChecked(!hasChecked),
@@ -3539,7 +3539,7 @@
           ),
 
           e('h3', { style: sectionStyle }, '11. INTENDED AUDIENCE'),
-          e('p', { style: paraStyle }, 'This application is intended for healthcare professionals and students as an educational reference only.'),
+          e('p', { style: paraStyle }, 'This application is intended for healthcare professionals and students as an educational reference only. Reference ranges and clinical interpretations are for adult patients. Paediatric and pregnancy-specific interpretations are not covered.'),
 
           e('h3', { style: sectionStyle }, '12. MODIFICATIONS'),
           e('p', { style: paraStyle }, 'These terms may be modified at any time. Continued use constitutes acceptance.'),
