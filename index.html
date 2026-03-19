@@ -1754,8 +1754,8 @@
                 ),
                 e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Key points:'),
                 e('ul', { style: { margin: '0 0 16px', paddingLeft: '18px', lineHeight: '1.7' } },
-                  e('li', null, 'This is ', e('strong', null, 'NOT'), ' a thyroid disorder and usually does not require treatment'),
-                  e('li', null, 'Thyroid hormone replacement in critical illness has not shown benefit and may be harmful'),
+                  e('li', null, 'This pattern does not typically indicate primary thyroid disease'),
+                  e('li', null, 'Thyroid hormone replacement in critical illness is not routinely recommended based on current evidence'),
                   e('li', null, 'Severity of T3 depression correlates with illness severity and prognosis')
                 ),
                 e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'The key clinical question is whether there is underlying thyroid or pituitary disease that has been unmasked by the illness. Repeat testing after recovery is the recommended approach.')
@@ -2616,7 +2616,7 @@
               },
               color: 'var(--accent)'
             }),
-            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Strongly supportive.'), ' Ferritin <30 µg/L is highly specific for iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'),
+            ferritinResult === 'veryLow' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Strongly supportive.'), ' Ferritin <30 µg/L is strongly suggestive of iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'),
             ferritinResult === 'veryHigh' && e(WarningBanner, { onContinue: () => goToStep(3) }, e('strong', null, 'Urgent evaluation.'), ' Consider HLH, adult-onset Still\'s disease, hepatic necrosis, massive iron overload, haematological malignancy, or chronic transfusion burden.')
           ),
 
@@ -2672,13 +2672,13 @@
               if (ferritinResult === 'veryLow') {
                 return e(DiagnosisHeader, {
                   title: 'Iron Deficiency',
-                  description: 'Ferritin <30 µg/L is highly specific for iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'
+                  description: 'Ferritin <30 µg/L is strongly suggestive of iron deficiency in most clinical contexts. Always investigate the underlying cause (GI blood loss, malabsorption, dietary insufficiency, menstrual loss).'
                 });
               }
               if ((ferritinResult === 'veryLow' || ferritinResult === 'lowNormal') && tsatResult === 'low') {
                 return e(DiagnosisHeader, {
                   title: 'Iron Deficiency',
-                  description: 'Low ferritin with low TSAT confirms iron deficiency. Stores are depleted and iron delivery to erythroid precursors is inadequate.'
+                  description: 'Low ferritin with low TSAT is consistent with iron deficiency. Stores are depleted and iron delivery to erythroid precursors is inadequate.'
                 });
               }
               if (ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation) {
@@ -2788,7 +2788,7 @@
               ) : clinicalContext === 'heartFailure' ? e(InfoPanel, { title: 'Iron Deficiency in Heart Failure' },
                 e('p', null, 'In heart failure, iron deficiency is common and definitions used in trials may differ from general population reference ranges. Interpretation in this context often considers ferritin and transferrin saturation together and should be aligned with local heart failure guidance.')
               ) : null
-            }, 'Low-normal ferritin + low TSAT confirms iron deficiency. Investigate the underlying cause.'),
+            }, 'Low-normal ferritin + low TSAT is consistent with iron deficiency. Investigate the underlying cause.'),
 
             // Pattern: Ferritin normal + TSAT low (with inflammation)
             ferritinResult === 'normal' && tsatResult === 'low' && hasInflammation && e(DiffListItem, {
@@ -3074,7 +3074,7 @@
               ),
 
               e('div', { style: { background: 'rgba(255,149,0,0.1)', borderRadius: '10px', padding: '12px' } },
-                e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '⚠️ Do not interpret mixing studies if the patient is on DOACs or heparin unless the lab has neutralised or verified absence of these agents — they will cause non-correction and confound interpretation.')
+                e('p', { style: { fontSize: '13px', margin: 0, lineHeight: 1.6 } }, '⚠️ Use caution interpreting mixing studies if the patient is on DOACs or heparin unless the lab has neutralised or verified absence of these agents — these drugs can cause non-correction and confound interpretation.')
               )
             )
           ),
@@ -3154,11 +3154,11 @@
                       e('li', null, 'Anti-Xa assays (calibrated for LMWH) are more informative when monitoring is needed'),
                       e('li', null, 'Interpret results in context of timing of last dose')
                     ),
-                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Normal thrombin time excludes significant UFH effect.')
+                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'A normal thrombin time makes significant UFH effect unlikely.')
                   )
                 }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
                 e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
-                  'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.')
+                  'Direct thrombin inhibitor. A normal thrombin time makes significant dabigatran effect unlikely.')
               ),
 
               // If not done: show all differentials (fallback)
@@ -3179,7 +3179,7 @@
                       e('li', null, 'Anti-Xa assays (calibrated for LMWH) are more informative when monitoring is needed'),
                       e('li', null, 'Interpret results in context of timing of last dose')
                     ),
-                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'Normal thrombin time excludes significant UFH effect.')
+                    e('p', { style: { fontSize: '13px', color: 'var(--label3)', fontStyle: 'italic' } }, 'A normal thrombin time makes significant UFH effect unlikely.')
                   )
                 }, 'Most common cause in hospital. Check for heparin infusion, prophylactic LMWH, or heparin-coated line.'),
                 e(DiffListItem, { title: 'Haemophilia A (Factor VIII ↓)', tags: ['X-linked', 'Severity correlates with level'] },
@@ -3199,7 +3199,7 @@
                   tags: ['Antiphospholipid', 'PROTHROMBOTIC', 'Paradoxical']
                 }, 'Prolongs APTT in vitro but is PROTHROMBOTIC in vivo — the clinical risk is clotting, not bleeding.'),
                 e(DiffListItem, { title: 'Dabigatran', tags: ['Direct thrombin inhibitor', 'Check thrombin time'] },
-                  'Direct thrombin inhibitor. Normal thrombin time excludes significant dabigatran effect.'),
+                  'Direct thrombin inhibitor. A normal thrombin time makes significant dabigatran effect unlikely.'),
                 e(DiffListItem, {
                   title: 'Acquired Factor VIII Inhibitor',
                   tags: ['Haematology EMERGENCY', 'Elderly', 'Does NOT correct on mixing'],
@@ -3329,7 +3329,7 @@
                     e('div', { style: { color: 'var(--label2)', lineHeight: 1.5 } }, 'Dilute thrombin time')
                   )
                 ),
-                e('div', { style: { fontSize: '11px', color: 'var(--accent)', marginTop: '8px', fontWeight: 500 } }, '✓ Normal TT excludes dabigatran effect')
+                e('div', { style: { fontSize: '11px', color: 'var(--accent)', marginTop: '8px', fontWeight: 500 } }, '✓ Normal TT makes significant dabigatran effect unlikely')
               ),
 
               // Anti-Xa agents card
@@ -3413,7 +3413,7 @@
 
       // State
       const [pattern, setPattern] = useState(null); // 'hepatocellular' | 'cholestatic' | 'mixed' | 'hyperbili' | 'ammonia'
-      const [severity, setSeverity] = useState(null); // 'borderline' | 'mild' | 'moderate' | 'severe' | 'massive'
+      const [severity, setSeverity] = useState(null); // 'mild' | 'moderate' | 'severe' | 'massive'
       const [astAltRatio, setAstAltRatio] = useState(null); // 'alt_gt_ast' | 'ast_gt_alt' | 'ast_only'
       const [ggtStatus, setGgtStatus] = useState(null); // 'raised' | 'normal' | 'unknown'
       const [biliType, setBiliType] = useState(null); // 'unconjugated' | 'conjugated' | 'unknown'
@@ -3563,19 +3563,8 @@
             e('div', { style: STYLES.screenTitle }, 'How elevated are the transaminases?'),
             e('div', { style: STYLES.screenSubtitle }, 'Relative to your lab\'s upper limit of normal (ULN)'),
             e(ChoiceButton, {
-              label: 'Borderline',
-              sublabel: '<2× ULN',
-              selected: severity === 'borderline',
-              onClick: () => {
-                clearAutoAdvance();
-                setSeverity('borderline');
-                scheduleAdvance(() => goToStep(2), false);
-              },
-              color: 'var(--accent)'
-            }),
-            e(ChoiceButton, {
               label: 'Mild',
-              sublabel: '2–5× ULN',
+              sublabel: '< 5× ULN',
               selected: severity === 'mild',
               onClick: () => {
                 clearAutoAdvance();
@@ -3597,7 +3586,7 @@
             }),
             e(ChoiceButton, {
               label: 'Severe',
-              sublabel: '>15× ULN',
+              sublabel: '> 15× ULN',
               selected: severity === 'severe',
               onClick: () => {
                 clearAutoAdvance();
@@ -3608,7 +3597,7 @@
             }),
             e(ChoiceButton, {
               label: 'Massive',
-              sublabel: '>100× ULN or >10,000 IU/L',
+              sublabel: '> 10,000 IU/L',
               selected: severity === 'massive',
               onClick: () => {
                 clearAutoAdvance();
@@ -3661,15 +3650,29 @@
           // Screen A3: Hepatocellular Results
           step === 3 && pattern === 'hepatocellular' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('button', {
+              onClick: resetModule,
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '0',
+                marginBottom: '16px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, '↻ Start over'),
 
             // ALF Warning for severe/massive
             (severity === 'severe' || severity === 'massive') && e(WarningBanner, null,
               e('div', null,
-                e('strong', null, 'Consider evaluating for acute liver failure (ALF).'),
+                e('strong', null, 'Evaluate for acute liver failure (ALF).'),
                 e('br', null),
-                'ALF criteria: INR >1.5 (not on anticoagulants) + any degree of encephalopathy + no pre-existing cirrhosis (illness <26 weeks).',
+                'ALF criteria: INR ≥1.5 (not on anticoagulants) + any degree of encephalopathy, in a patient without pre-existing chronic liver disease.',
                 e('br', null),
-                'Consider urgent consultation with ICU/hepatology.'
+                'If ALF criteria are met, urgent consultation with ICU/hepatology is recommended.'
               )
             ),
 
@@ -3709,7 +3712,7 @@
                 e('li', null, e('strong', null, 'Non-hepatic source of AST'), ' — skeletal muscle, myocardium, RBCs — consider checking CK')
               ),
               e('p', { style: { marginTop: '12px', fontStyle: 'italic' } },
-                'AST:ALT ratio ≥5 (especially with normal/near-normal ALT): consistent with extrahepatic source — consider prioritising muscle/cardiac workup.'
+                'AST:ALT ratio ≥5 (especially with normal/near-normal ALT) raises concern for an extrahepatic source — consider prioritising muscle/cardiac workup.'
               )
             ),
 
@@ -3725,13 +3728,13 @@
                 'Exercise, statins, trauma, seizures, prolonged immobilisation. Check CK — often dramatically elevated.'
               ),
               e(DiffListItem, { title: 'Myocardial injury' },
-                'MI, myocarditis. AST rises with troponin. ECG and troponin are diagnostic.'
+                'MI, myocarditis. AST rises with troponin. ECG and troponin help establish the diagnosis.'
               ),
               e(DiffListItem, { title: 'Haemolysis' },
                 'RBCs contain AST. Check LDH (elevated), haptoglobin (low), reticulocytes, blood film, Coombs test.'
               ),
               e(DiffListItem, { title: 'Macro-AST' },
-                'Benign. Causes persistent unexplained AST elevation. Immunoglobulin-bound AST with delayed clearance.'
+                'Rare cause of persistent unexplained AST elevation. Immunoglobulin-bound AST with delayed clearance. Generally considered benign.'
               ),
               e(DiffListItem, { title: 'Thyroid disease' },
                 'Hypothyroidism can raise both AST and CK via muscle effects.'
@@ -3761,10 +3764,13 @@
                 e(DiffListItem, { title: 'Budd-Chiari syndrome' },
                   'Hepatic vein thrombosis. Triad: hepatomegaly, ascites, abdominal pain. Doppler/CT for diagnosis.'
                 ),
+                e(DiffListItem, { title: 'Sinusoidal obstruction syndrome (veno-occlusive disease)' },
+                  'Consider post-stem cell transplant, post-chemotherapy (e.g. oxaliplatin), or pyrrolizidine alkaloid exposure (herbal remedies). Hepatomegaly, ascites, jaundice, weight gain.'
+                ),
 
                 e('div', { style: categoryLabelStyle }, 'Toxin / Drug'),
                 e(DiffListItem, { title: 'Paracetamol toxicity' },
-                  'Accounts for ~50% of ALF in Australia. Check paracetamol level and timing. Staggered therapeutic overdose is particularly dangerous.'
+                  'Commonest single cause of ALF in Australia. Check paracetamol level and timing. Staggered therapeutic overdose is particularly dangerous.'
                 ),
                 e(DiffListItem, { title: 'Idiosyncratic drug reactions' },
                   'NSAIDs, antibiotics, anticonvulsants, herbal supplements. Onset typically 1–8 weeks after starting medication.'
@@ -3782,8 +3788,14 @@
                 e(DiffListItem, { title: 'Autoimmune hepatitis' },
                   'Can present acutely. Check ANA, SMA, immunoglobulins. May need liver biopsy.'
                 ),
+                e(DiffListItem, { title: 'Haemophagocytic lymphohistiocytosis (HLH)' },
+                  'Multi-organ hyperinflammatory syndrome. Suspect if hyperferritinaemia (often >10,000 µg/L), cytopenias, splenomegaly, hypertriglyceridaemia, low fibrinogen. Check ferritin, triglycerides, fibrinogen. Can be primary or secondary (infection, malignancy, autoimmune). Requires urgent specialist input.'
+                ),
 
                 e('div', { style: categoryLabelStyle }, 'Metabolic'),
+                e(DiffListItem, { title: 'Wilson\'s disease' },
+                  'If age <50. Can present as fulminant liver failure with Coombs-negative haemolytic anaemia. Characteristically, transaminases are modest relative to the degree of liver failure — disproportionately low AST/ALT with very high bilirubin and low ALP is a diagnostic clue. Check ALP:bilirubin ratio (<4) and AST:ALT ratio (>2.2). Caeruloplasmin may be unreliable in ALF. Essentially zero transplant-free survival if fulminant — urgent transplant assessment.'
+                ),
                 e(DiffListItem, { title: 'HELLP syndrome / Acute fatty liver of pregnancy' },
                   'If pregnant. HELLP: haemolysis, elevated liver enzymes, low platelets. AFLP: microvesicular steatosis, hypoglycaemia, coagulopathy.'
                 ),
@@ -3791,6 +3803,9 @@
                 e('div', { style: categoryLabelStyle }, 'Other'),
                 e(DiffListItem, { title: 'Heat stroke' },
                   'Hyperthermia with multi-organ dysfunction. Can cause massive hepatocyte necrosis.'
+                ),
+                e(DiffListItem, { title: 'Hepatic trauma / laceration' },
+                  'Blunt or penetrating abdominal injury. Consider in trauma patients with rising transaminases. CT abdomen for diagnosis.'
                 )
               ),
 
@@ -3801,7 +3816,7 @@
                   'Common culprits: paracetamol, antibiotics, NSAIDs, statins, anticonvulsants, herbal/supplements.'
                 ),
                 e(DiffListItem, { title: 'Alcohol-related hepatitis' },
-                  'History of heavy alcohol use. AST typically 2–6× ULN, AST:ALT ratio often ≥2.'
+                  'History of heavy alcohol use. AST typically 2–6× ULN (rarely >8× ULN unless co-existing injury). AST:ALT ratio often ≥2.'
                 ),
 
                 e('div', { style: categoryLabelStyle }, 'Infectious'),
@@ -3812,6 +3827,9 @@
                 e('div', { style: categoryLabelStyle }, 'Autoimmune'),
                 e(DiffListItem, { title: 'Autoimmune hepatitis' },
                   'More common in women. Check ANA, SMA, anti-LKM, immunoglobulins.'
+                ),
+                e(DiffListItem, { title: 'Coeliac disease' },
+                  'Transaminases can reach 5–10× ULN in severe untreated coeliac disease. Check tTG-IgA. LFTs typically normalise on gluten-free diet.'
                 ),
 
                 e('div', { style: categoryLabelStyle }, 'Metabolic'),
@@ -3834,11 +3852,20 @@
                 )
               ),
 
-              // MILD / BORDERLINE
-              (severity === 'mild' || severity === 'borderline') && e(React.Fragment, null,
+              // MILD
+              severity === 'mild' && e(React.Fragment, null,
                 e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Metabolic'),
                 e(DiffListItem, { title: 'MASLD/MASH (fatty liver)' },
                   'Commonest cause of mildly elevated LFTs in Australia. Associated with metabolic syndrome, obesity, T2DM. Consider FIB-4 for fibrosis risk.'
+                ),
+                e(DiffListItem, { title: 'Haemochromatosis' },
+                  'Iron overload. Ferritin and transferrin saturation are screening tests.'
+                ),
+                e(DiffListItem, { title: 'Alpha-1 antitrypsin deficiency' },
+                  'Consider if early-onset emphysema or family history. Check A1AT level.'
+                ),
+                e(DiffListItem, { title: 'Wilson\'s disease' },
+                  'If <55 years. Check caeruloplasmin, 24h urine copper.'
                 ),
 
                 e('div', { style: categoryLabelStyle }, 'Toxin / Drug'),
@@ -3854,23 +3881,20 @@
                   'May have persistently mild elevation. Check hepatitis serology.'
                 ),
 
-                e('div', { style: categoryLabelStyle }, 'Metabolic'),
-                e(DiffListItem, { title: 'Haemochromatosis' },
-                  'Iron overload. Ferritin and transferrin saturation are screening tests.'
-                ),
-                e(DiffListItem, { title: 'Alpha-1 antitrypsin deficiency' },
-                  'Consider if early-onset emphysema or family history. Check A1AT level.'
-                ),
-                e(DiffListItem, { title: 'Wilson\'s disease' },
-                  'If <55 years. Check caeruloplasmin, 24h urine copper.'
-                ),
-
                 e('div', { style: categoryLabelStyle }, 'Autoimmune'),
                 e(DiffListItem, { title: 'Autoimmune hepatitis' },
                   'Can present with mild chronic elevation. Check autoantibodies.'
                 ),
                 e(DiffListItem, { title: 'Coeliac disease' },
                   'Can cause mild transaminitis. Consider if GI symptoms or iron deficiency.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Neoplastic'),
+                e(DiffListItem, { title: 'Hepatocellular carcinoma (HCC)' },
+                  'Consider in patients with known chronic liver disease, cirrhosis, or chronic hepatitis B. AFP and liver ultrasound for screening.'
+                ),
+                e(DiffListItem, { title: 'Hepatic metastases' },
+                  'Especially colorectal, breast, lung primaries. ALP may be disproportionately elevated. CT or MRI for diagnosis.'
                 )
               ),
 
@@ -3878,13 +3902,13 @@
               astAltRatio === 'ast_gt_alt' && e(React.Fragment, null,
                 e('div', { style: categoryLabelStyle }, 'Non-hepatic / AST-predominant'),
                 e(DiffListItem, { title: 'Alcohol-related liver disease' },
-                  'AST:ALT ratio typically ≥2:1. GGT usually elevated. AST rarely exceeds 8–10× ULN in alcoholic hepatitis.'
+                  'AST:ALT ratio typically ≥2:1. GGT usually elevated. AST typically <8× ULN in alcohol-related hepatitis, though higher levels can occur with co-existing injury (e.g. paracetamol, ischaemia).'
                 ),
                 e(DiffListItem, { title: 'Cirrhosis (any cause)' },
                   'AST:ALT ratio reverses as fibrosis progresses. MASH cirrhosis can have ratio ≥2.'
                 ),
                 e(DiffListItem, { title: 'Rhabdomyolysis' },
-                  'Muscle source of AST. CK will be dramatically elevated (often >10,000 U/L).'
+                  'Muscle source of AST. CK is typically markedly elevated (often >10,000 U/L).'
                 ),
                 e(DiffListItem, { title: 'Myocardial injury' },
                   'MI, myocarditis. Check troponin and ECG.'
@@ -3893,7 +3917,7 @@
                   'RBCs contain AST. Check haemolysis panel: LDH, haptoglobin, reticulocytes, blood film, Coombs.'
                 ),
                 e(DiffListItem, { title: 'Macro-AST' },
-                  'Rare, benign. Persistently elevated AST with no clinical explanation. Immunoglobulin-bound.'
+                  'Rare cause of persistently elevated AST with no clinical explanation. Immunoglobulin-bound. Generally considered benign.'
                 )
               )
             ),
@@ -3951,7 +3975,7 @@
               e('p', { style: { marginBottom: '8px' } }, 'ALP elevation may be non-hepatic in origin. ALP is also found in bone, placenta, and intestine.'),
               e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Consider:'),
               e('ul', { style: { margin: 0, paddingLeft: '18px', lineHeight: 1.7 } },
-                e('li', null, 'Vitamin D deficiency (commonest cause)'),
+                e('li', null, 'Vitamin D deficiency'),
                 e('li', null, 'Paget\'s disease'),
                 e('li', null, 'Bone metastases'),
                 e('li', null, 'Fracture healing'),
@@ -3997,6 +4021,20 @@
           // Screen B2: Cholestatic Results
           step === 2 && pattern === 'cholestatic' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('button', {
+              onClick: resetModule,
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '0',
+                marginBottom: '16px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, '↻ Start over'),
 
             // Caveat if GGT not tested
             ggtStatus === 'unknown' && e(WarningBanner, null,
@@ -4005,7 +4043,7 @@
 
             // Charcot's triad warning
             e(WarningBanner, null,
-              e('span', null, e('strong', null, 'Pain + fever + jaundice = Charcot\'s triad'), ' — consistent with ascending cholangitis. Consider urgent imaging and surgical/GI consultation.')
+              e('span', null, e('strong', null, 'Pain + fever + jaundice = Charcot\'s triad'), ' — consistent with ascending cholangitis. Add confusion + hypotension = Reynolds\' pentad (life-threatening). Consider urgent imaging and surgical/GI consultation.')
             ),
 
             e('div', { style: categoryLabelStyle }, 'Extrahepatic obstruction'),
@@ -4035,6 +4073,9 @@
             e(DiffListItem, { title: 'TPN-related cholestasis' },
               'Prolonged parenteral nutrition. Multifactorial aetiology.'
             ),
+            e(DiffListItem, { title: 'Intrahepatic cholestasis of pregnancy (ICP)' },
+              'Typically presents in 3rd trimester with pruritus (often palms/soles). Elevated bile acids support the diagnosis. Associated with adverse foetal outcomes — urgent obstetric review required.'
+            ),
 
             e(InfoPanel, { title: 'Isolated GGT elevation' },
               'GGT is sensitive but non-specific. Isolated GGT elevation is common and often due to enzyme induction (alcohol, medications) rather than structural liver disease. An isolated GGT elevation may not warrant extensive investigation.'
@@ -4050,6 +4091,20 @@
           // Screen C1: Mixed Results
           step === 1 && pattern === 'mixed' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('button', {
+              onClick: resetModule,
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '0',
+                marginBottom: '16px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, '↻ Start over'),
 
             e('div', { style: teachingBoxStyle },
               'Mixed pattern means features of both hepatocellular and cholestatic injury.'
@@ -4067,6 +4122,12 @@
             ),
             e(DiffListItem, { title: 'Granulomatous hepatitis' },
               'Sarcoidosis, TB, histoplasmosis, drug reaction. May need liver biopsy for diagnosis.'
+            ),
+            e(DiffListItem, { title: 'Autoimmune hepatitis' },
+              'Commonly presents with a mixed pattern. More common in women. Check ANA, SMA, anti-LKM, immunoglobulins. Treatable — early recognition matters.'
+            ),
+            e(DiffListItem, { title: 'Infiltrative liver disease' },
+              'Lymphoma, amyloidosis, sarcoidosis. Consider if hepatomegaly or systemic features. May need liver biopsy for diagnosis.'
             ),
 
             e('div', { style: { marginTop: '20px' } },
@@ -4114,12 +4175,26 @@
           // Screen D2: Hyperbilirubinaemia Results
           step === 2 && pattern === 'hyperbili' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+            e('button', {
+              onClick: resetModule,
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '0',
+                marginBottom: '16px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, '↻ Start over'),
 
             // Unconjugated
             biliType === 'unconjugated' && e(React.Fragment, null,
               e('div', { style: categoryLabelStyle }, 'Unconjugated hyperbilirubinaemia'),
               e(DiffListItem, { title: 'Gilbert\'s syndrome' },
-                'Commonest (~5% of population), benign. Fluctuates with fasting, illness, stress. Bilirubin usually <70 µmol/L (<4 mg/dL). No treatment needed.'
+                'Commonest cause (~5% of population). Fluctuates with fasting, illness, stress. Bilirubin usually <70 µmol/L (<4 mg/dL). Generally considered a benign condition not requiring specific treatment.'
               ),
               e(DiffListItem, { title: 'Haemolysis' },
                 'Consider checking haemolysis panel: LDH (elevated), haptoglobin (low/undetectable), reticulocyte count (elevated), blood film (fragmented cells, spherocytes), direct Coombs test.'
@@ -4156,6 +4231,9 @@
               e(DiffListItem, { title: 'Primary sclerosing cholangitis' },
                 'Associated with IBD. Beaded bile ducts on MRCP.'
               ),
+              e(DiffListItem, { title: 'Sepsis' },
+                'Conjugated hyperbilirubinaemia can be an early marker of sepsis, even before other LFTs become abnormal. Cytokine-mediated bile transport dysfunction.'
+              ),
               e(DiffListItem, { title: 'Dubin-Johnson / Rotor syndrome' },
                 'Rare, benign inherited disorders of bilirubin excretion. Diagnosis of exclusion.'
               )
@@ -4164,8 +4242,16 @@
             // Not fractionated
             biliType === 'unknown' && e(React.Fragment, null,
               e('div', { style: teachingBoxStyle },
-                e('p', { style: { marginBottom: '8px' } }, 'Fractionating the bilirubin (direct vs indirect) may help clarify the differential, as the distinction between conjugated and unconjugated hyperbilirubinaemia leads to different diagnostic considerations.'),
-                e('p', null, 'Consider requesting a split bilirubin.')
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Fractionation is the essential next step.'),
+                e('p', { style: { marginBottom: '8px' } }, 'The distinction between conjugated and unconjugated hyperbilirubinaemia leads to fundamentally different differentials. Request a split bilirubin (direct and indirect fractions).')
+              ),
+              e('div', { style: categoryLabelStyle }, 'If predominantly unconjugated'),
+              e(DiffListItem, { title: 'Gilbert\'s syndrome, haemolysis, haemoglobinopathy, G6PD deficiency' },
+                'See unconjugated pathway for full differential.'
+              ),
+              e('div', { style: categoryLabelStyle }, 'If predominantly conjugated'),
+              e(DiffListItem, { title: 'Liver disease, biliary obstruction, Dubin-Johnson/Rotor syndrome' },
+                'See conjugated pathway for full differential.'
               )
             ),
 
@@ -4179,6 +4265,20 @@
           // Screen E1: Hyperammonaemia Results
           step === 1 && pattern === 'ammonia' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Hyperammonaemia — Differentials'),
+            e('button', {
+              onClick: resetModule,
+              style: {
+                background: 'none',
+                border: 'none',
+                color: 'var(--accent)',
+                fontSize: '13px',
+                fontWeight: 600,
+                padding: '0',
+                marginBottom: '16px',
+                cursor: 'pointer',
+                fontFamily: 'var(--font)'
+              }
+            }, '↻ Start over'),
 
             e('div', { style: categoryLabelStyle }, 'Causes'),
             e(DiffListItem, { title: 'Hepatic failure (acute or chronic)' },
@@ -4207,11 +4307,11 @@
             e('div', { style: { marginTop: '20px' } },
               e('div', { style: interpretationPanelStyle(false) },
                 e('p', { style: { fontWeight: 600, marginBottom: '8px', color: 'var(--label)' } }, 'In chronic liver disease / cirrhosis:'),
-                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Ammonia is neither sensitive nor specific for hepatic encephalopathy. It does not correlate with severity of encephalopathy or patient-centred outcomes. Serial ammonia levels may not be clinically useful in stable cirrhotics.')
+                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Ammonia is neither sensitive nor specific for hepatic encephalopathy. It does not correlate with severity of encephalopathy or patient-centred outcomes. Serial ammonia levels are generally not clinically useful in stable cirrhotics.')
               ),
               e('div', { style: interpretationPanelStyle(true) },
                 e('p', { style: { fontWeight: 600, marginBottom: '8px', color: 'var(--label)' } }, 'In acute / fulminant liver failure:'),
-                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Ammonia levels correlate with severity of encephalopathy and risk of cerebral oedema. Levels >150 µmol/L are associated with increased risk of intracranial hypertension. CRRT may be considered to clear ammonia.')
+                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Arterial ammonia levels correlate with severity of encephalopathy and risk of cerebral oedema. Arterial ammonia >150 µmol/L has been associated with increased risk of intracranial hypertension, though this threshold should be interpreted in clinical context. CRRT may be considered to clear ammonia.')
               )
             ),
 
@@ -4262,7 +4362,7 @@
               e('strong', { style: { color: 'var(--label)' } }, 'educational reference tool'),
               ' for qualified healthcare professionals.'
             ),
-            e('p', null, 'Reference ranges and interpretations are for ', e('strong', { style: { color: 'var(--label)' } }, 'adult patients'), '. Always verify against your local laboratory reference ranges. This tool supports clinical judgement but does not replace it.')
+            e('p', null, 'Reference ranges and interpretations are for ', e('strong', { style: { color: 'var(--label)' } }, 'adult patients (≥18 years)'), '. Always verify against your local laboratory reference ranges. This tool supports clinical judgement but does not replace it.')
           ),
           e('div', {
             onClick: () => setHasChecked(!hasChecked),
@@ -4363,7 +4463,7 @@
           ),
 
           e('h3', { style: sectionStyle }, '11. INTENDED AUDIENCE'),
-          e('p', { style: paraStyle }, 'This application is intended for healthcare professionals and students as an educational reference only. Reference ranges and clinical interpretations are for adult patients. Paediatric and pregnancy-specific interpretations are not covered.'),
+          e('p', { style: paraStyle }, 'This application is intended for healthcare professionals and students as an educational reference only. Reference ranges and clinical interpretations are for adult patients (≥18 years). Paediatric and pregnancy-specific interpretations are not covered.'),
 
           e('h3', { style: sectionStyle }, '12. MODIFICATIONS'),
           e('p', { style: paraStyle }, 'These terms may be modified at any time. Continued use constitutes acceptance.'),
