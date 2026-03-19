@@ -3523,7 +3523,6 @@
             }),
             e(ChoiceButton, {
               label: 'Mixed',
-              sublabel: 'Both elevated',
               selected: pattern === 'mixed',
               onClick: () => {
                 clearAutoAdvance();
@@ -3534,7 +3533,6 @@
             }),
             e(ChoiceButton, {
               label: 'Isolated hyperbilirubinaemia',
-              sublabel: '↑ Bilirubin, other LFTs normal',
               selected: pattern === 'hyperbili',
               onClick: () => {
                 clearAutoAdvance();
@@ -3545,7 +3543,6 @@
             }),
             e(ChoiceButton, {
               label: 'Hyperammonaemia',
-              sublabel: '↑ Ammonia',
               selected: pattern === 'ammonia',
               onClick: () => {
                 clearAutoAdvance();
@@ -3619,10 +3616,7 @@
                 scheduleAdvance(() => goToStep(2), false);
               },
               color: 'var(--accent)'
-            }),
-            e('div', { style: STYLES.hintBox },
-              '💡 Borderline elevations (<2× ULN) often normalise spontaneously. Consider observation with repeat testing in 3–6 months before extensive workup.'
-            )
+            })
           ),
 
           // Screen A2: AST:ALT Ratio
@@ -3758,7 +3752,7 @@
               // MASSIVE / SEVERE
               (severity === 'severe' || severity === 'massive') && e(React.Fragment, null,
                 e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Vascular'),
-                e(DiffListItem, { title: 'Ischaemic hepatitis (shock liver)', defaultOpen: astAltRatio !== 'ast_gt_alt' },
+                e(DiffListItem, { title: 'Ischaemic hepatitis (shock liver)' },
                   'Hypoperfusion injury. Recent hypotension, cardiac arrest, sepsis, or right heart failure. AST/ALT often >10,000 IU/L with rapid rise and fall.'
                 ),
                 e(DiffListItem, { title: 'Portal vein or hepatic artery thrombosis' },
@@ -3843,7 +3837,7 @@
               // MILD / BORDERLINE
               (severity === 'mild' || severity === 'borderline') && e(React.Fragment, null,
                 e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Metabolic'),
-                e(DiffListItem, { title: 'MASLD/MASH (fatty liver)', defaultOpen: true },
+                e(DiffListItem, { title: 'MASLD/MASH (fatty liver)' },
                   'Commonest cause of mildly elevated LFTs in Australia. Associated with metabolic syndrome, obesity, T2DM. Consider FIB-4 for fibrosis risk.'
                 ),
 
@@ -3902,11 +3896,6 @@
                   'Rare, benign. Persistently elevated AST with no clinical explanation. Immunoglobulin-bound.'
                 )
               )
-            ),
-
-            // Paracetamol info panel
-            e(InfoPanel, { title: 'Paracetamol in Australia' },
-              'Paracetamol toxicity accounts for approximately 50% of acute liver failure in Australia. Staggered therapeutic overdose is particularly dangerous because patients present late and the standard NAC nomogram doesn\'t apply.'
             ),
 
             e('div', { style: { marginTop: '20px' } },
@@ -4067,7 +4056,7 @@
             ),
 
             e('div', { style: categoryLabelStyle }, 'Differentials'),
-            e(DiffListItem, { title: 'Drug-induced liver injury (DILI)', defaultOpen: true },
+            e(DiffListItem, { title: 'Drug-induced liver injury (DILI)' },
               'Commonest cause of mixed pattern. Review all medications including over-the-counter, herbal, and supplements. Common Australian culprits include flucloxacillin, amoxicillin-clavulanate, NSAIDs, and paracetamol.'
             ),
             e(DiffListItem, { title: 'Two processes simultaneously' },
@@ -4090,7 +4079,6 @@
           // Screen D1: Conjugated vs Unconjugated
           step === 1 && pattern === 'hyperbili' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Is the bilirubin predominantly conjugated or unconjugated?'),
-            e('div', { style: STYLES.screenSubtitle }, 'This completely changes the differential'),
             e(ChoiceButton, {
               label: 'Unconjugated (indirect)',
               selected: biliType === 'unconjugated',
@@ -4130,7 +4118,7 @@
             // Unconjugated
             biliType === 'unconjugated' && e(React.Fragment, null,
               e('div', { style: categoryLabelStyle }, 'Unconjugated hyperbilirubinaemia'),
-              e(DiffListItem, { title: 'Gilbert\'s syndrome', defaultOpen: true },
+              e(DiffListItem, { title: 'Gilbert\'s syndrome' },
                 'Commonest (~5% of population), benign. Fluctuates with fasting, illness, stress. Bilirubin usually <70 µmol/L (<4 mg/dL). No treatment needed.'
               ),
               e(DiffListItem, { title: 'Haemolysis' },
