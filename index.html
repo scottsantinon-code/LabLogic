@@ -3659,20 +3659,6 @@
           // Screen A3: Hepatocellular Results
           step === 3 && pattern === 'hepatocellular' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-            e('button', {
-              onClick: resetModule,
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, '↻ Start over'),
 
             // ALF Warning for severe/massive
             (severity === 'severe' || severity === 'massive') && e(WarningBanner, null,
@@ -4030,29 +4016,10 @@
           // Screen B2: Cholestatic Results
           step === 2 && pattern === 'cholestatic' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-            e('button', {
-              onClick: resetModule,
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, '↻ Start over'),
 
             // Caveat if GGT not tested
             ggtStatus === 'unknown' && e(WarningBanner, null,
               'GGT was not tested. The differentials below assume hepatic origin of ALP elevation. Consider checking GGT to confirm.'
-            ),
-
-            // Charcot's triad warning
-            e(WarningBanner, null,
-              e('span', null, e('strong', null, 'Pain + fever + jaundice = Charcot\'s triad'), ' — consistent with ascending cholangitis. Add confusion + hypotension = Reynolds\' pentad (life-threatening). Consider urgent imaging and surgical/GI consultation.')
             ),
 
             e('div', { style: categoryLabelStyle }, 'Extrahepatic obstruction'),
@@ -4100,20 +4067,6 @@
           // Screen C1: Mixed Results
           step === 1 && pattern === 'mixed' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-            e('button', {
-              onClick: resetModule,
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, '↻ Start over'),
 
             e('div', { style: teachingBoxStyle },
               'Mixed pattern means features of both hepatocellular and cholestatic injury.'
@@ -4184,20 +4137,6 @@
           // Screen D2: Hyperbilirubinaemia Results
           step === 2 && pattern === 'hyperbili' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Interpretation'),
-            e('button', {
-              onClick: resetModule,
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, '↻ Start over'),
 
             // Unconjugated
             biliType === 'unconjugated' && e(React.Fragment, null,
@@ -4274,20 +4213,6 @@
           // Screen E1: Hyperammonaemia Results
           step === 1 && pattern === 'ammonia' && e(FadeIn, null,
             e('div', { style: STYLES.screenTitle }, 'Hyperammonaemia — Differentials'),
-            e('button', {
-              onClick: resetModule,
-              style: {
-                background: 'none',
-                border: 'none',
-                color: 'var(--accent)',
-                fontSize: '13px',
-                fontWeight: 600,
-                padding: '0',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontFamily: 'var(--font)'
-              }
-            }, '↻ Start over'),
 
             e('div', { style: categoryLabelStyle }, 'Causes'),
             e(DiffListItem, { title: 'Hepatic failure (acute or chronic)' },
