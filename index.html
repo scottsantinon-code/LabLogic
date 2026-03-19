@@ -291,7 +291,10 @@
               fontWeight: 500,
               fontFamily: 'var(--font)',
               cursor: 'pointer',
-              padding: 0
+              padding: '12px',
+              minHeight: '44px',
+              minWidth: '44px',
+              marginLeft: '-12px'
             }
           }, '‹ Back')
         ),
@@ -1065,7 +1068,7 @@
         style: {
           background: 'none',
           border: 'none',
-          padding: '4px',
+          padding: '11px',
           cursor: 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -1418,7 +1421,7 @@
       };
 
       const goToStep = (newStep) => {
-        document.activeElement.blur();
+        document.activeElement?.blur();
         setStep(newStep);
         if (containerRef.current) {
           containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
@@ -2055,7 +2058,7 @@
       };
 
       const goToStep = (newStep) => {
-        document.activeElement.blur();
+        document.activeElement?.blur();
         setStep(newStep);
         scrollToTop();
       };
@@ -2474,7 +2477,7 @@
         if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' });
       };
 
-      const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
+      const goToStep = (s) => { document.activeElement?.blur(); setStep(s); scrollToTop(); };
 
       const resetModule = () => {
         setStep(0);
@@ -2928,7 +2931,7 @@
       const getResultsStep = () => pattern === 'B' ? 2 : 1;
 
       const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
-      const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
+      const goToStep = (s) => { document.activeElement?.blur(); setStep(s); scrollToTop(); };
 
       const resetModule = () => {
         setStep(0);
@@ -3439,7 +3442,7 @@
       };
 
       const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
-      const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
+      const goToStep = (s) => { document.activeElement?.blur(); setStep(s); scrollToTop(); };
 
       const resetModule = () => {
         setStep(0);
@@ -3456,9 +3459,9 @@
         clearAutoAdvance();
         if (step === 0) {
           onBack();
-        } else if (showNonHepaticALP && pattern === 'cholestatic') {
+        } else if (step === 1 && showNonHepaticALP && pattern === 'cholestatic') {
           setShowNonHepaticALP(false);
-          goToStep(1);
+          // Stay on step 1 - just hide the overlay
         } else {
           goToStep(step - 1);
         }
