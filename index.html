@@ -151,7 +151,8 @@
       { id: "hypona", name: "Hyponatraemia", icon: "sodium" },
       { id: "tft", name: "Thyroid Function", icon: "thyroid" },
       { id: "iron", name: "Iron Studies", icon: "iron" },
-      { id: "coag", name: "Coagulation", icon: "coag" }
+      { id: "coag", name: "Coagulation", icon: "coag" },
+      { id: "lft", name: "LFTs", icon: "lft" }
     ];
 
     // Reusable style constants for screen titles and subtitles
@@ -182,6 +183,9 @@
       ),
       coag: e('svg', { width: 24, height: 24, viewBox: '0 0 510 510', fill: 'white' },
         e('path', { d: 'm215.967 455.018c-40.229 1.863-81.092-12.492-111.647-43.048-44.082-44.082-46.742-98.284-29.499-154.98 24.818-81.601 91.566-168.48 128.075-235.276 1.227-2.246 3.583-3.643 6.142-3.643 2.56 0 4.915 1.397 6.143 3.643 28.513 52.175 85.056 126.996 115.859 201.661 8.984-7.686 19.874-13.008 31.682-15.313 17.985-3.51 36.629.268 51.828 10.503.003.002.006.004.008.006 15.2 10.235 25.711 26.089 29.222 44.075 3.51 17.985-.268 36.628-10.504 51.828l-99.053 147.096c-10.235 15.2-26.09 25.711-44.075 29.221s-38.327-1.411-51.836-10.508c-8.62-5.805-16.708-14.825-22.345-25.265zm190.771-224.835-.007-.005c-12.12-8.161-26.986-11.174-41.327-8.375s-26.983 11.18-35.144 23.3l-45.617 67.742 91.404 61.551 45.617-67.742c8.161-12.12 11.174-26.986 8.375-41.327s-11.181-26.982-23.301-35.144zm-129.915 94.275-45.617 67.741c-8.161 12.12-11.174 26.986-8.375 41.327s12.528 27.89 23.301 35.144c10.772 7.254 26.993 11.18 41.334 8.38 14.341-2.799 26.983-11.18 35.144-23.3l45.617-67.742zm-2.555 139.279c-5.438-3.663-6.88-11.051-3.218-16.49 3.662-5.438 11.051-6.88 16.489-3.218 5.439 3.662 6.881 11.051 3.219 16.489-3.663 5.439-11.051 6.881-16.49 3.219zm3.047-107.446c-4.697-3.163-5.942-9.544-2.779-14.241 3.162-4.697 9.543-5.942 14.24-2.78 4.697 3.163 5.943 9.544 2.78 14.241s-9.544 5.942-14.241 2.78zm-43.15 77.215c-3.708-2.497-4.692-7.535-2.195-11.243s7.535-4.691 11.243-2.194 4.691 7.535 2.194 11.243-7.534 4.691-11.242 2.194zm23.096-4.718c-4.696-3.162-5.942-9.543-2.779-14.24s9.544-5.943 14.241-2.78c4.696 3.163 5.942 9.544 2.779 14.241s-9.544 5.942-14.241 2.779zm-12.783-24.067c-5.439-3.662-6.881-11.05-3.219-16.489 3.663-5.438 11.051-6.88 16.49-3.218 5.438 3.662 6.88 11.051 3.218 16.489s-11.051 6.88-16.489 3.218zm50.215-18.937c-5.439-3.662-6.881-11.051-3.219-16.489 3.663-5.439 11.051-6.881 16.49-3.219 5.438 3.663 6.88 11.051 3.218 16.49-3.662 5.438-11.051 6.88-16.489 3.218zm-17.867 22.855c-3.708-2.497-4.691-7.535-2.194-11.243s7.534-4.691 11.242-2.194 4.692 7.534 2.195 11.242-7.535 4.692-11.243 2.195zm-13.595-30.212c-3.46-2.33-4.378-7.032-2.048-10.493 2.331-3.461 7.033-4.379 10.494-2.048 3.46 2.33 4.378 7.032 2.048 10.493-2.331 3.461-7.033 4.379-10.494 2.048zm37.17 36.829c-4.697-3.162-5.943-9.543-2.78-14.24s9.544-5.943 14.241-2.78 5.942 9.544 2.779 14.241c-3.162 4.697-9.543 5.942-14.24 2.779zm.42 32.422c-5.438-3.662-6.88-11.051-3.218-16.489 3.662-5.439 11.051-6.881 16.489-3.219s6.88 11.051 3.218 16.489c-3.662 5.439-11.05 6.881-16.489 3.219zm33.312-51.174c-5.439-3.662-6.881-11.051-3.218-16.489 3.662-5.438 11.05-6.88 16.489-3.218 5.438 3.662 6.88 11.05 3.218 16.489-3.662 5.438-11.051 6.88-16.489 3.218zm-9.129 26.772c-3.461-2.331-4.379-7.032-2.048-10.493 2.33-3.461 7.032-4.379 10.493-2.048 3.461 2.33 4.379 7.032 2.048 10.493-2.33 3.461-7.032 4.378-10.493 2.048zm-80.366 33.546c-3.708-2.497-4.691-7.535-2.194-11.243s7.535-4.691 11.243-2.194 4.691 7.534 2.194 11.242-7.535 4.692-11.243 2.195zm75.86-222.154c-27.922-71.077-80.864-142.817-111.438-195.337-37.055 64.46-97.62 145.371-120.844 221.733-15.672 51.528-14.061 100.942 26.003 141.006 26.393 26.394 61.284 39.423 96.064 39.103-.468-1.643-.867-3.3-1.192-4.965-3.511-17.986.267-36.629 10.503-51.828l99.053-147.097c.598-.888 1.215-1.76 1.851-2.615z' })
+      ),
+      lft: e('svg', { width: 24, height: 24, viewBox: '0 0 57.983 57.983', fill: 'white' },
+        e('path', { d: 'M57.391,3.951c-0.499-0.61-1.236-0.96-2.022-0.96H33.983v1c0,8.271-6.729,15-15,15c-0.553,0-1-0.447-1-1s0.447-1,1-1c7.168,0,13-5.832,13-13v-1H14.262c-3.239,0-7.883,2.145-10.956,6.936c-3.679,5.735-6.131,16.771,2.999,36.798l-0.011,0.297c-0.017,0.516,0.171,1.003,0.528,1.372c0.356,0.368,0.835,0.571,1.347,0.571l0.11-0.004c2.481-0.143,9.644-1.035,13.703-6.289v11.32c0,0.553,0.447,1,1,1s1-0.447,1-1V39.013c0.069,0.001,0.144,0.001,0.221,0.001c0.258,0,0.52-0.016,0.779-0.023v15c0,0.553,0.447,1,1,1s1-0.447,1-1V38.874c8.511-0.778,17.249-5.246,19.086-15.854c6.479-4.293,10.473-9.977,11.864-16.909C58.085,5.345,57.888,4.558,57.391,3.951z M24.204,37.014c-0.032,0-0.055-0.001-0.086-0.001c0.439-1.732,1.998-3.022,3.865-3.022c0.553,0,1-0.447,1-1s-0.447-1-1-1c-2.527,0-4.69,1.573-5.573,3.789c-0.883-0.491-2.071-0.789-3.427-0.789c-0.553,0-1,0.447-1,1s0.447,1,1,1c0.655,0,1.201,0.089,1.649,0.213c-3.304,0.614-5.649,2.497-5.649,4.787c0,0.553,0.447,1,1,1c0.553,0,1-0.447,1-1c0-1.257,1.935-2.639,4.834-2.938c-2.853,6.639-10.814,7.729-13.52,7.903l0.072-2.16c0.024-0.132,0.051-0.267,0.08-0.404c0.015-0.068,0.032-0.139,0.048-0.209c0.015-0.066,0.03-0.133,0.047-0.2c0.025-0.098,0.052-0.199,0.08-0.3c0.01-0.038,0.021-0.076,0.031-0.114c0.035-0.123,0.073-0.248,0.114-0.375c0.004-0.012,0.008-0.025,0.012-0.037c1.32-4.079,5.463-9.941,18.027-13.178l-0.001-0.004c0.046-0.012,0.095-0.023,0.141-0.035l0.001,0.002c0.591-0.15,1.202-0.294,1.826-0.432l0.512-0.111c0.696-0.147,1.408-0.291,2.15-0.423l0,0c0.327-0.054,5.733-1,11.669-4.186c0.073-0.039,0.145-0.078,0.218-0.117c0.135-0.074,0.269-0.142,0.404-0.218C40.599,36.067,28.133,37.014,24.204,37.014z' })
       ),
       // Default fallback icon (simple circle with question mark)
       default: e('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'white' },
@@ -3400,6 +3404,837 @@
       );
     }
 
+    // ========== LFT MODULE ==========
+
+    function LFTModule({ onBack }) {
+      const containerRef = useRef(null);
+      const [step, setStep] = useState(0);
+      const { scheduleAdvance, clearAutoAdvance } = useAutoAdvance();
+
+      // State
+      const [pattern, setPattern] = useState(null); // 'hepatocellular' | 'cholestatic' | 'mixed' | 'hyperbili' | 'ammonia'
+      const [severity, setSeverity] = useState(null); // 'borderline' | 'mild' | 'moderate' | 'severe' | 'massive'
+      const [astAltRatio, setAstAltRatio] = useState(null); // 'alt_gt_ast' | 'ast_gt_alt' | 'ast_only'
+      const [ggtStatus, setGgtStatus] = useState(null); // 'raised' | 'normal' | 'unknown'
+      const [biliType, setBiliType] = useState(null); // 'unconjugated' | 'conjugated' | 'unknown'
+      const [showNonHepaticALP, setShowNonHepaticALP] = useState(false); // For cholestatic pathway when GGT normal
+
+      // Calculate total screens based on pathway
+      const getTotalScreens = () => {
+        if (!pattern) return 1;
+        switch (pattern) {
+          case 'hepatocellular': return 4; // Pattern → Severity → AST:ALT → Results
+          case 'cholestatic': return showNonHepaticALP ? 3 : 3; // Pattern → GGT → Results
+          case 'mixed': return 2; // Pattern → Results
+          case 'hyperbili': return 3; // Pattern → Conj/Unconj → Results
+          case 'ammonia': return 2; // Pattern → Results
+          default: return 2;
+        }
+      };
+
+      const scrollToTop = () => { if (containerRef.current) containerRef.current.scrollTo({ top: 0, behavior: 'auto' }); };
+      const goToStep = (s) => { document.activeElement.blur(); setStep(s); scrollToTop(); };
+
+      const resetModule = () => {
+        setStep(0);
+        setPattern(null);
+        setSeverity(null);
+        setAstAltRatio(null);
+        setGgtStatus(null);
+        setBiliType(null);
+        setShowNonHepaticALP(false);
+        scrollToTop();
+      };
+
+      const handleBack = () => {
+        clearAutoAdvance();
+        if (step === 0) {
+          onBack();
+        } else if (showNonHepaticALP && pattern === 'cholestatic') {
+          setShowNonHepaticALP(false);
+          goToStep(1);
+        } else {
+          goToStep(step - 1);
+        }
+      };
+
+      // Category label style for differential groups
+      const categoryLabelStyle = {
+        fontSize: '11px',
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        letterSpacing: '0.05em',
+        color: 'var(--label3)',
+        marginTop: '16px',
+        marginBottom: '6px'
+      };
+
+      // Teaching box style
+      const teachingBoxStyle = {
+        background: 'rgba(0,113,227,0.06)',
+        border: '1px solid rgba(0,113,227,0.15)',
+        borderRadius: '14px',
+        padding: '16px',
+        marginBottom: '16px',
+        fontSize: '13px',
+        lineHeight: 1.6,
+        color: 'var(--label2)'
+      };
+
+      // Interpretation panel style (two-tone for ammonia)
+      const interpretationPanelStyle = (isAcute) => ({
+        background: isAcute ? 'rgba(255,149,0,0.08)' : 'rgba(142,142,147,0.06)',
+        border: isAcute ? '1px solid rgba(255,149,0,0.2)' : '1px solid var(--sep)',
+        borderRadius: '12px',
+        padding: '14px',
+        marginBottom: '12px'
+      });
+
+      return e('div', { className: 'app-container', ref: containerRef, style: { overflowY: 'auto', height: '100dvh' } },
+        e(NavBar, { title: 'LFTs', onBack: handleBack, rightAction: e(HomeButton, { onClick: onBack }) }),
+        e('div', { className: 'screen-content' },
+          e(ProgressBar, { current: step, total: getTotalScreens() }),
+
+          // ===== SCREEN 0: Pattern Selection =====
+          step === 0 && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'What pattern do the LFTs show?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Select the predominant abnormality'),
+            e(ChoiceButton, {
+              label: 'Hepatocellular',
+              sublabel: '↑↑ ALT/AST, normal or mild ↑ ALP',
+              selected: pattern === 'hepatocellular',
+              onClick: () => {
+                clearAutoAdvance();
+                setPattern('hepatocellular');
+                scheduleAdvance(() => goToStep(1), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Cholestatic',
+              sublabel: '↑↑ ALP/GGT, normal or mild ↑ ALT/AST',
+              selected: pattern === 'cholestatic',
+              onClick: () => {
+                clearAutoAdvance();
+                setPattern('cholestatic');
+                scheduleAdvance(() => goToStep(1), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Mixed',
+              sublabel: 'Both elevated',
+              selected: pattern === 'mixed',
+              onClick: () => {
+                clearAutoAdvance();
+                setPattern('mixed');
+                scheduleAdvance(() => goToStep(1), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Isolated hyperbilirubinaemia',
+              sublabel: '↑ Bilirubin, other LFTs normal',
+              selected: pattern === 'hyperbili',
+              onClick: () => {
+                clearAutoAdvance();
+                setPattern('hyperbili');
+                scheduleAdvance(() => goToStep(1), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Hyperammonaemia',
+              sublabel: '↑ Ammonia',
+              selected: pattern === 'ammonia',
+              onClick: () => {
+                clearAutoAdvance();
+                setPattern('ammonia');
+                scheduleAdvance(() => goToStep(1), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(InfoPanel, { title: 'LFTs are a misnomer' },
+              'ALT, AST, ALP, and GGT measure liver injury, not function. Albumin, INR, and bilirubin reflect synthetic function. Normal \'LFTs\' don\'t exclude liver disease.'
+            )
+          ),
+
+          // ===== HEPATOCELLULAR PATHWAY =====
+
+          // Screen A1: Severity
+          step === 1 && pattern === 'hepatocellular' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'How elevated are the transaminases?'),
+            e('div', { style: STYLES.screenSubtitle }, 'Relative to your lab\'s upper limit of normal (ULN)'),
+            e(ChoiceButton, {
+              label: 'Borderline',
+              sublabel: '<2× ULN',
+              selected: severity === 'borderline',
+              onClick: () => {
+                clearAutoAdvance();
+                setSeverity('borderline');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Mild',
+              sublabel: '2–5× ULN',
+              selected: severity === 'mild',
+              onClick: () => {
+                clearAutoAdvance();
+                setSeverity('mild');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Moderate',
+              sublabel: '5–15× ULN',
+              selected: severity === 'moderate',
+              onClick: () => {
+                clearAutoAdvance();
+                setSeverity('moderate');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Severe',
+              sublabel: '>15× ULN',
+              selected: severity === 'severe',
+              onClick: () => {
+                clearAutoAdvance();
+                setSeverity('severe');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Massive',
+              sublabel: '>100× ULN or >10,000 IU/L',
+              selected: severity === 'massive',
+              onClick: () => {
+                clearAutoAdvance();
+                setSeverity('massive');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e('div', { style: STYLES.hintBox },
+              '💡 Borderline elevations (<2× ULN) often normalise spontaneously. Consider observation with repeat testing in 3–6 months before extensive workup.'
+            )
+          ),
+
+          // Screen A2: AST:ALT Ratio
+          step === 2 && pattern === 'hepatocellular' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'What\'s the relationship between AST and ALT?'),
+            e('div', { style: STYLES.screenSubtitle }, 'This helps narrow the differential'),
+            e(ChoiceButton, {
+              label: 'ALT > AST',
+              sublabel: 'Typical of most liver disease',
+              selected: astAltRatio === 'alt_gt_ast',
+              onClick: () => {
+                clearAutoAdvance();
+                setAstAltRatio('alt_gt_ast');
+                scheduleAdvance(() => goToStep(3), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'AST > ALT',
+              sublabel: 'Suggests alcohol, advanced fibrosis, or non-hepatic source',
+              selected: astAltRatio === 'ast_gt_alt',
+              onClick: () => {
+                clearAutoAdvance();
+                setAstAltRatio('ast_gt_alt');
+                scheduleAdvance(() => goToStep(3), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'AST elevated, ALT normal',
+              sublabel: 'Consider non-hepatic sources',
+              selected: astAltRatio === 'ast_only',
+              onClick: () => {
+                clearAutoAdvance();
+                setAstAltRatio('ast_only');
+                scheduleAdvance(() => goToStep(3), false);
+              },
+              color: 'var(--accent)'
+            })
+          ),
+
+          // Screen A3: Hepatocellular Results
+          step === 3 && pattern === 'hepatocellular' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // ALF Warning for severe/massive
+            (severity === 'severe' || severity === 'massive') && e(WarningBanner, null,
+              e('div', null,
+                e('strong', null, 'Consider evaluating for acute liver failure (ALF).'),
+                e('br', null),
+                'ALF criteria: INR >1.5 (not on anticoagulants) + any degree of encephalopathy + no pre-existing cirrhosis (illness <26 weeks).',
+                e('br', null),
+                'Consider urgent consultation with ICU/hepatology.'
+              )
+            ),
+
+            // Falling transaminases warning for severe/massive
+            (severity === 'severe' || severity === 'massive') && e(InfoPanel, { title: 'Falling transaminases — not always good news' },
+              'In acute liver injury, rapidly falling ALT/AST with rising bilirubin and worsening INR may indicate hepatocyte loss rather than recovery. This pattern warrants careful evaluation.'
+            ),
+
+            // O'Grady classification for severe/massive
+            (severity === 'severe' || severity === 'massive') && e(InfoPanel, { title: 'O\'Grady classification of ALF' },
+              e('div', null,
+                e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Time from jaundice to encephalopathy:'),
+                e('ul', { style: { margin: 0, paddingLeft: '18px', lineHeight: 1.7 } },
+                  e('li', null, e('strong', null, 'Hyperacute:'), ' <7 days (paracetamol, ischaemic, viral — better prognosis)'),
+                  e('li', null, e('strong', null, 'Acute:'), ' 8–28 days'),
+                  e('li', null, e('strong', null, 'Subacute:'), ' 29 days – 12 weeks (DILI, autoimmune — worse prognosis without transplant)')
+                )
+              )
+            ),
+
+            // West Haven for severe/massive
+            (severity === 'severe' || severity === 'massive') && e(InfoPanel, { title: 'West Haven Criteria for Hepatic Encephalopathy' },
+              e('ul', { style: { margin: 0, paddingLeft: '18px', lineHeight: 1.7 } },
+                e('li', null, e('strong', null, 'Grade I:'), ' Altered behaviour, mild confusion, slurred speech, disordered sleep'),
+                e('li', null, e('strong', null, 'Grade II:'), ' Lethargy, moderate confusion, inappropriate behaviour'),
+                e('li', null, e('strong', null, 'Grade III:'), ' Marked confusion, incoherent speech, sleeping but rousable'),
+                e('li', null, e('strong', null, 'Grade IV:'), ' Coma, unresponsive to painful stimuli')
+              )
+            ),
+
+            // AST > ALT Teaching box
+            astAltRatio === 'ast_gt_alt' && e('div', { style: teachingBoxStyle },
+              e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'AST > ALT pattern is associated with a narrower differential:'),
+              e('ol', { style: { margin: 0, paddingLeft: '18px', lineHeight: 1.7 } },
+                e('li', null, e('strong', null, 'Alcohol-related liver disease'), ' — GGT usually also raised, AST:ALT ratio typically ≥2:1'),
+                e('li', null, e('strong', null, 'Advanced fibrosis / cirrhosis'), ' — AST:ALT ratio ≥2 is consistent with alcohol-related or MASH cirrhosis'),
+                e('li', null, e('strong', null, 'Non-hepatic source of AST'), ' — skeletal muscle, myocardium, RBCs — consider checking CK')
+              ),
+              e('p', { style: { marginTop: '12px', fontStyle: 'italic' } },
+                'AST:ALT ratio ≥5 (especially with normal/near-normal ALT): consistent with extrahepatic source — consider prioritising muscle/cardiac workup.'
+              )
+            ),
+
+            // AST only (isolated AST elevation) - different differential
+            astAltRatio === 'ast_only' && e(React.Fragment, null,
+              e('div', { style: teachingBoxStyle },
+                e('p', { style: { marginBottom: '8px', fontWeight: 600, color: 'var(--label)' } }, 'Isolated AST elevation — consider non-hepatic sources'),
+                e('p', { style: { marginBottom: '8px' } }, 'ALT is liver-specific. AST is not — it\'s found in skeletal muscle, myocardium, kidney, brain, and RBCs.'),
+                e('p', null, 'Consider checking CK. If CK is elevated, the AST elevation may be coming from muscle.')
+              ),
+              e('div', { style: categoryLabelStyle }, 'Differentials'),
+              e(DiffListItem, { title: 'Skeletal muscle injury / rhabdomyolysis' },
+                'Exercise, statins, trauma, seizures, prolonged immobilisation. Check CK — often dramatically elevated.'
+              ),
+              e(DiffListItem, { title: 'Myocardial injury' },
+                'MI, myocarditis. AST rises with troponin. ECG and troponin are diagnostic.'
+              ),
+              e(DiffListItem, { title: 'Haemolysis' },
+                'RBCs contain AST. Check LDH (elevated), haptoglobin (low), reticulocytes, blood film, Coombs test.'
+              ),
+              e(DiffListItem, { title: 'Macro-AST' },
+                'Benign. Causes persistent unexplained AST elevation. Immunoglobulin-bound AST with delayed clearance.'
+              ),
+              e(DiffListItem, { title: 'Thyroid disease' },
+                'Hypothyroidism can raise both AST and CK via muscle effects.'
+              ),
+              e(DiffListItem, { title: 'Adrenal insufficiency' },
+                'Can cause mild transaminase elevation that resolves with treatment.'
+              ),
+              e(DiffListItem, { title: 'Occult liver disease' },
+                'If CK normal and non-hepatic causes excluded, consider repeating with full liver panel.'
+              )
+            ),
+
+            // Standard hepatocellular differentials (ALT > AST or AST > ALT with standard list)
+            astAltRatio !== 'ast_only' && e(React.Fragment, null,
+              e('div', { style: categoryLabelStyle }, 'Differentials'),
+
+              // Severity-specific differentials
+              // MASSIVE / SEVERE
+              (severity === 'severe' || severity === 'massive') && e(React.Fragment, null,
+                e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Vascular'),
+                e(DiffListItem, { title: 'Ischaemic hepatitis (shock liver)', defaultOpen: astAltRatio !== 'ast_gt_alt' },
+                  'Hypoperfusion injury. Recent hypotension, cardiac arrest, sepsis, or right heart failure. AST/ALT often >10,000 IU/L with rapid rise and fall.'
+                ),
+                e(DiffListItem, { title: 'Portal vein or hepatic artery thrombosis' },
+                  'Consider in post-liver transplant, hypercoagulable states, or malignancy. Doppler ultrasound for diagnosis.'
+                ),
+                e(DiffListItem, { title: 'Budd-Chiari syndrome' },
+                  'Hepatic vein thrombosis. Triad: hepatomegaly, ascites, abdominal pain. Doppler/CT for diagnosis.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Toxin / Drug'),
+                e(DiffListItem, { title: 'Paracetamol toxicity' },
+                  'Accounts for ~50% of ALF in Australia. Check paracetamol level and timing. Staggered therapeutic overdose is particularly dangerous.'
+                ),
+                e(DiffListItem, { title: 'Idiosyncratic drug reactions' },
+                  'NSAIDs, antibiotics, anticonvulsants, herbal supplements. Onset typically 1–8 weeks after starting medication.'
+                ),
+                e(DiffListItem, { title: 'Recreational drugs' },
+                  'MDMA, cocaine, synthetic cannabinoids. Consider in young patients with hyperthermia.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Infectious'),
+                e(DiffListItem, { title: 'Viral hepatitis' },
+                  'Hepatitis A, B (acute), rarely C. Also CMV, EBV, HSV (immunocompromised), VZV.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Autoimmune'),
+                e(DiffListItem, { title: 'Autoimmune hepatitis' },
+                  'Can present acutely. Check ANA, SMA, immunoglobulins. May need liver biopsy.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Metabolic'),
+                e(DiffListItem, { title: 'HELLP syndrome / Acute fatty liver of pregnancy' },
+                  'If pregnant. HELLP: haemolysis, elevated liver enzymes, low platelets. AFLP: microvesicular steatosis, hypoglycaemia, coagulopathy.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Other'),
+                e(DiffListItem, { title: 'Heat stroke' },
+                  'Hyperthermia with multi-organ dysfunction. Can cause massive hepatocyte necrosis.'
+                )
+              ),
+
+              // MODERATE
+              severity === 'moderate' && e(React.Fragment, null,
+                e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Toxin / Drug'),
+                e(DiffListItem, { title: 'Drug-induced liver injury (DILI)' },
+                  'Common culprits: paracetamol, antibiotics, NSAIDs, statins, anticonvulsants, herbal/supplements.'
+                ),
+                e(DiffListItem, { title: 'Alcohol-related hepatitis' },
+                  'History of heavy alcohol use. AST typically 2–6× ULN, AST:ALT ratio often ≥2.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Infectious'),
+                e(DiffListItem, { title: 'Viral hepatitis' },
+                  'Hepatitis A, B, C. Also EBV, CMV in appropriate clinical context.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Autoimmune'),
+                e(DiffListItem, { title: 'Autoimmune hepatitis' },
+                  'More common in women. Check ANA, SMA, anti-LKM, immunoglobulins.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Metabolic'),
+                e(DiffListItem, { title: 'Haemochromatosis' },
+                  'Iron overload. Check ferritin and transferrin saturation. HFE gene testing if elevated.'
+                ),
+                e(DiffListItem, { title: 'Wilson\'s disease' },
+                  'If <55 years. Note: characteristically shows modest transaminase elevation even in severe disease. Check caeruloplasmin, 24h urine copper.'
+                ),
+                e(DiffListItem, { title: 'HELLP / Acute fatty liver of pregnancy' },
+                  'If pregnant. Urgent obstetric review required.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Vascular'),
+                e(DiffListItem, { title: 'Ischaemic hepatitis' },
+                  'Hypoperfusion. May have less dramatic elevation than classic shock liver.'
+                ),
+                e(DiffListItem, { title: 'Budd-Chiari syndrome' },
+                  'Hepatic vein thrombosis. Consider in hypercoagulable states.'
+                )
+              ),
+
+              // MILD / BORDERLINE
+              (severity === 'mild' || severity === 'borderline') && e(React.Fragment, null,
+                e('div', { style: { ...categoryLabelStyle, marginTop: '8px' } }, 'Metabolic'),
+                e(DiffListItem, { title: 'MASLD/MASH (fatty liver)', defaultOpen: true },
+                  'Commonest cause of mildly elevated LFTs in Australia. Associated with metabolic syndrome, obesity, T2DM. Consider FIB-4 for fibrosis risk.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Toxin / Drug'),
+                e(DiffListItem, { title: 'Alcohol' },
+                  'Even moderate intake can cause mild elevation. GGT often disproportionately elevated.'
+                ),
+                e(DiffListItem, { title: 'Medications' },
+                  'Statins (usually mild, often tolerable), methotrexate, azathioprine, many others.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Infectious'),
+                e(DiffListItem, { title: 'Chronic hepatitis B or C' },
+                  'May have persistently mild elevation. Check hepatitis serology.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Metabolic'),
+                e(DiffListItem, { title: 'Haemochromatosis' },
+                  'Iron overload. Ferritin and transferrin saturation are screening tests.'
+                ),
+                e(DiffListItem, { title: 'Alpha-1 antitrypsin deficiency' },
+                  'Consider if early-onset emphysema or family history. Check A1AT level.'
+                ),
+                e(DiffListItem, { title: 'Wilson\'s disease' },
+                  'If <55 years. Check caeruloplasmin, 24h urine copper.'
+                ),
+
+                e('div', { style: categoryLabelStyle }, 'Autoimmune'),
+                e(DiffListItem, { title: 'Autoimmune hepatitis' },
+                  'Can present with mild chronic elevation. Check autoantibodies.'
+                ),
+                e(DiffListItem, { title: 'Coeliac disease' },
+                  'Can cause mild transaminitis. Consider if GI symptoms or iron deficiency.'
+                )
+              ),
+
+              // Additional AST>ALT specific items
+              astAltRatio === 'ast_gt_alt' && e(React.Fragment, null,
+                e('div', { style: categoryLabelStyle }, 'Non-hepatic / AST-predominant'),
+                e(DiffListItem, { title: 'Alcohol-related liver disease' },
+                  'AST:ALT ratio typically ≥2:1. GGT usually elevated. AST rarely exceeds 8–10× ULN in alcoholic hepatitis.'
+                ),
+                e(DiffListItem, { title: 'Cirrhosis (any cause)' },
+                  'AST:ALT ratio reverses as fibrosis progresses. MASH cirrhosis can have ratio ≥2.'
+                ),
+                e(DiffListItem, { title: 'Rhabdomyolysis' },
+                  'Muscle source of AST. CK will be dramatically elevated (often >10,000 U/L).'
+                ),
+                e(DiffListItem, { title: 'Myocardial injury' },
+                  'MI, myocarditis. Check troponin and ECG.'
+                ),
+                e(DiffListItem, { title: 'Haemolysis' },
+                  'RBCs contain AST. Check haemolysis panel: LDH, haptoglobin, reticulocytes, blood film, Coombs.'
+                ),
+                e(DiffListItem, { title: 'Macro-AST' },
+                  'Rare, benign. Persistently elevated AST with no clinical explanation. Immunoglobulin-bound.'
+                )
+              )
+            ),
+
+            // Paracetamol info panel
+            e(InfoPanel, { title: 'Paracetamol in Australia' },
+              'Paracetamol toxicity accounts for approximately 50% of acute liver failure in Australia. Staggered therapeutic overdose is particularly dangerous because patients present late and the standard NAC nomogram doesn\'t apply.'
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Start Over', onClick: resetModule })
+            )
+          ),
+
+          // ===== CHOLESTATIC PATHWAY =====
+
+          // Screen B1: GGT Confirmation
+          step === 1 && pattern === 'cholestatic' && !showNonHepaticALP && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Is GGT also raised?'),
+            e('div', { style: STYLES.screenSubtitle }, 'GGT helps confirm whether ALP elevation is hepatic in origin'),
+            e(ChoiceButton, {
+              label: 'Yes',
+              sublabel: 'Consistent with hepatic origin',
+              selected: ggtStatus === 'raised',
+              onClick: () => {
+                clearAutoAdvance();
+                setGgtStatus('raised');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'No',
+              sublabel: 'Consider non-hepatic ALP sources',
+              selected: ggtStatus === 'normal',
+              onClick: () => {
+                clearAutoAdvance();
+                setGgtStatus('normal');
+                setShowNonHepaticALP(true);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Not tested / unsure',
+              sublabel: 'Proceed with caveat',
+              selected: ggtStatus === 'unknown',
+              onClick: () => {
+                clearAutoAdvance();
+                setGgtStatus('unknown');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            })
+          ),
+
+          // Non-hepatic ALP screen (when GGT normal)
+          step === 1 && pattern === 'cholestatic' && showNonHepaticALP && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Non-hepatic ALP Elevation'),
+            e('div', { style: teachingBoxStyle },
+              e('p', { style: { marginBottom: '8px' } }, 'ALP elevation may be non-hepatic in origin. ALP is also found in bone, placenta, and intestine.'),
+              e('p', { style: { marginBottom: '8px', fontWeight: 600 } }, 'Consider:'),
+              e('ul', { style: { margin: 0, paddingLeft: '18px', lineHeight: 1.7 } },
+                e('li', null, 'Vitamin D deficiency (commonest cause)'),
+                e('li', null, 'Paget\'s disease'),
+                e('li', null, 'Bone metastases'),
+                e('li', null, 'Fracture healing'),
+                e('li', null, 'Pregnancy (3rd trimester)'),
+                e('li', null, 'Adolescent growth spurt')
+              ),
+              e('p', { style: { marginTop: '12px' } }, 'Consider checking vitamin D level and bone profile.')
+            ),
+            e('div', { style: { display: 'flex', gap: '10px', marginTop: '16px' } },
+              e('button', {
+                onClick: onBack,
+                style: {
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  background: 'var(--card)',
+                  color: 'var(--label)',
+                  border: '1px solid var(--sep)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font)'
+                }
+              }, 'Exit module'),
+              e('button', {
+                onClick: () => { setShowNonHepaticALP(false); goToStep(2); },
+                style: {
+                  flex: 1,
+                  padding: '14px',
+                  borderRadius: '12px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  background: 'var(--accent)',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font)'
+                }
+              }, 'Continue anyway')
+            )
+          ),
+
+          // Screen B2: Cholestatic Results
+          step === 2 && pattern === 'cholestatic' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // Caveat if GGT not tested
+            ggtStatus === 'unknown' && e(WarningBanner, null,
+              'GGT was not tested. The differentials below assume hepatic origin of ALP elevation. Consider checking GGT to confirm.'
+            ),
+
+            // Charcot's triad warning
+            e(WarningBanner, null,
+              e('span', null, e('strong', null, 'Pain + fever + jaundice = Charcot\'s triad'), ' — consistent with ascending cholangitis. Consider urgent imaging and surgical/GI consultation.')
+            ),
+
+            e('div', { style: categoryLabelStyle }, 'Extrahepatic obstruction'),
+            e(DiffListItem, { title: 'Choledocholithiasis' },
+              'Gallstone in common bile duct. RUQ pain, often with dilated CBD on ultrasound. MRCP or ERCP for diagnosis/treatment.'
+            ),
+            e(DiffListItem, { title: 'Malignant obstruction' },
+              'Pancreatic head carcinoma, cholangiocarcinoma, ampullary tumour. Painless jaundice is classic. CT/MRCP for staging.'
+            ),
+            e(DiffListItem, { title: 'Primary sclerosing cholangitis' },
+              'Associated with IBD (especially UC). Beaded bile ducts on MRCP. Check p-ANCA. Increased cholangiocarcinoma risk.'
+            ),
+
+            e('div', { style: categoryLabelStyle }, 'Intrahepatic cholestasis'),
+            e(DiffListItem, { title: 'Drug-induced cholestasis' },
+              'Flucloxacillin, amoxicillin-clavulanate (common Australian culprits). Can persist weeks after stopping drug.'
+            ),
+            e(DiffListItem, { title: 'Primary biliary cholangitis' },
+              'AMA positive, typically middle-aged female. Pruritus often prominent. Check AMA, immunoglobulins.'
+            ),
+            e(DiffListItem, { title: 'Sepsis-associated cholestasis' },
+              'Cytokine-mediated bile transport dysfunction. Usually in critically ill patients.'
+            ),
+            e(DiffListItem, { title: 'Hepatic congestion / right heart failure' },
+              'Elevated JVP, peripheral oedema. ALP and bilirubin elevated, AST often mildly elevated.'
+            ),
+            e(DiffListItem, { title: 'TPN-related cholestasis' },
+              'Prolonged parenteral nutrition. Multifactorial aetiology.'
+            ),
+
+            e(InfoPanel, { title: 'Isolated GGT elevation' },
+              'GGT is sensitive but non-specific. Isolated GGT elevation is common and often due to enzyme induction (alcohol, medications) rather than structural liver disease. An isolated GGT elevation may not warrant extensive investigation.'
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Start Over', onClick: resetModule })
+            )
+          ),
+
+          // ===== MIXED PATHWAY =====
+
+          // Screen C1: Mixed Results
+          step === 1 && pattern === 'mixed' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            e('div', { style: teachingBoxStyle },
+              'Mixed pattern means features of both hepatocellular and cholestatic injury.'
+            ),
+
+            e('div', { style: categoryLabelStyle }, 'Differentials'),
+            e(DiffListItem, { title: 'Drug-induced liver injury (DILI)', defaultOpen: true },
+              'Commonest cause of mixed pattern. Review all medications including over-the-counter, herbal, and supplements. Common Australian culprits include flucloxacillin, amoxicillin-clavulanate, NSAIDs, and paracetamol.'
+            ),
+            e(DiffListItem, { title: 'Two processes simultaneously' },
+              'Consider whether patient has concurrent hepatocellular and cholestatic pathology.'
+            ),
+            e(DiffListItem, { title: 'Transitional phase' },
+              'Disease evolving from predominantly hepatocellular to cholestatic (or vice versa). Repeat LFTs to clarify trajectory.'
+            ),
+            e(DiffListItem, { title: 'Granulomatous hepatitis' },
+              'Sarcoidosis, TB, histoplasmosis, drug reaction. May need liver biopsy for diagnosis.'
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Start Over', onClick: resetModule })
+            )
+          ),
+
+          // ===== ISOLATED HYPERBILIRUBINAEMIA PATHWAY =====
+
+          // Screen D1: Conjugated vs Unconjugated
+          step === 1 && pattern === 'hyperbili' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Is the bilirubin predominantly conjugated or unconjugated?'),
+            e('div', { style: STYLES.screenSubtitle }, 'This completely changes the differential'),
+            e(ChoiceButton, {
+              label: 'Unconjugated (indirect)',
+              selected: biliType === 'unconjugated',
+              onClick: () => {
+                clearAutoAdvance();
+                setBiliType('unconjugated');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Conjugated (direct)',
+              selected: biliType === 'conjugated',
+              onClick: () => {
+                clearAutoAdvance();
+                setBiliType('conjugated');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            }),
+            e(ChoiceButton, {
+              label: 'Not fractionated',
+              selected: biliType === 'unknown',
+              onClick: () => {
+                clearAutoAdvance();
+                setBiliType('unknown');
+                scheduleAdvance(() => goToStep(2), false);
+              },
+              color: 'var(--accent)'
+            })
+          ),
+
+          // Screen D2: Hyperbilirubinaemia Results
+          step === 2 && pattern === 'hyperbili' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Interpretation'),
+
+            // Unconjugated
+            biliType === 'unconjugated' && e(React.Fragment, null,
+              e('div', { style: categoryLabelStyle }, 'Unconjugated hyperbilirubinaemia'),
+              e(DiffListItem, { title: 'Gilbert\'s syndrome', defaultOpen: true },
+                'Commonest (~5% of population), benign. Fluctuates with fasting, illness, stress. Bilirubin usually <70 µmol/L (<4 mg/dL). No treatment needed.'
+              ),
+              e(DiffListItem, { title: 'Haemolysis' },
+                'Consider checking haemolysis panel: LDH (elevated), haptoglobin (low/undetectable), reticulocyte count (elevated), blood film (fragmented cells, spherocytes), direct Coombs test.'
+              ),
+              e(DiffListItem, { title: 'Haemoglobinopathy' },
+                'Sickle cell disease, thalassaemia. Chronic haemolysis leads to unconjugated hyperbilirubinaemia.'
+              ),
+              e(DiffListItem, { title: 'G6PD deficiency' },
+                'Episodic haemolysis triggered by oxidant stress (fava beans, certain drugs, infection).'
+              ),
+              e(DiffListItem, { title: 'Ineffective erythropoiesis' },
+                'Megaloblastic anaemia, myelodysplasia. RBC precursors destroyed in marrow.'
+              ),
+              e(DiffListItem, { title: 'Resorbing large haematoma' },
+                'Breakdown of extravasated blood. Usually clinically obvious.'
+              ),
+              e(InfoPanel, { title: 'Physiology note' },
+                'Haemolysis alone rarely causes bilirubin >85 µmol/L (5 mg/dL) unless there is coexistent liver or renal impairment. If hepatic function is normal, unconjugated hyperbilirubinaemia typically reflects overproduction rather than failed conjugation.'
+              )
+            ),
+
+            // Conjugated
+            biliType === 'conjugated' && e(React.Fragment, null,
+              e('div', { style: categoryLabelStyle }, 'Conjugated hyperbilirubinaemia'),
+              e(DiffListItem, { title: 'Liver disease (early/subclinical)' },
+                'Any hepatocellular or cholestatic process can cause conjugated hyperbilirubinaemia before other LFTs become abnormal.'
+              ),
+              e(DiffListItem, { title: 'Choledocholithiasis' },
+                'Biliary obstruction from gallstones. May have associated RUQ pain.'
+              ),
+              e(DiffListItem, { title: 'Malignant obstruction' },
+                'Pancreatic, biliary, or ampullary malignancy. Consider if painless jaundice.'
+              ),
+              e(DiffListItem, { title: 'Primary sclerosing cholangitis' },
+                'Associated with IBD. Beaded bile ducts on MRCP.'
+              ),
+              e(DiffListItem, { title: 'Dubin-Johnson / Rotor syndrome' },
+                'Rare, benign inherited disorders of bilirubin excretion. Diagnosis of exclusion.'
+              )
+            ),
+
+            // Not fractionated
+            biliType === 'unknown' && e(React.Fragment, null,
+              e('div', { style: teachingBoxStyle },
+                e('p', { style: { marginBottom: '8px' } }, 'Fractionating the bilirubin (direct vs indirect) may help clarify the differential, as the distinction between conjugated and unconjugated hyperbilirubinaemia leads to different diagnostic considerations.'),
+                e('p', null, 'Consider requesting a split bilirubin.')
+              )
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Start Over', onClick: resetModule })
+            )
+          ),
+
+          // ===== HYPERAMMONAEMIA PATHWAY =====
+
+          // Screen E1: Hyperammonaemia Results
+          step === 1 && pattern === 'ammonia' && e(FadeIn, null,
+            e('div', { style: STYLES.screenTitle }, 'Hyperammonaemia — Differentials'),
+
+            e('div', { style: categoryLabelStyle }, 'Causes'),
+            e(DiffListItem, { title: 'Hepatic failure (acute or chronic)' },
+              'Liver cannot convert ammonia to urea. Most common cause in adults.'
+            ),
+            e(DiffListItem, { title: 'Medications' },
+              'Sodium valproate (inhibits urea cycle), carbamazepine. Check drug history.'
+            ),
+            e(DiffListItem, { title: 'Porto-systemic shunts' },
+              'Including TIPS. Ammonia bypasses hepatic metabolism.'
+            ),
+            e(DiffListItem, { title: 'Increased protein catabolism' },
+              'GI bleeding (protein load), TPN, starvation, chemotherapy, severe infection.'
+            ),
+            e(DiffListItem, { title: 'Urea-splitting organisms' },
+              'Urinary tract infections with Proteus, Klebsiella. Consider if urinary symptoms.'
+            ),
+            e(DiffListItem, { title: 'Multiple myeloma' },
+              'Rare cause. Mechanism unclear but reported association.'
+            ),
+            e(DiffListItem, { title: 'Urea cycle defects' },
+              'Rare in adults. Consider if recurrent hyperammonaemia without obvious cause.'
+            ),
+
+            // Interpretation panels (two-tone)
+            e('div', { style: { marginTop: '20px' } },
+              e('div', { style: interpretationPanelStyle(false) },
+                e('p', { style: { fontWeight: 600, marginBottom: '8px', color: 'var(--label)' } }, 'In chronic liver disease / cirrhosis:'),
+                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Ammonia is neither sensitive nor specific for hepatic encephalopathy. It does not correlate with severity of encephalopathy or patient-centred outcomes. Serial ammonia levels may not be clinically useful in stable cirrhotics.')
+              ),
+              e('div', { style: interpretationPanelStyle(true) },
+                e('p', { style: { fontWeight: 600, marginBottom: '8px', color: 'var(--label)' } }, 'In acute / fulminant liver failure:'),
+                e('p', { style: { margin: 0, lineHeight: 1.6 } }, 'Ammonia levels correlate with severity of encephalopathy and risk of cerebral oedema. Levels >150 µmol/L are associated with increased risk of intracranial hypertension. CRRT may be considered to clear ammonia.')
+              )
+            ),
+
+            e('div', { style: { marginTop: '20px' } },
+              e(PrimaryButton, { label: 'Start Over', onClick: resetModule })
+            )
+          )
+        )
+      );
+    }
+
     // ========== DISCLAIMER POPUP ==========
 
     function DisclaimerPopup({ onAccept }) {
@@ -3635,6 +4470,10 @@
 
       if (screen === 'coag') {
         return e(CoagModule, { onBack: () => setScreen('home') });
+      }
+
+      if (screen === 'lft') {
+        return e(LFTModule, { onBack: () => setScreen('home') });
       }
 
       // Placeholder for other modules
