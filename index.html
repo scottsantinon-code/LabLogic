@@ -1259,7 +1259,10 @@
           style: {
             padding: '16px 24px',
             paddingTop: 'calc(16px + env(safe-area-inset-top))',
-            flexShrink: 0
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between'
           }
         },
           e('div', {
@@ -1273,7 +1276,29 @@
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }
-          }, 'LabLogic')
+          }, 'LabLogic'),
+          // Info button
+          e('button', {
+            onClick: () => onSelectModule('info'),
+            style: {
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(142,142,147,0.12)',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }
+          },
+            e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--label3)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+              e('circle', { cx: 12, cy: 12, r: 10 }),
+              e('line', { x1: 12, y1: 16, x2: 12, y2: 12 }),
+              e('line', { x1: 12, y1: 8, x2: 12.01, y2: 8 })
+            )
+          )
         ),
 
         // Module Cards
@@ -1328,23 +1353,7 @@
         ),
 
         // Footer
-        e('div', {
-          style: { textAlign: 'center', padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))', flexShrink: 0 }
-        },
-          e('button', {
-            onClick: () => onSelectModule('terms'),
-            style: {
-              background: 'none',
-              border: 'none',
-              color: 'var(--label3)',
-              fontSize: '11px',
-              fontWeight: 500,
-              cursor: 'pointer',
-              fontFamily: 'var(--font)'
-            }
-          }, 'Disclaimer & Terms'),
-          e('div', { style: { fontSize: '10px', color: 'var(--label4)', marginTop: '6px' } }, '© 2026 Critical Condition Pty Ltd')
-        )
+        e('div', { style: { fontSize: '10px', color: 'var(--label4)', textAlign: 'center', padding: '16px 20px', paddingBottom: 'calc(16px + env(safe-area-inset-bottom))' } }, '© 2026 Critical Condition Pty Ltd')
       );
     }
 
@@ -4351,6 +4360,169 @@
       );
     }
 
+    // ========== INFO SCREEN ==========
+
+    function InfoScreen({ onBack, onNavigate }) {
+      const cardStyle = {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        background: 'var(--card)',
+        borderRadius: 'var(--radius)',
+        padding: '16px',
+        border: '1px solid var(--sep)',
+        cursor: 'pointer',
+        textAlign: 'left',
+        fontFamily: 'var(--font)',
+        marginBottom: '10px'
+      };
+
+      return e('div', { className: 'app-container' },
+        e(NavBar, { title: 'About', onBack }),
+        e('div', { style: { padding: '20px' } },
+          e('div', { style: STYLES.screenTitle }, 'LabLogic'),
+          e('div', { style: { fontSize: '14px', color: 'var(--label3)', marginBottom: '8px', lineHeight: 1.5 } },
+            'A clinical laboratory investigation interpreter for healthcare professionals.'
+          ),
+          e('div', { style: { fontSize: '13px', color: 'var(--label2)', marginBottom: '24px' } },
+            'Developed by Critical Condition Pty Ltd'
+          ),
+
+          // Navigation cards
+          e('button', {
+            onClick: () => onNavigate('terms'),
+            style: cardStyle
+          },
+            e('span', { style: { fontSize: '24px', flexShrink: 0 } }, '📋'),
+            e('div', { style: { flex: 1, fontSize: '15px', fontWeight: 600, color: 'var(--label)' } }, 'Terms of Use'),
+            e('span', { style: { color: 'var(--label4)', fontSize: '18px', flexShrink: 0 } }, '›')
+          ),
+
+          e('button', {
+            onClick: () => onNavigate('references'),
+            style: cardStyle
+          },
+            e('span', { style: { fontSize: '24px', flexShrink: 0 } }, '📚'),
+            e('div', { style: { flex: 1, fontSize: '15px', fontWeight: 600, color: 'var(--label)' } }, 'References'),
+            e('span', { style: { color: 'var(--label4)', fontSize: '18px', flexShrink: 0 } }, '›')
+          ),
+
+          // Footer
+          e('div', { style: { marginTop: '40px', textAlign: 'center' } },
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)', marginBottom: '4px' } }, '© 2026 Critical Condition Pty Ltd'),
+            e('div', { style: { fontSize: '11px', color: 'var(--label4)' } }, 'hello@criticalcondition.com.au')
+          )
+        )
+      );
+    }
+
+    // ========== REFERENCES SCREEN ==========
+
+    function ReferencesScreen({ onBack }) {
+      const sectionHeaderStyle = { fontSize: '15px', fontWeight: 700, color: 'var(--label)', marginTop: '24px', marginBottom: '12px', letterSpacing: '-0.02em' };
+      const refStyle = { fontSize: '12px', lineHeight: 1.6, color: 'var(--label2)', marginBottom: '10px' };
+
+      // Helper to render a reference with italic journal title
+      const ref = (authors, year, title, journal, details) => {
+        return e('p', { style: refStyle },
+          authors + ' (' + year + '). ' + title + ' ',
+          e('span', { style: { fontStyle: 'italic' } }, journal),
+          details ? ', ' + details : '.'
+        );
+      };
+
+      return e('div', { className: 'app-container' },
+        e(NavBar, { title: 'References', onBack }),
+        e('div', { style: { padding: '16px 20px 40px', overflow: 'auto' } },
+          e('p', { style: { fontSize: '13px', color: 'var(--label3)', marginBottom: '20px', lineHeight: 1.6 } },
+            'The clinical content in LabLogic is informed by the following guidelines, reviews, and primary literature.'
+          ),
+
+          // Thyroid Function
+          e('div', { style: sectionHeaderStyle }, 'Thyroid Function'),
+          ref('Bartalena, L., Bogazzi, F., Chiovato, L., et al.', '2018', '2018 European Thyroid Association guidelines for the management of amiodarone-associated thyroid dysfunction.', 'European Thyroid Journal', '7(2), 55–66'),
+          ref('Barroso-Sousa, R., Barry, W. T., Garrido-Castro, A. C., et al.', '2018', 'Incidence of endocrine dysfunction following the use of different immune checkpoint inhibitor regimens.', 'JAMA Oncology', '4(2), 173–182'),
+          ref('Beck-Peccoz, P., Persani, L., Mannavola, D., & Campi, I.', '2009', 'Pituitary tumours: TSH-secreting adenomas.', 'Best Practice & Research Clinical Endocrinology & Metabolism', '23(5), 597–606'),
+          ref('Bocchetta, A., & Loviselli, A.', '2006', 'Lithium treatment and thyroid abnormalities.', 'Clinical Practice and Epidemiology in Mental Health', '2, 23'),
+          ref('Chiha, M., Samarasinghe, S., & Kabaker, A. S.', '2015', 'Thyroid storm: An updated review.', 'Journal of Intensive Care Medicine', '30(3), 131–140'),
+          ref('Fliers, E., Bianco, A. C., Langouche, L., & Boelen, A.', '2015', 'Thyroid function in critically ill patients.', 'The Lancet Diabetes & Endocrinology', '3(10), 816–825'),
+          ref('Garber, J. R., Cobin, R. H., Gharib, H., et al.', '2012', 'Clinical practice guidelines for hypothyroidism in adults.', 'Thyroid', '22(12), 1200–1235'),
+          ref('Hershman, J. M.', '2004', 'Physiological and pathological aspects of the effect of human chorionic gonadotropin on the thyroid.', 'Best Practice & Research Clinical Endocrinology & Metabolism', '18(2), 249–265'),
+          ref('Kricka, L. J.', '1999', 'Human anti-animal antibody interferences in immunological assays.', 'Clinical Chemistry', '45(7), 942–956'),
+          ref('Li, D., Radulescu, A., Shrestha, R. T., et al.', '2017', 'Association of biotin ingestion with performance of hormone and nonhormone assays in healthy adults.', 'JAMA', '318(12), 1150–1160'),
+          ref('Pappa, T. A., Vagenakis, A. G., & Alevizaki, M.', '2011', 'The nonthyroidal illness syndrome in the non-critically ill patient.', 'European Journal of Clinical Investigation', '41(2), 212–220'),
+          ref('Persani, L., Cangiano, B., & Bonomi, M.', '2019', 'The diagnosis and management of central hypothyroidism in 2018.', 'Endocrine Connections', '8(2), R44–R54'),
+          ref('Refetoff, S., & Dumitrescu, A. M.', '2007', 'Syndromes of reduced sensitivity to thyroid hormone.', 'Best Practice & Research Clinical Endocrinology & Metabolism', '21(2), 277–305'),
+          ref('Ross, D. S., Burch, H. B., Cooper, D. S., et al.', '2016', '2016 American Thyroid Association guidelines for diagnosis and management of hyperthyroidism.', 'Thyroid', '26(10), 1343–1421'),
+          ref('Wall, C. R.', '2000', 'Myxedema coma: Diagnosis and treatment.', 'American Family Physician', '62(11), 2485–2490'),
+          ref('Warner, M. H., & Beckett, G. J.', '2010', 'Mechanisms behind the non-thyroidal illness syndrome: An update.', 'Journal of Endocrinology', '205(1), 1–13'),
+
+          // Hyponatraemia
+          e('div', { style: sectionHeaderStyle }, 'Hyponatraemia'),
+          ref('Ayus, J. C., Moritz, M. L., Fuentes, N. A., et al.', '2025', 'Correction rates and clinical outcomes in hospitalized adults with severe hyponatremia.', 'JAMA Internal Medicine', '185(1), 38–51'),
+          ref('Ellison, D. H., & Berl, T.', '2007', 'The syndrome of inappropriate antidiuresis.', 'New England Journal of Medicine', '356(20), 2064–2072'),
+          ref('Liamis, G., Liberopoulos, E., Barkas, F., & Elisaf, M.', '2014', 'Spurious electrolyte disorders: A diagnostic challenge for clinicians.', 'American Journal of Nephrology', '38(1), 50–57'),
+          ref('Liamis, G., Milionis, H., & Elisaf, M.', '2008', 'A review of drug-induced hyponatremia.', 'American Journal of Kidney Diseases', '52(1), 144–153'),
+          ref('MacMillan, T. E., Shin, S., Topf, J., et al.', '2023', 'Osmotic demyelination syndrome in patients hospitalized with hyponatremia.', 'NEJM Evidence', '2(4), EVIDoa2200215'),
+          ref('Schrier, R. W.', '1988', 'Pathogenesis of sodium and water retention in high-output and low-output cardiac failure, nephrotic syndrome, cirrhosis, and pregnancy.', 'New England Journal of Medicine', '319(17), 1127–1134'),
+          ref('Seethapathy, H., Zhao, S., Ouyang, T., et al.', '2023', 'Severe hyponatremia correction, mortality, and central pontine myelinolysis.', 'NEJM Evidence', '2(8), EVIDoa2300107'),
+          ref('Spasovski, G., Vanholder, R., Allolio, B., et al.', '2014', 'Clinical practice guideline on diagnosis and treatment of hyponatraemia.', 'European Journal of Endocrinology', '170(3), G1–G47'),
+          ref('Sterns, R. H., Riggs, J. E., & Schochet, S. S., Jr.', '1986', 'Osmotic demyelination syndrome following correction of hyponatremia.', 'New England Journal of Medicine', '314(24), 1535–1542'),
+          ref('Verbalis, J. G., Goldsmith, S. R., Greenberg, A., et al.', '2013', 'Diagnosis, evaluation, and treatment of hyponatremia: Expert panel recommendations.', 'American Journal of Medicine', '126(10 Suppl 1), S1–S42'),
+          ref('Yee, A. H., Burns, J. D., & Bhatt, U. Y.', '2010', 'Cerebral salt wasting: Pathophysiology, diagnosis, and treatment.', 'Neurosurgery Clinics of North America', '21(2), 339–352'),
+
+          // Iron Studies
+          e('div', { style: sectionHeaderStyle }, 'Iron Studies'),
+          ref('Camaschella, C.', '2015', 'Iron-deficiency anemia.', 'New England Journal of Medicine', '372(19), 1832–1843'),
+          ref('Dignass, A. U., Gasche, C., Bettenworth, D., et al.', '2015', 'European consensus on the diagnosis and management of iron deficiency and anaemia in inflammatory bowel diseases.', 'Journal of Crohn\'s and Colitis', '9(3), 211–222'),
+          ref('European Association for the Study of the Liver', '2010', 'EASL clinical practice guidelines for HFE hemochromatosis.', 'Journal of Hepatology', '53(1), 3–22'),
+          ref('Ganz, T.', '2011', 'Hepcidin and iron regulation, 10 years later.', 'Blood', '117(17), 4425–4433'),
+          ref('KDIGO Anemia Work Group', '2012', 'KDIGO clinical practice guideline for anemia in chronic kidney disease.', 'Kidney International Supplements', '2(4), 279–335'),
+          ref('McDonagh, T. A., Metra, M., Adamo, M., et al.', '2021', '2021 ESC guidelines for the diagnosis and treatment of acute and chronic heart failure.', 'European Heart Journal', '42(36), 3599–3726'),
+          ref('Rosário, C., Zandman-Goddard, G., Meyron-Holtz, E. G., et al.', '2013', 'The hyperferritinemic syndrome.', 'BMC Medicine', '11, 185'),
+
+          // Coagulation
+          e('div', { style: sectionHeaderStyle }, 'Coagulation'),
+          ref('Girolami, A., Ruzzon, E., Tezza, F., et al.', '2004', 'Arterial and venous thrombosis in rare congenital bleeding disorders: A critical review.', 'Haemophilia', '10(5), 564–577'),
+          ref('Gosselin, R. C., Adcock, D. M., Bates, S. M., et al.', '2018', 'ICSH recommendations for laboratory measurement of direct oral anticoagulants.', 'Thrombosis and Haemostasis', '118(3), 437–450'),
+          ref('Kamal, A. H., Tefferi, A., & Pruthi, R. K.', '2007', 'How to interpret and pursue an abnormal prothrombin time, activated partial thromboplastin time, and bleeding time in adults.', 'Mayo Clinic Proceedings', '82(7), 864–873'),
+          ref('Kershaw, G., & Orellana, D.', '2013', 'Mixing tests: Diagnostic aides in the investigation of prolonged prothrombin times and activated partial thromboplastin times.', 'Seminars in Thrombosis and Hemostasis', '39(3), 283–290'),
+          ref('Kruse-Jarres, R., Kempton, C. L., Baudo, F., et al.', '2017', 'Acquired hemophilia A: Updated review of evidence and treatment guidance.', 'American Journal of Hematology', '92(7), 695–705'),
+          ref('Laffan, M. A., Lester, W., O\'Donnell, J. S., et al.', '2014', 'The diagnosis and management of von Willebrand disease.', 'British Journal of Haematology', '167(4), 453–465'),
+          ref('Levi, M.', '2007', 'Disseminated intravascular coagulation.', 'Critical Care Medicine', '35(9), 2191–2195'),
+          ref('Mumford, A. D., O\'Donnell, J., Gillmore, J. D., et al.', '2000', 'Bleeding symptoms and coagulation abnormalities in 337 patients with AL-amyloidosis.', 'British Journal of Haematology', '110(2), 454–460'),
+          ref('Muszbek, L., Bereczky, Z., Bagoly, Z., et al.', '2011', 'Factor XIII: A coagulation factor with multiple plasmatic and cellular functions.', 'Physiological Reviews', '91(3), 931–972'),
+          ref('Pengo, V., Tripodi, A., Reber, G., et al.', '2009', 'Update of the guidelines for lupus anticoagulant detection.', 'Journal of Thrombosis and Haemostasis', '7(10), 1737–1740'),
+          ref('Scully, M., Hunt, B. J., Benjamin, S., et al.', '2012', 'Guidelines on the diagnosis and management of thrombotic thrombocytopenic purpura.', 'British Journal of Haematology', '158(3), 323–335'),
+          ref('Taylor, F. B., Jr., Toh, C. H., Hoots, W. K., et al.', '2001', 'Towards definition, clinical and laboratory criteria, and a scoring system for disseminated intravascular coagulation.', 'Thrombosis and Haemostasis', '86(5), 1327–1330'),
+
+          // Liver Function Tests
+          e('div', { style: sectionHeaderStyle }, 'Liver Function Tests'),
+          ref('Bernal, W., Hall, C., Karvellas, C. J., et al.', '2007', 'Arterial ammonia and clinical risk factors for encephalopathy and intracranial hypertension in acute liver failure.', 'Hepatology', '46(6), 1844–1852'),
+          ref('Bernal, W., & Wendon, J.', '2013', 'Acute liver failure.', 'New England Journal of Medicine', '369(26), 2525–2534'),
+          ref('Björnsson, E. S.', '2015', 'Drug-induced liver injury: An overview over the most critical compounds.', 'Archives of Toxicology', '89(3), 327–334'),
+          ref('Bosma, P. J.', '2003', 'Inherited disorders of bilirubin metabolism.', 'Journal of Hepatology', '38(1), 107–117'),
+          ref('Ge, P. S., & Runyon, B. A.', '2014', 'Serum ammonia level for the evaluation of hepatic encephalopathy.', 'JAMA', '312(6), 643–644'),
+          ref('Korman, J. D., Volenberg, I., Balko, J., et al.', '2008', 'Screening for Wilson disease in acute liver failure.', 'Hepatology', '48(4), 1167–1174'),
+          ref('Kwo, P. Y., Cohen, S. M., & Lim, J. K.', '2017', 'ACG clinical guideline: Evaluation of abnormal liver chemistries.', 'American Journal of Gastroenterology', '112(1), 18–35'),
+          ref('Lindor, K. D., Bowlus, C. L., Boyer, J., et al.', '2019', 'Primary biliary cholangitis: 2018 Practice Guidance from the AASLD.', 'Hepatology', '69(1), 394–419'),
+          ref('Lindor, K. D., Kowdley, K. V., & Harrison, M. E.', '2015', 'ACG clinical guideline: Primary sclerosing cholangitis.', 'American Journal of Gastroenterology', '110(5), 646–659'),
+          ref('Newsome, P. N., Cramb, R., Davison, S. M., et al.', '2018', 'Guidelines on the management of abnormal liver blood tests.', 'Gut', '67(1), 6–19'),
+          ref('O\'Grady, J. G., Schalm, S. W., & Williams, R.', '1993', 'Acute liver failure: Redefining the syndromes.', 'The Lancet', '342(8866), 273–275'),
+          ref('Rinella, M. E., Lazarus, J. V., Ratziu, V., et al.', '2023', 'A multisociety Delphi consensus statement on new fatty liver disease nomenclature.', 'Hepatology', '78(6), 1966–1986'),
+          ref('Sorbi, D., Boynton, J., & Lindor, K. D.', '1999', 'The ratio of aspartate aminotransferase to alanine aminotransferase: Potential value in differentiating nonalcoholic steatohepatitis from alcoholic liver disease.', 'American Journal of Gastroenterology', '94(4), 1018–1022'),
+          ref('Vilstrup, H., Amodio, P., Bajaj, J., et al.', '2014', 'Hepatic encephalopathy in chronic liver disease: 2014 Practice Guideline by the AASLD and EASL.', 'Hepatology', '60(2), 715–735'),
+          ref('Williams, A. L. B., & Hoofnagle, J. H.', '1988', 'Ratio of serum aspartate to alanine aminotransferase in chronic hepatitis: Relationship to cirrhosis.', 'Gastroenterology', '95(3), 734–739'),
+
+          // Footer
+          e('div', { style: { textAlign: 'center', padding: '16px', marginTop: '16px', borderTop: '1px solid var(--sep)' } },
+            e('p', { style: { fontSize: '11px', color: 'var(--label4)' } }, '© 2026 Critical Condition Pty Ltd')
+          )
+        )
+      );
+    }
+
     // ========== FULL TERMS SCREEN ==========
 
     function FullTermsScreen({ onBack }) {
@@ -4467,9 +4639,24 @@
         );
       }
 
+      // Info screen
+      if (screen === 'info') {
+        return e(InfoScreen, {
+          onBack: () => setScreen('home'),
+          onNavigate: setScreen
+        });
+      }
+
+      // References screen
+      if (screen === 'references') {
+        return e(ReferencesScreen, {
+          onBack: () => setScreen('info')
+        });
+      }
+
       // Terms screen
       if (screen === 'terms') {
-        return e(FullTermsScreen, { onBack: () => setScreen('home') });
+        return e(FullTermsScreen, { onBack: () => setScreen('info') });
       }
 
       if (screen === 'home') {
